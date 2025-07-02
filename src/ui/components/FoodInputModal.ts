@@ -17,6 +17,7 @@ export class FoodInputModal extends Modal {
     private fileService: FileService
   ) {
     super(app);
+    this.modalEl.addClass('nutrition-tracker-modal');
   }
 
   onOpen() {
@@ -26,7 +27,7 @@ export class FoodInputModal extends Modal {
     contentEl.createEl('h2', { text: 'Add Food Entry' });
 
     // Food description input
-    new Setting(contentEl)
+    const foodDescSetting = new Setting(contentEl)
       .setName('Food description')
       .setDesc('Describe what you ate (e.g., "2 eggs scrambled with butter, 1 slice of whole grain toast")')
       .addTextArea(text => {
@@ -38,13 +39,15 @@ export class FoodInputModal extends Modal {
             this.updateButtonState();
           });
         
-        // Make the text area larger
-        text.inputEl.style.minHeight = '100px';
-        text.inputEl.style.width = '100%';
+        // Add class for CSS targeting
+        text.inputEl.addClass('nutrition-tracker-food-input');
       });
+    
+    // Add class to the setting container
+    foodDescSetting.settingEl.addClass('nutrition-tracker-food-setting');
 
     // Image upload
-    new Setting(contentEl)
+    const imageUploadSetting = new Setting(contentEl)
       .setName('Food image (optional)')
       .setDesc('Upload an image of your food for better accuracy')
       .addButton(button => {
@@ -53,6 +56,9 @@ export class FoodInputModal extends Modal {
           .onClick(() => this.selectImage())
           .setDisabled(this.isProcessing);
       });
+    
+    // Add class to keep this setting horizontal
+    imageUploadSetting.settingEl.addClass('nutrition-tracker-image-setting');
 
     // Show selected image info
     if (this.selectedImage) {

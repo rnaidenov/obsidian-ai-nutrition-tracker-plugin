@@ -12,21 +12,101 @@
 .nutrition-tracker-modal .setting-item {
   border: none;
   padding: 10px 0;
+  display: flex;
+  flex-direction: column;
 }
 
 .nutrition-tracker-modal .setting-item-info {
   flex-grow: 1;
+  margin-bottom: 10px;
 }
 
 .nutrition-tracker-modal .setting-item-control {
-  flex-shrink: 0;
-  margin-left: 10px;
+  width: 100%;
+  min-height: 64px;
+  display: flex;
+  margin-left: 0;
 }
 
 .nutrition-tracker-modal textarea {
-  min-height: 80px;
-  font-family: var(--font-monospace);
+  min-height: 100px !important;
+  width: 100% !important;
+  font-family: var(--font-interface);
   resize: vertical;
+  box-sizing: border-box;
+}
+
+/* Direct targeting approach */
+.nutrition-tracker-food-input {
+  min-height: 100px !important;
+  width: 100% !important;
+  min-width: 100% !important;
+  max-width: 100% !important;
+  font-family: var(--font-interface) !important;
+  resize: vertical !important;
+  box-sizing: border-box !important;
+}
+
+/* Layout for the food description setting */
+.nutrition-tracker-food-setting {
+  display: flex !important;
+  flex-direction: column !important;
+  border: none !important;
+  padding: 10px 0 !important;
+}
+
+/* Keep image setting horizontal */
+.nutrition-tracker-image-setting {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  border: none !important;
+  padding: 10px 0 !important;
+}
+
+.nutrition-tracker-image-setting .setting-item-info {
+  flex-grow: 1 !important;
+  margin-right: 15px !important;
+}
+
+.nutrition-tracker-food-setting .setting-item-info {
+  margin-bottom: 10px !important;
+}
+
+.nutrition-tracker-food-setting .setting-item-control {
+  width: 100% !important;
+  min-height: 64px !important;
+  display: flex !important;
+  margin-left: 0 !important;
+}
+
+/* Fallback with :has() selector */
+.setting-item:has(.nutrition-tracker-food-input) {
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+.setting-item:has(.nutrition-tracker-food-input) .setting-item-info {
+  margin-bottom: 10px !important;
+}
+
+.setting-item:has(.nutrition-tracker-food-input) .setting-item-control {
+  width: 100% !important;
+  min-height: 64px !important;
+  display: flex !important;
+  margin-left: 0 !important;
+}
+
+/* Fallback by placeholder */
+textarea[placeholder*="Enter food description"] {
+  min-height: 100px !important;
+  width: 100% !important;
+  min-width: 100% !important;
+  max-width: 100% !important;
+  font-family: var(--font-interface) !important;
+  resize: vertical !important;
+  box-sizing: border-box !important;
 }
 
 .nutrition-tracker-modal .modal-button-container {
@@ -124,11 +204,13 @@
   background: var(--background-secondary);
   padding: 15px;
   border-radius: 8px;
-  margin: 15px 0;
+  margin: 5px 0 15px 0;
   border: 1px solid var(--background-modifier-border);
   display: flex;
   align-items: center;
   justify-content: space-between;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .nutrition-tracker-selected-image p {
