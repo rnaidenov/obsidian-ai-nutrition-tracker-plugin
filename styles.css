@@ -1,7 +1,8 @@
 /* Nutrition Tracker Plugin Styles */
 
 .nutrition-tracker-modal {
-  min-width: 400px;
+  min-width: 600px;
+  max-width: 800px;
 }
 
 .nutrition-tracker-modal .modal-content {
@@ -116,4 +117,88 @@
   color: var(--text-accent);
   border-bottom: 1px solid var(--background-modifier-border);
   padding-bottom: 5px;
+}
+
+/* Food Input Modal Styles */
+.nutrition-tracker-selected-image {
+  background: var(--background-secondary);
+  padding: 15px;
+  border-radius: 8px;
+  margin: 15px 0;
+  border: 1px solid var(--background-modifier-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.nutrition-tracker-selected-image p {
+  margin: 0;
+  color: var(--text-normal);
+  font-size: 0.9em;
+}
+
+.nutrition-tracker-remove-image {
+  background: var(--interactive-accent);
+  color: var(--text-on-accent);
+  border: none;
+  padding: 5px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.8em;
+  transition: background-color 0.2s;
+}
+
+.nutrition-tracker-remove-image:hover {
+  background: var(--interactive-accent-hover);
+}
+
+.nutrition-tracker-processing {
+  background: var(--background-secondary);
+  padding: 15px;
+  border-radius: 8px;
+  margin: 15px 0;
+  text-align: center;
+  color: var(--text-accent);
+  font-weight: 500;
+  border: 1px solid var(--background-modifier-border);
+}
+
+.nutrition-tracker-button-container {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 30px;
+}
+
+.nutrition-tracker-button-container button {
+  padding: 10px 20px;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 6px;
+  background: var(--background-primary);
+  color: var(--text-normal);
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.nutrition-tracker-button-container button:hover:not(:disabled) {
+  background: var(--background-secondary);
+  border-color: var(--background-modifier-border-hover);
+}
+
+.nutrition-tracker-button-container button.mod-cta {
+  background: var(--interactive-accent);
+  color: var(--text-on-accent);
+  border-color: var(--interactive-accent);
+}
+
+.nutrition-tracker-button-container button.mod-cta:hover:not(:disabled) {
+  background: var(--interactive-accent-hover);
+  border-color: var(--interactive-accent-hover);
+}
+
+.nutrition-tracker-button-container button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 } 

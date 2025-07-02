@@ -2,18 +2,26 @@ import { Plugin, TFile, Notice } from 'obsidian';
 import { FoodInputModal } from './src/ui/components/FoodInputModal';
 import { SettingsTab } from './src/ui/settings/SettingsTab';
 import { PluginSettings, DEFAULT_SETTINGS } from './src/types/settings';
+import { LLMService } from './src/services/llm-service';
+import { FileService } from './src/services/file-service';
 
 export default class NutritionTrackerPlugin extends Plugin {
   settings: PluginSettings;
+  llmService: LLMService;
+  fileService: FileService;
 
   async onload() {
     console.log('Loading Nutrition Tracker Plugin');
     
     await this.loadSettings();
     
+    // Initialize services
+    this.llmService = new LLMService(this.settings);
+    this.fileService = new FileService(this.app.vault, this.settings);
+    
     // Add ribbon icon
     this.addRibbonIcon('apple', 'Log Food', () => {
-      new FoodInputModal(this.app, this).open();
+      this.openFoodInputModal();
     });
 
     // Add command palette command
@@ -21,7 +29,7 @@ export default class NutritionTrackerPlugin extends Plugin {
       id: 'open-food-log-modal',
       name: 'Log Food Entry',
       callback: () => {
-        new FoodInputModal(this.app, this).open();
+        this.openFoodInputModal();
       }
     });
 
@@ -47,12 +55,33 @@ export default class NutritionTrackerPlugin extends Plugin {
     console.log('Unloading Nutrition Tracker Plugin');
   }
 
+  private openFoodInputModal() {
+    new FoodInputModal(
+      this.app, 
+      this.settings, 
+      this.llmService, 
+      this.fileService
+    ).open();
+  }
+
   async loadSettings() {
     this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+    
+    // Update services with new settings if they exist
+    if (this.llmService) {
+      this.llmService = new LLMService(this.settings);
+    }
+    if (this.fileService) {
+      this.fileService = new FileService(this.app.vault, this.settings);
+    }
   }
 
   async saveSettings() {
     await this.saveData(this.settings);
+    
+    // Update services with new settings
+    this.llmService = new LLMService(this.settings);
+    this.fileService = new FileService(this.app.vault, this.settings);
   }
 
   private async openTodaysFoodLog() {
