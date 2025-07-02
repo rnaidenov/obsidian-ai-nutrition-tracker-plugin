@@ -1,0 +1,119 @@
+/* Nutrition Tracker Plugin Styles */
+
+.nutrition-tracker-modal {
+  min-width: 400px;
+}
+
+.nutrition-tracker-modal .modal-content {
+  padding: 20px;
+}
+
+.nutrition-tracker-modal .setting-item {
+  border: none;
+  padding: 10px 0;
+}
+
+.nutrition-tracker-modal .setting-item-info {
+  flex-grow: 1;
+}
+
+.nutrition-tracker-modal .setting-item-control {
+  flex-shrink: 0;
+  margin-left: 10px;
+}
+
+.nutrition-tracker-modal textarea {
+  min-height: 80px;
+  font-family: var(--font-monospace);
+  resize: vertical;
+}
+
+.nutrition-tracker-modal .modal-button-container {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+  padding-top: 10px;
+  border-top: 1px solid var(--background-modifier-border);
+}
+
+.nutrition-tracker-modal .mod-cta {
+  background-color: var(--interactive-accent);
+  color: var(--text-on-accent);
+}
+
+.nutrition-tracker-modal .mod-cta:hover {
+  background-color: var(--interactive-accent-hover);
+}
+
+/* Progress bars */
+.nutrition-progress {
+  margin: 10px 0;
+}
+
+.nutrition-progress-bar {
+  width: 100%;
+  height: 20px;
+  background-color: var(--background-secondary);
+  border-radius: 10px;
+  overflow: hidden;
+  margin: 5px 0;
+}
+
+.nutrition-progress-fill {
+  height: 100%;
+  background-color: var(--interactive-accent);
+  transition: width 0.3s ease;
+}
+
+.nutrition-progress-text {
+  font-size: 0.9em;
+  color: var(--text-muted);
+  text-align: right;
+  margin-top: 2px;
+}
+
+/* Food items */
+.food-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  margin: 4px 0;
+  background-color: var(--background-secondary);
+  border-radius: 8px;
+  border-left: 3px solid var(--interactive-accent);
+}
+
+.food-item-name {
+  font-weight: 500;
+  color: var(--text-normal);
+}
+
+.food-item-quantity {
+  font-size: 0.9em;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.food-item-nutrition {
+  display: flex;
+  gap: 12px;
+  font-size: 0.85em;
+  color: var(--text-muted);
+}
+
+.food-item-nutrition span {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+/* Settings */
+.nutrition-tracker-settings h3 {
+  margin-top: 30px;
+  margin-bottom: 15px;
+  color: var(--text-accent);
+  border-bottom: 1px solid var(--background-modifier-border);
+  padding-bottom: 5px;
+} 

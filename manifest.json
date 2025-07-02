@@ -1,0 +1,10 @@
+{
+  "id": "nutrition-tracker",
+  "name": "Nutrition Tracker",
+  "version": "1.0.0",
+  "minAppVersion": "0.15.0",
+  "description": "AI-powered nutrition tracking with customizable goals and templates",
+  "author": "Rado",
+  "authorUrl": "https://github.com/rado",
+  "isDesktopOnly": false
+} 
