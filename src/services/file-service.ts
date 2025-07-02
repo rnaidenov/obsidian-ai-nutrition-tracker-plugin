@@ -74,37 +74,98 @@ export class FileService {
 
   private async replaceInExistingLog(file: TFile, newFoodItems: FoodItem[], originalEntry: { food: string, quantity: string, calories: number, protein: number, carbs: number, fat: number }): Promise<void> {
     const existingContent = await this.vault.read(file);
-    let updatedContent = existingContent;
     
-    // Find the complete card by using a more robust approach
-    const found = this.findAndReplaceCompleteCard(updatedContent, originalEntry);
-    if (found.success) {
-      updatedContent = found.content;
-      console.log('Successfully found and removed complete card');
+    // Find and replace the card in its original position
+    const replacement = this.replaceCardInPosition(existingContent, originalEntry, newFoodItems);
+    if (replacement.success) {
+      console.log('Successfully replaced entry in original position');
+      // Recalculate totals and update summary
+      const finalContent = await this.recalculateTotals(replacement.content);
+      await this.vault.modify(file, finalContent);
     } else {
-      console.warn('Original entry not found for replacement, appending new entry instead');
-      console.log('Original entry:', originalEntry);
+      console.warn('Original entry not found for replacement, falling back to append');
+      // Fallback to the old append logic
+      await this.appendToExistingLog(file, newFoodItems);
+    }
+  }
+
+  private replaceCardInPosition(content: string, originalEntry: { food: string, quantity: string, calories: number, protein: number, carbs: number, fat: number }, newFoodItems: FoodItem[]): { success: boolean, content: string } {
+    // Find the start of the card using data attributes
+    const escapedFood = originalEntry.food.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/"/g, '&quot;');
+    const escapedQuantity = originalEntry.quantity.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/"/g, '&quot;');
+    
+    const cardPosition = this.findCardPosition(content, escapedFood, escapedQuantity, originalEntry.calories);
+    if (!cardPosition.success) {
+      return { success: false, content };
     }
     
-    // Add new entries
-    const newEntries = await this.generateFoodLogContent(newFoodItems, false);
+    // Generate the new card content
+    const newCardContent = this.generateCardLayout(newFoodItems);
     
-    // Find the position to insert new entries (before the daily summary)
-    const summaryRegex = /## 📊 Daily Summary[\s\S]*$/;
-    const match = updatedContent.match(summaryRegex);
+    // Replace the old card with the new card at the exact position
+    const beforeCard = content.substring(0, cardPosition.startIndex);
+    const afterCard = content.substring(cardPosition.endIndex);
     
-    if (match) {
-      // Remove the existing summary and insert new entries
-      const beforeSummary = updatedContent.substring(0, match.index);
-      updatedContent = beforeSummary + newEntries;
-    } else {
-      // No summary found, just append new entries
-      updatedContent = updatedContent + '\n' + newEntries;
+    // Clean up any extra whitespace and insert new card
+    const cleanedAfter = afterCard.replace(/^\s*\n\s*/, '\n');
+    const updatedContent = beforeCard + newCardContent.trim() + cleanedAfter;
+    
+    return { success: true, content: updatedContent };
+  }
+
+  private findCardPosition(content: string, escapedFood: string, escapedQuantity: string, calories: number): { success: boolean, startIndex: number, endIndex: number } {
+    const startPattern = new RegExp(
+      `<div[^>]*data-ntr-food="${escapedFood}"[^>]*data-ntr-quantity="${escapedQuantity}"[^>]*data-ntr-calories="${calories}"[^>]*>`,
+      'gi'
+    );
+    
+    const startMatch = startPattern.exec(content);
+    if (!startMatch) {
+      // Try alternative attribute order
+      const startPattern2 = new RegExp(
+        `<div[^>]*data-ntr-calories="${calories}"[^>]*data-ntr-food="${escapedFood}"[^>]*data-ntr-quantity="${escapedQuantity}"[^>]*>`,
+        'gi'
+      );
+      const startMatch2 = startPattern2.exec(content);
+      if (!startMatch2) {
+        return { success: false, startIndex: -1, endIndex: -1 };
+      }
+      const cardBounds = this.findCardBounds(content, startMatch2.index);
+      return { success: cardBounds.success, startIndex: startMatch2.index, endIndex: cardBounds.endIndex };
     }
     
-    // Recalculate totals and add summary
-    const finalContent = await this.recalculateTotals(updatedContent);
-    await this.vault.modify(file, finalContent);
+    const cardBounds = this.findCardBounds(content, startMatch.index);
+    return { success: cardBounds.success, startIndex: startMatch.index, endIndex: cardBounds.endIndex };
+  }
+
+  private findCardBounds(content: string, startIndex: number): { success: boolean, endIndex: number } {
+    let divCount = 0;
+    let i = startIndex;
+    
+    // Find the opening div
+    while (i < content.length && content.charAt(i) !== '>') {
+      i++;
+    }
+    i++; // Move past the >
+    divCount = 1;
+    
+    // Count divs to find the matching closing div
+    while (i < content.length && divCount > 0) {
+      if (content.substring(i, i + 4) === '<div') {
+        divCount++;
+        i += 4;
+      } else if (content.substring(i, i + 6) === '</div>') {
+        divCount--;
+        if (divCount === 0) {
+          return { success: true, endIndex: i + 6 };
+        }
+        i += 6;
+      } else {
+        i++;
+      }
+    }
+    
+    return { success: false, endIndex: -1 };
   }
 
   private findAndReplaceCompleteCard(content: string, originalEntry: { food: string, quantity: string, calories: number, protein: number, carbs: number, fat: number }): { success: boolean, content: string } {

@@ -1,5 +1,5 @@
 {
-  "openRouterApiKey": "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",
+  "openRouterApiKey": "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",
   "llmModel": "google/gemini-2.5-flash-preview-05-20",
   "nutritionGoals": {
     "calories": 2000,
