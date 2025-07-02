@@ -158,5 +158,52 @@ export class SettingsTab extends PluginSettingTab {
           this.plugin.settings.dateFormat = value || 'YYYY-MM-DD';
           await this.plugin.saveSettings();
         }));
+
+    // Display Settings Section
+    containerEl.createEl('h3', { text: '🎨 Display Settings' });
+
+    new Setting(containerEl)
+      .setName('Layout Style')
+      .setDesc('Choose how food entries are displayed in your logs')
+      .addDropdown(dropdown => {
+        dropdown
+          .addOption('simple', 'Simple (Compact)')
+          .addOption('cards', 'Cards (Visual)')
+          .setValue(this.plugin.settings.layoutStyle)
+          .onChange(async (value: 'simple' | 'cards') => {
+            this.plugin.settings.layoutStyle = value;
+            await this.plugin.saveSettings();
+          });
+      });
+
+    new Setting(containerEl)
+      .setName('Display Theme')
+      .setDesc('Theme for generated food logs')
+      .addDropdown(dropdown => {
+        dropdown
+          .addOption('auto', 'Auto (Match Obsidian)')
+          .addOption('light', 'Light Theme')
+          .addOption('dark', 'Dark Theme')
+          .setValue(this.plugin.settings.displayTheme)
+          .onChange(async (value: 'auto' | 'light' | 'dark') => {
+            this.plugin.settings.displayTheme = value;
+            await this.plugin.saveSettings();
+          });
+      });
+
+    new Setting(containerEl)
+      .setName('Progress Bar Style')
+      .setDesc('How nutrition progress is displayed')
+      .addDropdown(dropdown => {
+        dropdown
+          .addOption('emoji-dots', 'Emoji Dots (🔴🟡🟢)')
+          .addOption('modern-bars', 'Modern Progress Bars')
+          .addOption('percentage-only', 'Percentage Only')
+          .setValue(this.plugin.settings.progressBarStyle)
+          .onChange(async (value: 'emoji-dots' | 'modern-bars' | 'percentage-only') => {
+            this.plugin.settings.progressBarStyle = value;
+            await this.plugin.saveSettings();
+          });
+      });
   }
 } 

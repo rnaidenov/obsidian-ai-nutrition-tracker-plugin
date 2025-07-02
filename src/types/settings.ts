@@ -9,6 +9,11 @@ export interface PluginSettings {
   imageStoragePath: string;
   autoCreateDailyNotes: boolean;
   dateFormat: string;
+  
+  // Display Settings
+  layoutStyle: 'simple' | 'cards';
+  displayTheme: 'auto' | 'light' | 'dark';
+  progressBarStyle: 'emoji-dots' | 'modern-bars' | 'percentage-only';
 }
 
 export const DEFAULT_SETTINGS: PluginSettings = {
@@ -24,5 +29,10 @@ export const DEFAULT_SETTINGS: PluginSettings = {
   templatePath: 'templates/Food Log Template.md',
   imageStoragePath: 'tracker/health/food/log/images',
   autoCreateDailyNotes: true,
-  dateFormat: 'YYYY-MM-DD'
+  dateFormat: 'YYYY-MM-DD',
+  
+  // Display Settings Defaults
+  layoutStyle: 'cards',
+  displayTheme: 'auto',
+  progressBarStyle: 'emoji-dots'
 }; 

@@ -1,15 +1,18 @@
 {
-  "openRouterApiKey": "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",
+  "openRouterApiKey": "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",
   "llmModel": "google/gemini-2.5-flash-preview-05-20",
   "nutritionGoals": {
     "calories": 2000,
     "protein": 150,
-    "carbs": 100,
+    "carbs": 50,
     "fat": 80
   },
   "logStoragePath": "tracker/health/food/log",
   "templatePath": "templates/Food Log Template.md",
   "imageStoragePath": "tracker/health/food/log/images",
   "autoCreateDailyNotes": true,
-  "dateFormat": "YYYY-MM-DD"
+  "dateFormat": "YYYY-MM-DD",
+  "layoutStyle": "cards",
+  "displayTheme": "light",
+  "progressBarStyle": "modern-bars"
 }

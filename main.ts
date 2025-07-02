@@ -9,6 +9,7 @@ export default class NutritionTrackerPlugin extends Plugin {
   settings: PluginSettings;
   llmService: LLMService;
   fileService: FileService;
+  private editButtonHandler: (event: Event) => void;
 
   async onload() {
     console.log('Loading Nutrition Tracker Plugin');
@@ -49,10 +50,18 @@ export default class NutritionTrackerPlugin extends Plugin {
     if (!this.settings.openRouterApiKey) {
       new Notice('Nutrition Tracker: Please configure your OpenRouter API key in settings');
     }
+
+    // Set up event delegation for edit buttons
+    this.setupEditButtonEventHandling();
   }
 
   async onunload() {
     console.log('Unloading Nutrition Tracker Plugin');
+    
+    // Clean up event listener
+    if (this.editButtonHandler) {
+      document.removeEventListener('click', this.editButtonHandler);
+    }
   }
 
   private openFoodInputModal() {
@@ -62,6 +71,53 @@ export default class NutritionTrackerPlugin extends Plugin {
       this.llmService, 
       this.fileService
     ).open();
+  }
+
+  private editFoodEntry(food: string, quantity: string, calories: number, protein: number, carbs: number, fat: number) {
+    const modal = new FoodInputModal(
+      this.app, 
+      this.settings, 
+      this.llmService, 
+      this.fileService
+    );
+    
+    // Pre-fill the modal with existing data
+    modal.setInitialData({
+      food,
+      quantity,
+      calories,
+      protein,
+      carbs,
+      fat
+    });
+    
+    modal.open();
+  }
+
+  private setupEditButtonEventHandling() {
+    // Use event delegation to handle clicks on edit buttons
+    this.editButtonHandler = (event: Event) => {
+      const target = event.target as HTMLElement;
+      
+      if (target && target.classList.contains('nutrition-edit-btn')) {
+        event.preventDefault();
+        
+        // Extract data from button attributes
+        const food = target.getAttribute('data-food') || '';
+        const quantity = target.getAttribute('data-quantity') || '';
+        const calories = parseFloat(target.getAttribute('data-calories') || '0');
+        const protein = parseFloat(target.getAttribute('data-protein') || '0');
+        const carbs = parseFloat(target.getAttribute('data-carbs') || '0');
+        const fat = parseFloat(target.getAttribute('data-fat') || '0');
+        
+        console.log('Edit button clicked via event delegation:', { food, quantity, calories, protein, carbs, fat });
+        new Notice(`Editing: ${food} (${quantity})`);
+        
+        this.editFoodEntry(food, quantity, calories, protein, carbs, fat);
+      }
+    };
+    
+    document.addEventListener('click', this.editButtonHandler);
   }
 
   async loadSettings() {

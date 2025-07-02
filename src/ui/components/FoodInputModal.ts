@@ -9,6 +9,7 @@ export class FoodInputModal extends Modal {
   private isProcessing: boolean = false;
   private processButton: HTMLButtonElement | null = null;
   private processingIndicator: HTMLElement | null = null;
+  private initialData: any = null;
 
   constructor(
     app: App, 
@@ -20,11 +21,32 @@ export class FoodInputModal extends Modal {
     this.modalEl.addClass('nutrition-tracker-modal');
   }
 
+  setInitialData(data: { food: string, quantity: string, calories: number, protein: number, carbs: number, fat: number }) {
+    this.initialData = data;
+    this.description = `${data.quantity} ${data.food}`;
+  }
+
   onOpen() {
     const { contentEl } = this;
     contentEl.empty();
 
-    contentEl.createEl('h2', { text: 'Add Food Entry' });
+    const title = this.initialData ? 'Edit Food Entry' : 'Add Food Entry';
+    contentEl.createEl('h2', { text: title });
+
+    // Add editing notice
+    if (this.initialData) {
+      const isDarkTheme = document.body.classList.contains('theme-dark');
+      const notice = contentEl.createEl('p', { 
+        text: `✏️ Editing: ${this.initialData.quantity} ${this.initialData.food} (${this.initialData.calories} kcal). Modify description as needed - this will create a new entry.`,
+        cls: 'nutrition-tracker-edit-notice'
+      });
+      
+      if (isDarkTheme) {
+        notice.style.cssText = 'background: linear-gradient(135deg, #1e3a8a, #3730a3); padding: 12px; border-radius: 8px; border-left: 3px solid #60a5fa; margin-bottom: 16px; font-size: 11px; color: #dbeafe; border: 1px solid rgba(96, 165, 250, 0.2);';
+      } else {
+        notice.style.cssText = 'background: linear-gradient(135deg, #dbeafe, #e0f2fe); padding: 12px; border-radius: 8px; border-left: 3px solid #3b82f6; margin-bottom: 16px; font-size: 11px; color: #1e40af; border: 1px solid rgba(59, 130, 246, 0.2);';
+      }
+    }
 
     // Food description input
     const foodDescSetting = new Setting(contentEl)
@@ -90,8 +112,9 @@ export class FoodInputModal extends Modal {
     cancelButton.addEventListener('click', () => this.close());
     cancelButton.disabled = this.isProcessing;
     
+    const buttonText = this.initialData ? 'Update Food' : 'Process Food';
     this.processButton = buttonContainer.createEl('button', { 
-      text: this.isProcessing ? 'Processing...' : 'Process Food',
+      text: this.isProcessing ? 'Processing...' : buttonText,
       cls: 'mod-cta'
     });
     this.processButton.addEventListener('click', () => this.processFood());
@@ -101,7 +124,8 @@ export class FoodInputModal extends Modal {
   private updateButtonState() {
     if (this.processButton) {
       this.processButton.disabled = this.isProcessing || !this.description.trim();
-      this.processButton.textContent = this.isProcessing ? 'Processing...' : 'Process Food';
+      const buttonText = this.initialData ? 'Update Food' : 'Process Food';
+      this.processButton.textContent = this.isProcessing ? 'Processing...' : buttonText;
     }
     
     if (this.processingIndicator) {
@@ -168,11 +192,21 @@ export class FoodInputModal extends Modal {
       }
 
       // Create or update food log
-      await this.fileService.createOrUpdateFoodLog(foodItems);
+      if (this.initialData) {
+        // Replace the original entry
+        await this.fileService.createOrUpdateFoodLog(foodItems, this.initialData);
+      } else {
+        // Create new entry
+        await this.fileService.createOrUpdateFoodLog(foodItems);
+      }
       
       // Show success message with details
       const totalCalories = foodItems.reduce((sum, item) => sum + item.calories, 0);
-      new Notice(`✅ Successfully processed ${foodItems.length} food item(s) with ${totalCalories} calories`);
+      if (this.initialData) {
+        new Notice(`✅ Successfully replaced "${this.initialData.food}" with ${foodItems.length} item(s) (${totalCalories} kcal)`);
+      } else {
+        new Notice(`✅ Successfully processed ${foodItems.length} food item(s) with ${totalCalories} calories`);
+      }
       
       this.close();
     } catch (error) {
