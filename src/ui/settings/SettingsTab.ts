@@ -36,6 +36,12 @@ export class SettingsTab extends PluginSettingTab {
         .addOption('anthropic/claude-3.5-sonnet', 'Claude 3.5 Sonnet (Recommended)')
         .addOption('openai/gpt-4o', 'GPT-4O')
         .addOption('openai/gpt-4o-mini', 'GPT-4O Mini (Cheaper)')
+        .addOption('google/gemini-2.5-pro', 'Gemini 2.5 Pro (Most Capable)')
+        .addOption('google/gemini-2.5-flash-preview-05-20', 'Gemini 2.5 Flash (Fast & Smart)')
+        .addOption('google/gemini-2.5-flash-preview-05-20:thinking', 'Gemini 2.5 Flash Thinking (Reasoning)')
+        .addOption('google/gemini-2.0-flash-001', 'Gemini 2.0 Flash (Balanced)')
+        .addOption('google/gemini-2.0-flash-lite-001', 'Gemini 2.0 Flash Lite (Cheapest)')
+        .addOption('google/gemini-flash-1.5', 'Gemini 1.5 Flash (Legacy)')
         .setValue(this.plugin.settings.llmModel)
         .onChange(async (value) => {
           this.plugin.settings.llmModel = value;
