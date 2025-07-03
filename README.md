@@ -1,4 +1,4 @@
-# Nutrition Tracker Plugin for Obsidian
+# AI Nutrition Tracker for Obsidian
 
 An AI-powered nutrition tracking plugin for Obsidian that replaces traditional forms with intelligent food analysis.
 

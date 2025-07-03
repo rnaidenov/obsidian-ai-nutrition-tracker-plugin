@@ -13,7 +13,7 @@ export class SettingsTab extends PluginSettingTab {
     const { containerEl } = this;
     containerEl.empty();
     
-    containerEl.createEl('h2', { text: 'Nutrition Tracker Settings' });
+    containerEl.createEl('h2', { text: 'AI Nutrition Tracker Settings' });
 
     // API Configuration Section
     containerEl.createEl('h3', { text: 'AI Configuration' });
@@ -161,20 +161,6 @@ export class SettingsTab extends PluginSettingTab {
 
     // Display Settings Section
     containerEl.createEl('h3', { text: '🎨 Display Settings' });
-
-    new Setting(containerEl)
-      .setName('Layout Style')
-      .setDesc('Choose how food entries are displayed in your logs')
-      .addDropdown(dropdown => {
-        dropdown
-          .addOption('simple', 'Simple (Compact)')
-          .addOption('cards', 'Cards (Visual)')
-          .setValue(this.plugin.settings.layoutStyle)
-          .onChange(async (value: 'simple' | 'cards') => {
-            this.plugin.settings.layoutStyle = value;
-            await this.plugin.saveSettings();
-          });
-      });
 
     new Setting(containerEl)
       .setName('Display Theme')

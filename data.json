@@ -11,7 +11,7 @@
   "templatePath": "templates/Food Log Template.md",
   "imageStoragePath": "tracker/health/food/log/images",
   "autoCreateDailyNotes": true,
-  "dateFormat": "YYYY-MM-DD",
+  "dateFormat": "YY-MM-DD",
   "layoutStyle": "cards",
   "displayTheme": "light",
   "progressBarStyle": "modern-bars"

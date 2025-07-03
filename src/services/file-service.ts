@@ -169,27 +169,46 @@ export class FileService {
   }
 
   private findAndReplaceCompleteCard(content: string, originalEntry: { food: string, quantity: string, calories: number, protein: number, carbs: number, fat: number }): { success: boolean, content: string } {
-    // Find the start of the card using data attributes
+    // Find the start of the entry using data attributes
     const escapedFood = originalEntry.food.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/"/g, '&quot;');
     const escapedQuantity = originalEntry.quantity.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/"/g, '&quot;');
     
-    const startPattern = new RegExp(
+    // Try card layout attributes first (data-ntr-*)
+    const cardPattern = new RegExp(
       `<div[^>]*data-ntr-food="${escapedFood}"[^>]*data-ntr-quantity="${escapedQuantity}"[^>]*data-ntr-calories="${originalEntry.calories}"[^>]*>`,
       'gi'
     );
     
-    const startMatch = startPattern.exec(content);
+    let startMatch = cardPattern.exec(content);
     if (!startMatch) {
-      // Try alternative attribute order
-      const startPattern2 = new RegExp(
+      // Try alternative card attribute order
+      const cardPattern2 = new RegExp(
         `<div[^>]*data-ntr-calories="${originalEntry.calories}"[^>]*data-ntr-food="${escapedFood}"[^>]*data-ntr-quantity="${escapedQuantity}"[^>]*>`,
         'gi'
       );
-      const startMatch2 = startPattern2.exec(content);
-      if (!startMatch2) {
-        return { success: false, content };
+      startMatch = cardPattern2.exec(content);
+    }
+    
+    if (!startMatch) {
+      // Try simple layout attributes (data-*)
+      const simplePattern = new RegExp(
+        `<div[^>]*data-food="${escapedFood}"[^>]*data-quantity="${escapedQuantity}"[^>]*data-calories="${originalEntry.calories}"[^>]*>`,
+        'gi'
+      );
+      startMatch = simplePattern.exec(content);
+      
+      if (!startMatch) {
+        // Try alternative simple attribute order
+        const simplePattern2 = new RegExp(
+          `<div[^>]*data-calories="${originalEntry.calories}"[^>]*data-food="${escapedFood}"[^>]*data-quantity="${escapedQuantity}"[^>]*>`,
+          'gi'
+        );
+        startMatch = simplePattern2.exec(content);
       }
-      return this.extractCompleteCard(content, startMatch2.index);
+    }
+    
+    if (!startMatch) {
+      return { success: false, content };
     }
     
     return this.extractCompleteCard(content, startMatch.index);
@@ -372,30 +391,65 @@ export class FileService {
 
   private generateSimpleLayout(foodItems: FoodItem[]): string {
     let content = '';
+    const isDark = this.getEffectiveTheme() === 'dark';
     
     for (const item of foodItems) {
       const emoji = this.getFoodEmoji(item.food);
       const entryId = `entry-${item.food.replace(/[^a-zA-Z0-9]/g, '-')}-${item.quantity.replace(/[^a-zA-Z0-9]/g, '-')}-${item.calories}`;
       
-      content += `<div id="${entryId}" class="nutrition-food-entry-simple ${entryId}" data-food="${item.food.replace(/"/g, '&quot;')}" data-quantity="${item.quantity.replace(/"/g, '&quot;')}" data-calories="${item.calories}" data-protein="${item.protein}" data-carbs="${item.carbs}" data-fat="${item.fat}">\n\n`;
-      content += `### ${emoji} ${item.food}\n\n`;
-      
-      content += `**${item.quantity}**`;
+      // Time formatting
+      let timeDisplay = '';
       if (item.timestamp) {
         const time = new Date(item.timestamp).toLocaleTimeString('en-US', { 
           hour: '2-digit', 
           minute: '2-digit' 
         });
-        content += ` ・ 🕐 ${time}`;
+        timeDisplay = ` 🕐 ${time}`;
       }
-      content += `\n\n`;
       
-      content += `🔥 ${item.calories} kcal ・ `;
-      content += `💪 ${item.protein}g protein ・ `;
-      content += `🌾 ${item.carbs}g carbs ・ `;
-      content += `🥑 ${item.fat}g fat\n\n`;
+      // Clean theme-based styling
+      const styles = isDark ? {
+        background: 'linear-gradient(135deg, rgba(51, 65, 85, 0.6), rgba(30, 41, 59, 0.4))',
+        borderColor: 'rgba(139, 92, 246, 0.6)',
+        textColor: '#f8fafc',
+        subtleColor: '#cbd5e1',
+        quantityBg: 'rgba(255, 255, 255, 0.1)',
+        shadow: '0 4px 16px rgba(0, 0, 0, 0.3)',
+        editBtnBg: 'rgba(255, 255, 255, 0.08)',
+        editBtnBorder: 'rgba(255, 255, 255, 0.15)'
+      } : {
+        background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.8), rgba(248, 250, 252, 0.6))',
+        borderColor: 'rgba(139, 92, 246, 0.5)',
+        textColor: '#0f172a',
+        subtleColor: '#475569',
+        quantityBg: 'rgba(0, 0, 0, 0.05)',
+        shadow: '0 4px 16px rgba(0, 0, 0, 0.08)',
+        editBtnBg: 'rgba(0, 0, 0, 0.04)',
+        editBtnBorder: 'rgba(0, 0, 0, 0.08)'
+      };
       
-      content += `---\n\n`;
+      // Main container
+      content += `<div id="${entryId}" class="nutrition-food-entry-simple ${entryId}" data-food="${item.food.replace(/"/g, '&quot;')}" data-quantity="${item.quantity.replace(/"/g, '&quot;')}" data-calories="${item.calories}" data-protein="${item.protein}" data-carbs="${item.carbs}" data-fat="${item.fat}" style="margin: 12px 0; padding: 16px 20px; background: ${styles.background}; border-left: 4px solid ${styles.borderColor}; border-radius: 0 12px 12px 0; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); box-shadow: ${styles.shadow};">\n\n`;
+      
+      // Header with food name and edit button
+      content += `<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">\n`;
+      content += `<h3 style="margin: 0; color: ${styles.textColor}; font-size: 18px; font-weight: 600;">${emoji} ${item.food}</h3>\n`;
+      content += `<button class="nutrition-edit-btn" data-food="${item.food.replace(/"/g, '&quot;')}" data-quantity="${item.quantity.replace(/"/g, '&quot;')}" data-calories="${item.calories}" data-protein="${item.protein}" data-carbs="${item.carbs}" data-fat="${item.fat}" style="background: ${styles.editBtnBg}; border: 1px solid ${styles.editBtnBorder}; color: ${styles.subtleColor}; cursor: pointer; font-size: 12px; padding: 4px 8px; border-radius: 6px; transition: all 0.2s ease; opacity: 0.8;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.8'">✏️</button>\n`;
+      content += `</div>\n\n`;
+      
+      // Quantity and time
+      content += `<div style="color: ${styles.textColor}; font-weight: 500; margin-bottom: 10px;">\n`;
+      content += `<span style="background: ${styles.quantityBg}; padding: 2px 8px; border-radius: 6px; font-size: 14px;">${item.quantity}</span>${timeDisplay}\n`;
+      content += `</div>\n\n`;
+      
+      // Nutrition info
+      content += `<div style="color: ${styles.subtleColor}; font-size: 14px; line-height: 1.5;">\n`;
+      content += `🔥 <span style="color: ${isDark ? '#f87171' : '#dc2626'}; font-weight: 600;">${item.calories} kcal</span> ・ `;
+      content += `💪 <span style="color: ${isDark ? '#4ade80' : '#16a34a'}; font-weight: 600;">${item.protein}g protein</span> ・ `;
+      content += `🌾 <span style="color: ${isDark ? '#fbbf24' : '#d97706'}; font-weight: 600;">${item.carbs}g carbs</span> ・ `;
+      content += `🥑 <span style="color: ${isDark ? '#a78bfa' : '#7c3aed'}; font-weight: 600;">${item.fat}g fat</span>\n`;
+      content += `</div>\n\n`;
+      
       content += `</div>\n\n`;
     }
     
@@ -499,63 +553,63 @@ export class FileService {
   private extractFoodItemsFromContent(content: string): FoodItem[] {
     const items: FoodItem[] = [];
     
-    // Extract from data attributes (most reliable)
-    const dataAttributeRegex = /<div[^>]*data-ntr-food="([^"]*)"[^>]*data-ntr-quantity="([^"]*)"[^>]*data-ntr-calories="([\d.]+)"[^>]*>/g;
+    // Try simple layout first (most common - data-food, data-quantity, etc.)
+    const simpleRegex = /class="nutrition-food-entry-simple[^"]*"[^>]*data-food="([^"]*)"[^>]*data-quantity="([^"]*)"[^>]*data-calories="([^"]*)"[^>]*data-protein="([^"]*)"[^>]*data-carbs="([^"]*)"[^>]*data-fat="([^"]*)"/g;
+    
+    // Try card layout (data-ntr-food, data-ntr-quantity, etc.)
+    const cardAttributeRegex = /<div[^>]*data-ntr-food="([^"]*)"[^>]*data-ntr-quantity="([^"]*)"[^>]*data-ntr-calories="([\d.]+)"[^>]*>/g;
     
     // Extract from old HTML card layouts (fallback)
     const htmlCardRegex = /<div style="background: linear-gradient\(135deg,[^"]+\)"[\s\S]*?<h3[^>]*>([^<]+)<\/h3>[\s\S]*?📏 ([^<]+)[\s\S]*?<div style="color: [^"]+; font-weight: bold; font-size: 14px;">([\d.]+)<\/div>[\s\S]*?<div style="color: [^"]+; font-weight: bold; font-size: 14px;">([\d.]+)g<\/div>[\s\S]*?<div style="color: [^"]+; font-weight: bold; font-size: 14px;">([\d.]+)g<\/div>[\s\S]*?<div style="color: [^"]+; font-weight: bold; font-size: 14px;">([\d.]+)g<\/div>/g;
     
-    // Try extracting from simple layout
-    const simpleRegex = /### (?:[^\s]+\s)?(.+?)\n\n\*\*(.+?)\*\*[\s\S]*?🔥 ([\d.]+) kcal[\s\S]*?💪 ([\d.]+)g protein[\s\S]*?🌾 ([\d.]+)g carbs[\s\S]*?🥑 ([\d.]+)g fat/g;
-    
-    // Try data attributes first (most reliable)
+    // Try simple layout first (most reliable for new entries)
     let match;
-    while ((match = dataAttributeRegex.exec(content)) !== null) {
-      // For items with data attributes, we need to extract nutrition from the visual content
-      const food = match[1].replace(/&quot;/g, '"');
-      const quantity = match[2].replace(/&quot;/g, '"');
-      const calories = parseFloat(match[3]);
-      
-      // Find the corresponding nutrition values in the visual content
-      const entryStart = match.index;
-      const entryEndMatch = content.indexOf('</div>', entryStart);
-      const entryContent = content.substring(entryStart, entryEndMatch);
-      
-      // Extract nutrition from the card content
-      const proteinMatch = entryContent.match(/>(\d+(?:\.\d+)?)g<\/div>[\s\S]*?PROTEIN/i);
-      const carbsMatch = entryContent.match(/>(\d+(?:\.\d+)?)g<\/div>[\s\S]*?CARBS/i);
-      const fatMatch = entryContent.match(/>(\d+(?:\.\d+)?)g<\/div>[\s\S]*?FAT/i);
-      
+    while ((match = simpleRegex.exec(content)) !== null) {
       items.push({
-        food,
-        quantity,
-        calories,
-        protein: proteinMatch ? parseFloat(proteinMatch[1]) : 0,
-        carbs: carbsMatch ? parseFloat(carbsMatch[1]) : 0,
-        fat: fatMatch ? parseFloat(fatMatch[1]) : 0
+        food: match[1].replace(/&quot;/g, '"'),
+        quantity: match[2].replace(/&quot;/g, '"'),
+        calories: parseFloat(match[3]),
+        protein: parseFloat(match[4]),
+        carbs: parseFloat(match[5]),
+        fat: parseFloat(match[6])
       });
     }
     
-    // If no data attribute entries found, try HTML card pattern
+    // If no simple layout entries found, try card layout
+    if (items.length === 0) {
+      while ((match = cardAttributeRegex.exec(content)) !== null) {
+        // For items with card data attributes, we need to extract nutrition from the visual content
+        const food = match[1].replace(/&quot;/g, '"');
+        const quantity = match[2].replace(/&quot;/g, '"');
+        const calories = parseFloat(match[3]);
+        
+        // Find the corresponding nutrition values in the visual content
+        const entryStart = match.index;
+        const entryEndMatch = content.indexOf('</div>', entryStart);
+        const entryContent = content.substring(entryStart, entryEndMatch);
+        
+        // Extract nutrition from the card content
+        const proteinMatch = entryContent.match(/>(\d+(?:\.\d+)?)g<\/div>[\s\S]*?PROTEIN/i);
+        const carbsMatch = entryContent.match(/>(\d+(?:\.\d+)?)g<\/div>[\s\S]*?CARBS/i);
+        const fatMatch = entryContent.match(/>(\d+(?:\.\d+)?)g<\/div>[\s\S]*?FAT/i);
+        
+        items.push({
+          food,
+          quantity,
+          calories,
+          protein: proteinMatch ? parseFloat(proteinMatch[1]) : 0,
+          carbs: carbsMatch ? parseFloat(carbsMatch[1]) : 0,
+          fat: fatMatch ? parseFloat(fatMatch[1]) : 0
+        });
+      }
+    }
+    
+    // If still no items found, try old HTML card pattern
     if (items.length === 0) {
       while ((match = htmlCardRegex.exec(content)) !== null) {
         items.push({
           food: match[1].trim(),
           quantity: match[2].trim(),
-          calories: parseFloat(match[3]),
-          protein: parseFloat(match[4]),
-          carbs: parseFloat(match[5]),
-          fat: parseFloat(match[6])
-        });
-      }
-    }
-    
-    // If still no items found, try simple layout
-    if (items.length === 0) {
-      while ((match = simpleRegex.exec(content)) !== null) {
-        items.push({
-          food: match[1],
-          quantity: match[2],
           calories: parseFloat(match[3]),
           protein: parseFloat(match[4]),
           carbs: parseFloat(match[5]),

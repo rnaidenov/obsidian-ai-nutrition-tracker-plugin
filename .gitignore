@@ -107,4 +107,7 @@ dist
 # Obsidian plugin specific
 main.js
 *.js.map
-lib/ 
+lib/
+
+# Plugin data - contains API keys
+data.json 

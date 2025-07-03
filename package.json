@@ -1,5 +1,5 @@
 {
-  "name": "nutrition-tracker-plugin",
+  "name": "ai-nutrition-tracker",
   "version": "1.0.0",
   "description": "AI-powered nutrition tracking for Obsidian",
   "main": "main.js",
