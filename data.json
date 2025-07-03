@@ -13,6 +13,6 @@
   "autoCreateDailyNotes": true,
   "dateFormat": "YY-MM-DD",
   "layoutStyle": "cards",
-  "displayTheme": "dark",
+  "displayTheme": "light",
   "progressBarStyle": "modern-bars"
 }
