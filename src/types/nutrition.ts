@@ -14,6 +14,7 @@ export interface FoodItem {
   protein: number;
   carbs: number;
   fat: number;
+  emoji?: string;
   timestamp?: string;
 }
 

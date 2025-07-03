@@ -70,7 +70,8 @@ Return ONLY valid JSON in this exact format:
       "calories": number,
       "protein": number,
       "carbs": number,
-      "fat": number
+      "fat": number,
+      "emoji": "single most appropriate emoji for this food"
     }
   ]
 }
@@ -81,6 +82,7 @@ Rules:
 - Round nutrition values to 1 decimal place
 - Include all identifiable foods from the description
 - If portion size is unclear, assume reasonable serving sizes
+- Choose the most appropriate single emoji for each food item
 - Only return the JSON object, no other text
     `;
   }
@@ -161,6 +163,7 @@ Rules:
           protein: Math.round(protein * 10) / 10,
           carbs: Math.round(carbs * 10) / 10,
           fat: Math.round(fat * 10) / 10,
+          emoji: item.emoji || '🍽️',
           timestamp: new Date().toISOString()
         };
       });
@@ -180,6 +183,8 @@ Rules:
     
     return num;
   }
+
+
 
   // Test the API connection
   async testConnection(): Promise<boolean> {

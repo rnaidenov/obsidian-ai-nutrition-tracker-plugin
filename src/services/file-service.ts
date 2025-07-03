@@ -291,7 +291,7 @@ export class FileService {
     const isDarkTheme = this.getEffectiveTheme() === 'dark';
     
     for (const item of foodItems) {
-      const emoji = this.getFoodEmoji(item.food);
+      const emoji = item.emoji || '🍽️';
       const timeStr = item.timestamp ? 
         new Date(item.timestamp).toLocaleTimeString('en-US', { 
           hour: '2-digit', 
@@ -397,7 +397,7 @@ export class FileService {
     const isDark = this.getEffectiveTheme() === 'dark';
     
     for (const item of foodItems) {
-      const emoji = this.getFoodEmoji(item.food);
+      const emoji = item.emoji || '🍽️';
       const entryId = `entry-${item.food.replace(/[^a-zA-Z0-9]/g, '-')}-${item.quantity.replace(/[^a-zA-Z0-9]/g, '-')}-${item.calories}`;
       
       // Time formatting
@@ -804,99 +804,7 @@ export class FileService {
     }
   }
 
-  private getFoodEmoji(foodName: string): string {
-    const food = foodName.toLowerCase();
-    
-    // Fruits
-    if (food.includes('apple')) return '🍎';
-    if (food.includes('banana')) return '🍌';
-    if (food.includes('orange')) return '🍊';
-    if (food.includes('strawberry') || food.includes('berry')) return '🍓';
-    if (food.includes('grape')) return '🍇';
-    if (food.includes('watermelon') || food.includes('melon')) return '🍉';
-    if (food.includes('pineapple')) return '🍍';
-    if (food.includes('mango')) return '🥭';
-    if (food.includes('peach')) return '🍑';
-    if (food.includes('cherry')) return '🍒';
-    
-    // Vegetables
-    if (food.includes('tomato')) return '🍅';
-    if (food.includes('eggplant')) return '🍆';
-    if (food.includes('avocado')) return '🥑';
-    if (food.includes('broccoli')) return '🥦';
-    if (food.includes('cucumber')) return '🥒';
-    if (food.includes('pepper') || food.includes('bell pepper')) return '🫑';
-    if (food.includes('carrot')) return '🥕';
-    if (food.includes('corn')) return '🌽';
-    if (food.includes('lettuce') || food.includes('leafy') || food.includes('salad')) return '🥬';
-    if (food.includes('spinach')) return '🥬';
-    if (food.includes('potato')) return '🥔';
-    if (food.includes('onion')) return '🧅';
-    if (food.includes('garlic')) return '🧄';
-    
-    // Grains & Bread
-    if (food.includes('bread') || food.includes('toast')) return '🍞';
-    if (food.includes('rice')) return '🍚';
-    if (food.includes('pasta') || food.includes('spaghetti') || food.includes('noodle')) return '🍝';
-    if (food.includes('pizza')) return '🍕';
-    if (food.includes('bagel')) return '🥯';
-    if (food.includes('pretzel')) return '🥨';
-    if (food.includes('croissant')) return '🥐';
-    if (food.includes('waffle')) return '🧇';
-    if (food.includes('pancake')) return '🥞';
-    if (food.includes('cereal') || food.includes('oatmeal') || food.includes('oats')) return '🥣';
-    
-    // Proteins
-    if (food.includes('chicken')) return '🍗';
-    if (food.includes('meat') || food.includes('steak') || food.includes('beef')) return '🥩';
-    if (food.includes('bacon')) return '🥓';
-    if (food.includes('fish') || food.includes('salmon') || food.includes('tuna')) return '🐟';
-    if (food.includes('shrimp') || food.includes('prawn')) return '🍤';
-    if (food.includes('egg')) return '🥚';
-    if (food.includes('cheese')) return '🧀';
-    
-    // Dairy & Drinks
-    if (food.includes('milk')) return '🥛';
-    if (food.includes('yogurt') || food.includes('yoghurt')) return '🍦';
-    if (food.includes('coffee')) return '☕';
-    if (food.includes('tea')) return '🍵';
-    if (food.includes('water')) return '💧';
-    if (food.includes('juice')) return '🧃';
-    if (food.includes('smoothie')) return '🥤';
-    
-    // Snacks & Sweets
-    if (food.includes('chocolate') || food.includes('cocoa')) return '🍫';
-    if (food.includes('cookie') || food.includes('biscuit')) return '🍪';
-    if (food.includes('cake')) return '🍰';
-    if (food.includes('donut') || food.includes('doughnut')) return '🍩';
-    if (food.includes('ice cream')) return '🍨';
-    if (food.includes('candy')) return '🍬';
-    if (food.includes('honey')) return '🍯';
-    
-    // Nuts & Seeds
-    if (food.includes('nut') || food.includes('almond') || food.includes('walnut')) return '🥜';
-    if (food.includes('coconut')) return '🥥';
-    
-    // Legumes
-    if (food.includes('bean') || food.includes('lentil')) return '🫘';
-    
-    // Prepared foods
-    if (food.includes('soup')) return '🍲';
-    if (food.includes('stew')) return '🍲';
-    if (food.includes('curry')) return '🍛';
-    if (food.includes('sandwich') || food.includes('burger')) return '🥪';
-    if (food.includes('taco')) return '🌮';
-    if (food.includes('burrito')) return '🌯';
-    if (food.includes('sushi')) return '🍣';
-    if (food.includes('ramen')) return '🍜';
-    
-    // Supplements
-    if (food.includes('protein powder') || food.includes('whey')) return '🥤';
-    if (food.includes('vitamin') || food.includes('supplement')) return '💊';
-    
-    // Default
-    return '🍽️';
-  }
+
 
   private getProgressBar(current: number, goal: number): string {
     const percentage = this.calculatePercentage(current, goal);
