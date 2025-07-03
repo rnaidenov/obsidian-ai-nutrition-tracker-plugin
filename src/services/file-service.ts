@@ -302,18 +302,18 @@ export class FileService {
         // Glassy dark theme card
         const entryId = `ntr-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`;
         content += `\n<div id="${entryId}" data-ntr-food="${item.food.replace(/"/g, '&quot;')}" data-ntr-quantity="${item.quantity.replace(/"/g, '&quot;')}" data-ntr-calories="${item.calories}" data-ntr-protein="${item.protein}" data-ntr-carbs="${item.carbs}" data-ntr-fat="${item.fat}" style="background: linear-gradient(135deg, rgba(30, 41, 59, 0.75), rgba(51, 65, 85, 0.75)); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-radius: 16px; padding: 14px; margin: 10px 0; box-shadow: 0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.1); border: 1px solid rgba(148,163,184,0.2); position: relative; overflow: hidden;">\n`;
-        content += `  <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">\n`;
-        content += `    <div style="display: flex; align-items: center;">\n`;
+        content += `  <div style="display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 10px;">\n`;
+        content += `    <div style="display: flex; align-items: center; flex: 1;">\n`;
         content += `      <span style="font-size: 32px; margin-right: 10px;">${emoji}</span>\n`;
-        content += `      <div>\n`;
+        content += `      <div style="flex: 1;">\n`;
         content += `        <h3 style="color: #f8fafc; margin: 0; font-size: 16px; font-weight: 600;">${item.food}</h3>\n`;
         content += `        <div style="color: #94a3b8; font-size: 12px; margin-top: 2px;">📏 ${item.quantity}</div>\n`;
+        if (timeStr) {
+          content += `        <div style="color: #94a3b8; font-size: 10px; margin-top: 1px; opacity: 0.8;">🕐 ${timeStr}</div>\n`;
+        }
         content += `      </div>\n`;
         content += `    </div>\n`;
-        if (timeStr) {
-          content += `    <div style="position: absolute; top: 8px; right: 8px; background: linear-gradient(135deg, rgba(0,0,0,0.15), rgba(30,41,59,0.1)); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); padding: 2px 6px; border-radius: 8px; font-size: 10px; color: #cbd5e1; border: 1px solid rgba(255,255,255,0.08); max-width: calc(100% - 120px); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">🕐 ${timeStr}</div>\n`;
-        }
-        content += `    <button class="nutrition-edit-btn" data-food="${item.food.replace(/"/g, '&quot;')}" data-quantity="${item.quantity.replace(/"/g, '&quot;')}" data-calories="${item.calories}" data-protein="${item.protein}" data-carbs="${item.carbs}" data-fat="${item.fat}" style="background: linear-gradient(135deg, rgba(148,163,184,0.12), rgba(100,116,139,0.08)); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); border: 1px solid rgba(148,163,184,0.25); border-radius: 8px; padding: 4px 8px; color: #cbd5e1; font-size: 10px; cursor: pointer; margin-left: 8px; box-shadow: 0 2px 8px rgba(148,163,184,0.1), inset 0 1px 0 rgba(255,255,255,0.1);">✏️ Edit</button>\n`;
+        content += `    <button class="nutrition-edit-btn" data-food="${item.food.replace(/"/g, '&quot;')}" data-quantity="${item.quantity.replace(/"/g, '&quot;')}" data-calories="${item.calories}" data-protein="${item.protein}" data-carbs="${item.carbs}" data-fat="${item.fat}" style="background: linear-gradient(135deg, rgba(148,163,184,0.12), rgba(100,116,139,0.08)); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); border: 1px solid rgba(148,163,184,0.25); border-radius: 8px; padding: 6px 10px; color: #cbd5e1; font-size: 10px; cursor: pointer; margin-left: 12px; box-shadow: 0 2px 8px rgba(148,163,184,0.1), inset 0 1px 0 rgba(255,255,255,0.1); flex-shrink: 0;">✏️ Edit</button>\n`;
         content += `  </div>\n`;
         content += `  <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;">\n`;
         content += `    <div style="text-align: center; padding: 8px; background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(185, 28, 28, 0.1)); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); border-radius: 12px; border: 1px solid rgba(239, 68, 68, 0.25); box-shadow: 0 4px 16px rgba(239, 68, 68, 0.1);">\n`;
@@ -342,18 +342,18 @@ export class FileService {
         // Glassy light theme card
         const entryId = `ntr-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`;
         content += `\n<div id="${entryId}" data-ntr-food="${item.food.replace(/"/g, '&quot;')}" data-ntr-quantity="${item.quantity.replace(/"/g, '&quot;')}" data-ntr-calories="${item.calories}" data-ntr-protein="${item.protein}" data-ntr-carbs="${item.carbs}" data-ntr-fat="${item.fat}" style="background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(248, 250, 252, 0.9)); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-radius: 16px; padding: 14px; margin: 10px 0; box-shadow: 0 8px 32px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.9); border: 1px solid rgba(255,255,255,0.6); position: relative; overflow: hidden;">\n`;
-        content += `  <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">\n`;
-        content += `    <div style="display: flex; align-items: center;">\n`;
+        content += `  <div style="display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 10px;">\n`;
+        content += `    <div style="display: flex; align-items: center; flex: 1;">\n`;
         content += `      <span style="font-size: 32px; margin-right: 10px;">${emoji}</span>\n`;
-        content += `      <div>\n`;
+        content += `      <div style="flex: 1;">\n`;
         content += `        <h3 style="color: #0f172a; margin: 0; font-size: 16px; font-weight: 600;">${item.food}</h3>\n`;
         content += `        <div style="color: #64748b; font-size: 12px; margin-top: 2px;">📏 ${item.quantity}</div>\n`;
+        if (timeStr) {
+          content += `        <div style="color: #64748b; font-size: 10px; margin-top: 1px; opacity: 0.8;">🕐 ${timeStr}</div>\n`;
+        }
         content += `      </div>\n`;
         content += `    </div>\n`;
-        if (timeStr) {
-          content += `    <div style="position: absolute; top: 8px; right: 8px; background: linear-gradient(135deg, rgba(255,255,255,0.7), rgba(248,250,252,0.4)); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); padding: 2px 6px; border-radius: 8px; font-size: 10px; color: #64748b; border: 1px solid rgba(255,255,255,0.6); max-width: calc(100% - 120px); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">🕐 ${timeStr}</div>\n`;
-        }
-        content += `    <button class="nutrition-edit-btn" data-food="${item.food.replace(/"/g, '&quot;')}" data-quantity="${item.quantity.replace(/"/g, '&quot;')}" data-calories="${item.calories}" data-protein="${item.protein}" data-carbs="${item.carbs}" data-fat="${item.fat}" style="background: linear-gradient(135deg, rgba(255,255,255,0.7), rgba(248,250,252,0.5)); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); border: 1px solid rgba(255,255,255,0.6); border-radius: 8px; padding: 4px 8px; color: #475569; font-size: 10px; cursor: pointer; margin-left: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.8);">✏️ Edit</button>\n`;
+        content += `    <button class="nutrition-edit-btn" data-food="${item.food.replace(/"/g, '&quot;')}" data-quantity="${item.quantity.replace(/"/g, '&quot;')}" data-calories="${item.calories}" data-protein="${item.protein}" data-carbs="${item.carbs}" data-fat="${item.fat}" style="background: linear-gradient(135deg, rgba(255,255,255,0.7), rgba(248,250,252,0.5)); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); border: 1px solid rgba(255,255,255,0.6); border-radius: 8px; padding: 6px 10px; color: #475569; font-size: 10px; cursor: pointer; margin-left: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.8); flex-shrink: 0;">✏️ Edit</button>\n`;
         content += `  </div>\n`;
         content += `  <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;">\n`;
         content += `    <div style="text-align: center; padding: 8px; background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(254, 226, 226, 0.9)); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); border-radius: 12px; border: 1px solid rgba(252, 165, 165, 0.3); box-shadow: 0 4px 16px rgba(239, 68, 68, 0.06), inset 0 1px 0 rgba(255,255,255,0.8);">\n`;

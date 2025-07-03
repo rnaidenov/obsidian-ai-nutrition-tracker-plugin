@@ -37,7 +37,7 @@ export class FoodInputModal extends Modal {
     if (this.initialData) {
       const isDarkTheme = document.body.classList.contains('theme-dark');
       const notice = contentEl.createEl('p', { 
-        text: `✏️ Editing: ${this.initialData.quantity} ${this.initialData.food} (${this.initialData.calories} kcal). Modify description as needed - this will create a new entry.`,
+        text: `✏️ Editing: ${this.initialData.quantity} ${this.initialData.food} (${this.initialData.calories} kcal). Modify description as needed - this will edit the existing entry.`,
         cls: 'nutrition-tracker-edit-notice'
       });
       
