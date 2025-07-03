@@ -1,5 +1,5 @@
 {
-  "openRouterApiKey": "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",
+  "openRouterApiKey": "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",
   "llmModel": "google/gemini-2.5-flash-preview-05-20",
   "nutritionGoals": {
     "calories": 2000,
@@ -13,6 +13,6 @@
   "autoCreateDailyNotes": true,
   "dateFormat": "YY-MM-DD",
   "layoutStyle": "cards",
-  "displayTheme": "light",
+  "displayTheme": "dark",
   "progressBarStyle": "modern-bars"
 }

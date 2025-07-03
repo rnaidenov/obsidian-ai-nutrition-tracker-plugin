@@ -114,24 +114,25 @@ export class FileService {
   }
 
   private findCardPosition(content: string, escapedFood: string, escapedQuantity: string, calories: number): { success: boolean, startIndex: number, endIndex: number } {
+    // Look for cards with complete nutrition data
     const startPattern = new RegExp(
-      `<div[^>]*data-ntr-food="${escapedFood}"[^>]*data-ntr-quantity="${escapedQuantity}"[^>]*data-ntr-calories="${calories}"[^>]*>`,
+      `<div[^>]*data-ntr-food="${escapedFood}"[^>]*data-ntr-quantity="${escapedQuantity}"[^>]*data-ntr-calories="${calories}"[^>]*data-ntr-protein="[^"]*"[^>]*data-ntr-carbs="[^"]*"[^>]*data-ntr-fat="[^"]*"[^>]*>`,
       'gi'
     );
     
     const startMatch = startPattern.exec(content);
     if (!startMatch) {
-      // Try alternative attribute order
-      const startPattern2 = new RegExp(
-        `<div[^>]*data-ntr-calories="${calories}"[^>]*data-ntr-food="${escapedFood}"[^>]*data-ntr-quantity="${escapedQuantity}"[^>]*>`,
+      // Try legacy pattern without complete nutrition data
+      const legacyPattern = new RegExp(
+        `<div[^>]*data-ntr-food="${escapedFood}"[^>]*data-ntr-quantity="${escapedQuantity}"[^>]*data-ntr-calories="${calories}"[^>]*>`,
         'gi'
       );
-      const startMatch2 = startPattern2.exec(content);
-      if (!startMatch2) {
+      const legacyMatch = legacyPattern.exec(content);
+      if (!legacyMatch) {
         return { success: false, startIndex: -1, endIndex: -1 };
       }
-      const cardBounds = this.findCardBounds(content, startMatch2.index);
-      return { success: cardBounds.success, startIndex: startMatch2.index, endIndex: cardBounds.endIndex };
+      const cardBounds = this.findCardBounds(content, legacyMatch.index);
+      return { success: cardBounds.success, startIndex: legacyMatch.index, endIndex: cardBounds.endIndex };
     }
     
     const cardBounds = this.findCardBounds(content, startMatch.index);
@@ -173,20 +174,20 @@ export class FileService {
     const escapedFood = originalEntry.food.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/"/g, '&quot;');
     const escapedQuantity = originalEntry.quantity.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/"/g, '&quot;');
     
-    // Try card layout attributes first (data-ntr-*)
+    // Try card layout attributes first (data-ntr-*) - new format with complete nutrition data
     const cardPattern = new RegExp(
-      `<div[^>]*data-ntr-food="${escapedFood}"[^>]*data-ntr-quantity="${escapedQuantity}"[^>]*data-ntr-calories="${originalEntry.calories}"[^>]*>`,
+      `<div[^>]*data-ntr-food="${escapedFood}"[^>]*data-ntr-quantity="${escapedQuantity}"[^>]*data-ntr-calories="${originalEntry.calories}"[^>]*data-ntr-protein="${originalEntry.protein}"[^>]*data-ntr-carbs="${originalEntry.carbs}"[^>]*data-ntr-fat="${originalEntry.fat}"[^>]*>`,
       'gi'
     );
     
     let startMatch = cardPattern.exec(content);
     if (!startMatch) {
-      // Try alternative card attribute order
-      const cardPattern2 = new RegExp(
-        `<div[^>]*data-ntr-calories="${originalEntry.calories}"[^>]*data-ntr-food="${escapedFood}"[^>]*data-ntr-quantity="${escapedQuantity}"[^>]*>`,
+      // Try legacy card pattern without complete nutrition data
+      const legacyCardPattern = new RegExp(
+        `<div[^>]*data-ntr-food="${escapedFood}"[^>]*data-ntr-quantity="${escapedQuantity}"[^>]*data-ntr-calories="${originalEntry.calories}"[^>]*>`,
         'gi'
       );
-      startMatch = cardPattern2.exec(content);
+      startMatch = legacyCardPattern.exec(content);
     }
     
     if (!startMatch) {
@@ -298,7 +299,7 @@ export class FileService {
       if (isDarkTheme) {
         // Glassy dark theme card
         const entryId = `ntr-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`;
-        content += `\n<div id="${entryId}" data-ntr-food="${item.food.replace(/"/g, '&quot;')}" data-ntr-quantity="${item.quantity.replace(/"/g, '&quot;')}" data-ntr-calories="${item.calories}" style="background: linear-gradient(135deg, rgba(30, 41, 59, 0.75), rgba(51, 65, 85, 0.75)); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-radius: 16px; padding: 14px; margin: 10px 0; box-shadow: 0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.1); border: 1px solid rgba(148,163,184,0.2); position: relative;">\n`;
+        content += `\n<div id="${entryId}" data-ntr-food="${item.food.replace(/"/g, '&quot;')}" data-ntr-quantity="${item.quantity.replace(/"/g, '&quot;')}" data-ntr-calories="${item.calories}" data-ntr-protein="${item.protein}" data-ntr-carbs="${item.carbs}" data-ntr-fat="${item.fat}" style="background: linear-gradient(135deg, rgba(30, 41, 59, 0.75), rgba(51, 65, 85, 0.75)); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-radius: 16px; padding: 14px; margin: 10px 0; box-shadow: 0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.1); border: 1px solid rgba(148,163,184,0.2); position: relative;">\n`;
         content += `  <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">\n`;
         content += `    <div style="display: flex; align-items: center;">\n`;
         content += `      <span style="font-size: 20px; margin-right: 10px;">${emoji}</span>\n`;
@@ -338,7 +339,7 @@ export class FileService {
       } else {
         // Glassy light theme card
         const entryId = `ntr-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`;
-        content += `\n<div id="${entryId}" data-ntr-food="${item.food.replace(/"/g, '&quot;')}" data-ntr-quantity="${item.quantity.replace(/"/g, '&quot;')}" data-ntr-calories="${item.calories}" style="background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(248, 250, 252, 0.9)); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-radius: 16px; padding: 14px; margin: 10px 0; box-shadow: 0 8px 32px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.9); border: 1px solid rgba(255,255,255,0.6); position: relative;">\n`;
+        content += `\n<div id="${entryId}" data-ntr-food="${item.food.replace(/"/g, '&quot;')}" data-ntr-quantity="${item.quantity.replace(/"/g, '&quot;')}" data-ntr-calories="${item.calories}" data-ntr-protein="${item.protein}" data-ntr-carbs="${item.carbs}" data-ntr-fat="${item.fat}" style="background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(248, 250, 252, 0.9)); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-radius: 16px; padding: 14px; margin: 10px 0; box-shadow: 0 8px 32px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.9); border: 1px solid rgba(255,255,255,0.6); position: relative;">\n`;
         content += `  <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">\n`;
         content += `    <div style="display: flex; align-items: center;">\n`;
         content += `      <span style="font-size: 20px; margin-right: 10px;">${emoji}</span>\n`;
@@ -503,6 +504,7 @@ export class FileService {
 
   private generateModernProgressBars(totals: NutritionData, goals: any): string {
     let content = '';
+    const isDark = this.getEffectiveTheme() === 'dark';
     
     const nutrients = [
       { name: 'Calories', emoji: '🔥', current: totals.calories, goal: goals.calories, unit: 'kcal' },
@@ -513,22 +515,86 @@ export class FileService {
     
     for (const nutrient of nutrients) {
       const percentage = this.calculatePercentage(nutrient.current, nutrient.goal);
-      const color = this.getProgressColor(percentage);
+      const { gradient, textColor, borderColor } = this.getProgressGradient(percentage, isDark);
       
-      content += `**${nutrient.emoji} ${nutrient.name}**: ${Math.round(nutrient.current)} / ${nutrient.goal} ${nutrient.unit} (${percentage}%)\n`;
-      content += `<div style="width: 100%; background-color: #f0f0f0; border-radius: 10px; height: 20px; margin: 5px 0 15px 0;">\n`;
-      content += `  <div style="width: ${Math.min(percentage, 100)}%; background-color: ${color}; height: 100%; border-radius: 10px; transition: width 0.3s ease;"></div>\n`;
+      // Minimalistic glassy track background
+      const trackBg = isDark 
+        ? 'rgba(255, 255, 255, 0.05)'
+        : 'rgba(0, 0, 0, 0.04)';
+      
+      const trackBorder = isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.08)';
+      
+      content += `**${nutrient.emoji} ${nutrient.name}**: ${Math.round(nutrient.current)} / ${nutrient.goal} ${nutrient.unit} `;
+      content += `<span style="color: ${textColor}; font-weight: 600;">(${percentage}%)</span>\n`;
+      
+      // Minimalistic glassy progress bar with colored border
+      content += `<div style="width: 100%; background: ${trackBg}; border: 1px solid ${trackBorder}; border-radius: 8px; height: 18px; margin: 6px 0 12px 0; padding: 1px; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);">\n`;
+      content += `  <div style="width: ${Math.min(percentage, 100)}%; background: ${gradient}; height: 100%; border-radius: 7px; border: 1px solid ${borderColor}; transition: all 0.3s ease; position: relative; overflow: hidden;">\n`;
+      
+      // Subtle glass shine effect
+      if (percentage > 0) {
+        content += `    <div style="position: absolute; top: 0; left: 0; right: 0; height: 40%; background: linear-gradient(180deg, rgba(255,255,255,${isDark ? '0.08' : '0.15'}), transparent); border-radius: 7px 7px 0 0;"></div>\n`;
+      }
+      
+      content += `  </div>\n`;
       content += `</div>\n\n`;
     }
     
     return content;
   }
 
-  private getProgressColor(percentage: number): string {
-    if (percentage >= 100) return '#22c55e'; // Green
-    if (percentage >= 80) return '#eab308';  // Yellow
-    if (percentage >= 50) return '#f97316';  // Orange
-    return '#ef4444'; // Red
+  private getProgressGradient(percentage: number, isDark: boolean): { gradient: string, textColor: string, borderColor: string } {
+    // Smooth color transitions: Red (0%) → Orange (50%) → Green (100%)
+    let r, g, b;
+    
+    if (isDark) {
+      // Dark theme: Use existing darker colors
+      if (percentage <= 50) {
+        // Red to Orange transition (0% to 50%)
+        const factor = percentage / 50;
+        r = 239; // Red component stays high
+        g = Math.round(68 + (165 - 68) * factor); // 68 (red) to 165 (orange)
+        b = Math.round(68 * (1 - factor)); // 68 (red) to 0 (orange)
+      } else {
+        // Orange to Green transition (50% to 100%)
+        const factor = (percentage - 50) / 50;
+        r = Math.round(249 - (249 - 34) * factor); // 249 (orange) to 34 (green)
+        g = Math.round(165 + (197 - 165) * factor); // 165 (orange) to 197 (green)
+        b = Math.round(22 + (94 - 22) * factor); // 22 (orange) to 94 (green)
+      }
+    } else {
+      // Light theme: Use lighter, more pure colors
+      if (percentage <= 50) {
+        // Red to Orange transition (0% to 50%) - lighter, more pure
+        const factor = percentage / 50;
+        r = 255; // Pure red component
+        g = Math.round(80 + (200 - 80) * factor); // 80 (red) to 200 (orange)
+        b = Math.round(80 * (1 - factor)); // 80 (red) to 0 (orange)
+      } else {
+        // Orange to Green transition (50% to 100%) - lighter, more pure
+        const factor = (percentage - 50) / 50;
+        r = Math.round(255 - (255 - 50) * factor); // 255 (orange) to 50 (green)
+        g = Math.round(200 + (55) * factor); // 200 (orange) to 255 (green)
+        b = Math.round(0 + (50) * factor); // 0 (orange) to 50 (green)
+      }
+    }
+    
+    // Create subtle, glassy gradients with theme-appropriate opacity
+    const opacity = isDark ? 0.4 : 0.5;
+    const primaryColor = `rgba(${r}, ${g}, ${b}, ${opacity})`;
+    const secondaryColor = `rgba(${r}, ${g}, ${b}, ${opacity * 0.7})`;
+    
+    const gradient = `linear-gradient(135deg, ${primaryColor}, ${secondaryColor})`;
+    
+    // Border color - slightly more opaque than the gradient
+    const borderColor = `rgba(${r}, ${g}, ${b}, ${isDark ? 0.6 : 0.7})`;
+    
+    // Text color for percentage - theme-appropriate
+    const textColor = isDark 
+      ? `rgba(${r}, ${g}, ${b}, 0.9)` 
+      : `rgba(${Math.max(0, r-40)}, ${Math.max(0, g-40)}, ${Math.max(0, b-40)}, 0.9)`;
+    
+    return { gradient, textColor, borderColor };
   }
 
   private async recalculateTotals(content: string): Promise<string> {
@@ -557,7 +623,7 @@ export class FileService {
     const simpleRegex = /class="nutrition-food-entry-simple[^"]*"[^>]*data-food="([^"]*)"[^>]*data-quantity="([^"]*)"[^>]*data-calories="([^"]*)"[^>]*data-protein="([^"]*)"[^>]*data-carbs="([^"]*)"[^>]*data-fat="([^"]*)"/g;
     
     // Try card layout (data-ntr-food, data-ntr-quantity, etc.)
-    const cardAttributeRegex = /<div[^>]*data-ntr-food="([^"]*)"[^>]*data-ntr-quantity="([^"]*)"[^>]*data-ntr-calories="([\d.]+)"[^>]*>/g;
+    const cardAttributeRegex = /<div[^>]*data-ntr-food="([^"]*)"[^>]*data-ntr-quantity="([^"]*)"[^>]*data-ntr-calories="([\d.]+)"[^>]*data-ntr-protein="([\d.]+)"[^>]*data-ntr-carbs="([\d.]+)"[^>]*data-ntr-fat="([\d.]+)"[^>]*>/g;
     
     // Extract from old HTML card layouts (fallback)
     const htmlCardRegex = /<div style="background: linear-gradient\(135deg,[^"]+\)"[\s\S]*?<h3[^>]*>([^<]+)<\/h3>[\s\S]*?📏 ([^<]+)[\s\S]*?<div style="color: [^"]+; font-weight: bold; font-size: 14px;">([\d.]+)<\/div>[\s\S]*?<div style="color: [^"]+; font-weight: bold; font-size: 14px;">([\d.]+)g<\/div>[\s\S]*?<div style="color: [^"]+; font-weight: bold; font-size: 14px;">([\d.]+)g<\/div>[\s\S]*?<div style="color: [^"]+; font-weight: bold; font-size: 14px;">([\d.]+)g<\/div>/g;
@@ -578,28 +644,21 @@ export class FileService {
     // If no simple layout entries found, try card layout
     if (items.length === 0) {
       while ((match = cardAttributeRegex.exec(content)) !== null) {
-        // For items with card data attributes, we need to extract nutrition from the visual content
+        // Extract all nutrition data from card data attributes
         const food = match[1].replace(/&quot;/g, '"');
         const quantity = match[2].replace(/&quot;/g, '"');
         const calories = parseFloat(match[3]);
-        
-        // Find the corresponding nutrition values in the visual content
-        const entryStart = match.index;
-        const entryEndMatch = content.indexOf('</div>', entryStart);
-        const entryContent = content.substring(entryStart, entryEndMatch);
-        
-        // Extract nutrition from the card content
-        const proteinMatch = entryContent.match(/>(\d+(?:\.\d+)?)g<\/div>[\s\S]*?PROTEIN/i);
-        const carbsMatch = entryContent.match(/>(\d+(?:\.\d+)?)g<\/div>[\s\S]*?CARBS/i);
-        const fatMatch = entryContent.match(/>(\d+(?:\.\d+)?)g<\/div>[\s\S]*?FAT/i);
+        const protein = parseFloat(match[4]);
+        const carbs = parseFloat(match[5]);
+        const fat = parseFloat(match[6]);
         
         items.push({
           food,
           quantity,
           calories,
-          protein: proteinMatch ? parseFloat(proteinMatch[1]) : 0,
-          carbs: carbsMatch ? parseFloat(carbsMatch[1]) : 0,
-          fat: fatMatch ? parseFloat(fatMatch[1]) : 0
+          protein,
+          carbs,
+          fat
         });
       }
     }
@@ -772,30 +831,45 @@ export class FileService {
     const percentage = this.calculatePercentage(current, goal);
     const filledBlocks = Math.min(10, Math.round(percentage / 10));
     const emptyBlocks = 10 - filledBlocks;
+    const isDark = this.getEffectiveTheme() === 'dark';
     
     let bar = '';
     
-    // Use different colors based on progress
-    if (percentage >= 100) {
-      bar = '🟢'.repeat(filledBlocks) + '⚪'.repeat(emptyBlocks);
-    } else if (percentage >= 80) {
-      bar = '🟡'.repeat(filledBlocks) + '⚪'.repeat(emptyBlocks);
-    } else if (percentage >= 50) {
-      bar = '🟠'.repeat(filledBlocks) + '⚪'.repeat(emptyBlocks);
-    } else {
-      bar = '🔴'.repeat(filledBlocks) + '⚪'.repeat(emptyBlocks);
+    // Enhanced emoji selection with smooth transitions
+    for (let i = 0; i < 10; i++) {
+      const blockPercentage = ((i + 1) * 10);
+      
+      if (blockPercentage <= percentage) {
+        // This block is filled - choose color based on overall percentage
+        if (percentage >= 90) {
+          bar += '🟢'; // Bright green for excellent progress
+        } else if (percentage >= 70) {
+          bar += i < 7 ? '🟢' : '🟡'; // Mix of green and yellow
+        } else if (percentage >= 50) {
+          bar += i < 5 ? '🟠' : '🟡'; // Mix of orange and yellow  
+        } else if (percentage >= 30) {
+          bar += i < 3 ? '🔴' : '🟠'; // Mix of red and orange
+        } else {
+          bar += '🔴'; // Red for low progress
+        }
+      } else {
+        // Empty block - use theme-appropriate empty indicator
+        bar += isDark ? '⚫' : '⚪';
+      }
     }
     
     return bar;
   }
 
   private getOverallStatusEmoji(percentage: number): string {
-    if (percentage >= 90) return '🎉';
-    if (percentage >= 80) return '🔥';
-    if (percentage >= 70) return '💪';
-    if (percentage >= 60) return '📈';
-    if (percentage >= 50) return '⚡';
-    if (percentage >= 30) return '🌱';
-    return '🏃‍♂️';
+    if (percentage >= 95) return '🏆'; // Trophy for exceptional achievement
+    if (percentage >= 90) return '🎉'; // Party for great progress
+    if (percentage >= 80) return '🔥'; // Fire for strong progress
+    if (percentage >= 70) return '💪'; // Muscle for good progress
+    if (percentage >= 60) return '📈'; // Chart for steady progress
+    if (percentage >= 50) return '⚡'; // Lightning for halfway there
+    if (percentage >= 30) return '🌱'; // Seedling for growing progress
+    if (percentage >= 10) return '🏃‍♂️'; // Runner for getting started
+    return '🌟'; // Star for motivation to begin
   }
 } 
