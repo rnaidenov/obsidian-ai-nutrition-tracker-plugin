@@ -277,9 +277,9 @@ export class FileService {
         }) : '';
       
       if (isDarkTheme) {
-        // Sleek dark theme card
+        // Glassy dark theme card
         const entryId = `ntr-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`;
-        content += `\n<div id="${entryId}" data-ntr-food="${item.food.replace(/"/g, '&quot;')}" data-ntr-quantity="${item.quantity.replace(/"/g, '&quot;')}" data-ntr-calories="${item.calories}" style="background: linear-gradient(135deg, #1e293b, #334155); border-radius: 12px; padding: 14px; margin: 10px 0; box-shadow: 0 4px 20px rgba(0,0,0,0.4); border: 1px solid rgba(148,163,184,0.1); position: relative;">\n`;
+        content += `\n<div id="${entryId}" data-ntr-food="${item.food.replace(/"/g, '&quot;')}" data-ntr-quantity="${item.quantity.replace(/"/g, '&quot;')}" data-ntr-calories="${item.calories}" style="background: linear-gradient(135deg, rgba(30, 41, 59, 0.75), rgba(51, 65, 85, 0.75)); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-radius: 16px; padding: 14px; margin: 10px 0; box-shadow: 0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.1); border: 1px solid rgba(148,163,184,0.2); position: relative;">\n`;
         content += `  <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">\n`;
         content += `    <div style="display: flex; align-items: center;">\n`;
         content += `      <span style="font-size: 20px; margin-right: 10px;">${emoji}</span>\n`;
@@ -289,27 +289,27 @@ export class FileService {
         content += `      </div>\n`;
         content += `    </div>\n`;
         if (timeStr) {
-          content += `    <div style="position: absolute; top: 8px; right: 10px; background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 6px; font-size: 10px; color: #cbd5e1;">🕐 ${timeStr}</div>\n`;
+          content += `    <div style="position: absolute; top: 8px; right: 10px; background: linear-gradient(135deg, rgba(0,0,0,0.15), rgba(30,41,59,0.1)); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); padding: 2px 6px; border-radius: 8px; font-size: 10px; color: #cbd5e1; border: 1px solid rgba(255,255,255,0.08);">🕐 ${timeStr}</div>\n`;
         }
-        content += `    <button class="nutrition-edit-btn" data-food="${item.food.replace(/"/g, '&quot;')}" data-quantity="${item.quantity.replace(/"/g, '&quot;')}" data-calories="${item.calories}" data-protein="${item.protein}" data-carbs="${item.carbs}" data-fat="${item.fat}" style="background: rgba(148,163,184,0.1); border: 1px solid rgba(148,163,184,0.2); border-radius: 6px; padding: 4px 8px; color: #cbd5e1; font-size: 10px; cursor: pointer; margin-left: 8px;">✏️ Edit</button>\n`;
+        content += `    <button class="nutrition-edit-btn" data-food="${item.food.replace(/"/g, '&quot;')}" data-quantity="${item.quantity.replace(/"/g, '&quot;')}" data-calories="${item.calories}" data-protein="${item.protein}" data-carbs="${item.carbs}" data-fat="${item.fat}" style="background: linear-gradient(135deg, rgba(148,163,184,0.12), rgba(100,116,139,0.08)); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); border: 1px solid rgba(148,163,184,0.25); border-radius: 8px; padding: 4px 8px; color: #cbd5e1; font-size: 10px; cursor: pointer; margin-left: 8px; box-shadow: 0 2px 8px rgba(148,163,184,0.1), inset 0 1px 0 rgba(255,255,255,0.1);">✏️ Edit</button>\n`;
         content += `  </div>\n`;
         content += `  <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;">\n`;
-        content += `    <div style="text-align: center; padding: 8px; background: rgba(239, 68, 68, 0.12); border-radius: 8px; border: 1px solid rgba(239, 68, 68, 0.25);">\n`;
+        content += `    <div style="text-align: center; padding: 8px; background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(185, 28, 28, 0.1)); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); border-radius: 12px; border: 1px solid rgba(239, 68, 68, 0.25); box-shadow: 0 4px 16px rgba(239, 68, 68, 0.1);">\n`;
         content += `      <div style="font-size: 16px; margin-bottom: 2px;">🔥</div>\n`;
         content += `      <div style="color: #fecaca; font-weight: bold; font-size: 14px;">${item.calories}</div>\n`;
         content += `      <div style="color: #f87171; font-size: 9px; text-transform: uppercase; font-weight: 500;">kcal</div>\n`;
         content += `    </div>\n`;
-        content += `    <div style="text-align: center; padding: 8px; background: rgba(34, 197, 94, 0.12); border-radius: 8px; border: 1px solid rgba(34, 197, 94, 0.25);">\n`;
+        content += `    <div style="text-align: center; padding: 8px; background: linear-gradient(135deg, rgba(34, 197, 94, 0.2), rgba(22, 163, 74, 0.1)); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); border-radius: 12px; border: 1px solid rgba(34, 197, 94, 0.25); box-shadow: 0 4px 16px rgba(34, 197, 94, 0.1);">\n`;
         content += `      <div style="font-size: 16px; margin-bottom: 2px;">💪</div>\n`;
         content += `      <div style="color: #bbf7d0; font-weight: bold; font-size: 14px;">${item.protein}g</div>\n`;
         content += `      <div style="color: #86efac; font-size: 9px; text-transform: uppercase; font-weight: 500;">protein</div>\n`;
         content += `    </div>\n`;
-        content += `    <div style="text-align: center; padding: 8px; background: rgba(251, 191, 36, 0.12); border-radius: 8px; border: 1px solid rgba(251, 191, 36, 0.25);">\n`;
+        content += `    <div style="text-align: center; padding: 8px; background: linear-gradient(135deg, rgba(251, 191, 36, 0.2), rgba(217, 119, 6, 0.1)); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); border-radius: 12px; border: 1px solid rgba(251, 191, 36, 0.25); box-shadow: 0 4px 16px rgba(251, 191, 36, 0.1);">\n`;
         content += `      <div style="font-size: 16px; margin-bottom: 2px;">🌾</div>\n`;
         content += `      <div style="color: #fde68a; font-weight: bold; font-size: 14px;">${item.carbs}g</div>\n`;
         content += `      <div style="color: #fbbf24; font-size: 9px; text-transform: uppercase; font-weight: 500;">carbs</div>\n`;
         content += `    </div>\n`;
-        content += `    <div style="text-align: center; padding: 8px; background: rgba(168, 85, 247, 0.12); border-radius: 8px; border: 1px solid rgba(168, 85, 247, 0.25);">\n`;
+        content += `    <div style="text-align: center; padding: 8px; background: linear-gradient(135deg, rgba(168, 85, 247, 0.2), rgba(124, 58, 237, 0.1)); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); border-radius: 12px; border: 1px solid rgba(168, 85, 247, 0.25); box-shadow: 0 4px 16px rgba(168, 85, 247, 0.1);">\n`;
         content += `      <div style="font-size: 16px; margin-bottom: 2px;">🥑</div>\n`;
         content += `      <div style="color: #ddd6fe; font-weight: bold; font-size: 14px;">${item.fat}g</div>\n`;
         content += `      <div style="color: #c4b5fd; font-size: 9px; text-transform: uppercase; font-weight: 500;">fat</div>\n`;
@@ -317,9 +317,9 @@ export class FileService {
         content += `  </div>\n`;
         content += `</div>\n\n`;
       } else {
-        // Sleek light theme card
+        // Glassy light theme card
         const entryId = `ntr-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`;
-        content += `\n<div id="${entryId}" data-ntr-food="${item.food.replace(/"/g, '&quot;')}" data-ntr-quantity="${item.quantity.replace(/"/g, '&quot;')}" data-ntr-calories="${item.calories}" style="background: linear-gradient(135deg, #ffffff, #f8fafc); border-radius: 12px; padding: 14px; margin: 10px 0; box-shadow: 0 2px 16px rgba(0,0,0,0.06); border: 1px solid rgba(203,213,225,0.3); position: relative;">\n`;
+        content += `\n<div id="${entryId}" data-ntr-food="${item.food.replace(/"/g, '&quot;')}" data-ntr-quantity="${item.quantity.replace(/"/g, '&quot;')}" data-ntr-calories="${item.calories}" style="background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(248, 250, 252, 0.9)); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-radius: 16px; padding: 14px; margin: 10px 0; box-shadow: 0 8px 32px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.9); border: 1px solid rgba(255,255,255,0.6); position: relative;">\n`;
         content += `  <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">\n`;
         content += `    <div style="display: flex; align-items: center;">\n`;
         content += `      <span style="font-size: 20px; margin-right: 10px;">${emoji}</span>\n`;
@@ -329,27 +329,27 @@ export class FileService {
         content += `      </div>\n`;
         content += `    </div>\n`;
         if (timeStr) {
-          content += `    <div style="position: absolute; top: 8px; right: 10px; background: rgba(0,0,0,0.05); padding: 2px 6px; border-radius: 6px; font-size: 10px; color: #64748b;">🕐 ${timeStr}</div>\n`;
+          content += `    <div style="position: absolute; top: 8px; right: 10px; background: linear-gradient(135deg, rgba(255,255,255,0.7), rgba(248,250,252,0.4)); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); padding: 2px 6px; border-radius: 8px; font-size: 10px; color: #64748b; border: 1px solid rgba(255,255,255,0.6);">🕐 ${timeStr}</div>\n`;
         }
-        content += `    <button class="nutrition-edit-btn" data-food="${item.food.replace(/"/g, '&quot;')}" data-quantity="${item.quantity.replace(/"/g, '&quot;')}" data-calories="${item.calories}" data-protein="${item.protein}" data-carbs="${item.carbs}" data-fat="${item.fat}" style="background: rgba(100,116,139,0.1); border: 1px solid rgba(203,213,225,0.4); border-radius: 6px; padding: 4px 8px; color: #475569; font-size: 10px; cursor: pointer; margin-left: 8px;">✏️ Edit</button>\n`;
+        content += `    <button class="nutrition-edit-btn" data-food="${item.food.replace(/"/g, '&quot;')}" data-quantity="${item.quantity.replace(/"/g, '&quot;')}" data-calories="${item.calories}" data-protein="${item.protein}" data-carbs="${item.carbs}" data-fat="${item.fat}" style="background: linear-gradient(135deg, rgba(255,255,255,0.7), rgba(248,250,252,0.5)); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); border: 1px solid rgba(255,255,255,0.6); border-radius: 8px; padding: 4px 8px; color: #475569; font-size: 10px; cursor: pointer; margin-left: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.8);">✏️ Edit</button>\n`;
         content += `  </div>\n`;
         content += `  <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;">\n`;
-        content += `    <div style="text-align: center; padding: 8px; background: linear-gradient(135deg, #fee2e2, #fecaca); border-radius: 8px; border: 1px solid #fca5a5; box-shadow: 0 1px 6px rgba(239, 68, 68, 0.08);">\n`;
+        content += `    <div style="text-align: center; padding: 8px; background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(254, 226, 226, 0.9)); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); border-radius: 12px; border: 1px solid rgba(252, 165, 165, 0.3); box-shadow: 0 4px 16px rgba(239, 68, 68, 0.06), inset 0 1px 0 rgba(255,255,255,0.8);">\n`;
         content += `      <div style="font-size: 16px; margin-bottom: 2px;">🔥</div>\n`;
         content += `      <div style="color: #dc2626; font-weight: bold; font-size: 14px;">${item.calories}</div>\n`;
         content += `      <div style="color: #ef4444; font-size: 9px; text-transform: uppercase; font-weight: 600;">KCAL</div>\n`;
         content += `    </div>\n`;
-        content += `    <div style="text-align: center; padding: 8px; background: linear-gradient(135deg, #dcfce7, #bbf7d0); border-radius: 8px; border: 1px solid #86efac; box-shadow: 0 1px 6px rgba(34, 197, 94, 0.08);">\n`;
+        content += `    <div style="text-align: center; padding: 8px; background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(220, 252, 231, 0.9)); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); border-radius: 12px; border: 1px solid rgba(134, 239, 172, 0.3); box-shadow: 0 4px 16px rgba(34, 197, 94, 0.06), inset 0 1px 0 rgba(255,255,255,0.8);">\n`;
         content += `      <div style="font-size: 16px; margin-bottom: 2px;">💪</div>\n`;
         content += `      <div style="color: #16a34a; font-weight: bold; font-size: 14px;">${item.protein}g</div>\n`;
         content += `      <div style="color: #22c55e; font-size: 9px; text-transform: uppercase; font-weight: 600;">PROTEIN</div>\n`;
         content += `    </div>\n`;
-        content += `    <div style="text-align: center; padding: 8px; background: linear-gradient(135deg, #fef3c7, #fde68a); border-radius: 8px; border: 1px solid #fcd34d; box-shadow: 0 1px 6px rgba(251, 191, 36, 0.08);">\n`;
+        content += `    <div style="text-align: center; padding: 8px; background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(254, 243, 199, 0.9)); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); border-radius: 12px; border: 1px solid rgba(252, 211, 77, 0.3); box-shadow: 0 4px 16px rgba(251, 191, 36, 0.06), inset 0 1px 0 rgba(255,255,255,0.8);">\n`;
         content += `      <div style="font-size: 16px; margin-bottom: 2px;">🌾</div>\n`;
         content += `      <div style="color: #d97706; font-weight: bold; font-size: 14px;">${item.carbs}g</div>\n`;
         content += `      <div style="color: #f59e0b; font-size: 9px; text-transform: uppercase; font-weight: 600;">CARBS</div>\n`;
         content += `    </div>\n`;
-        content += `    <div style="text-align: center; padding: 8px; background: linear-gradient(135deg, #ede9fe, #ddd6fe); border-radius: 8px; border: 1px solid #c4b5fd; box-shadow: 0 1px 6px rgba(168, 85, 247, 0.08);">\n`;
+        content += `    <div style="text-align: center; padding: 8px; background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(237, 233, 254, 0.9)); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); border-radius: 12px; border: 1px solid rgba(196, 181, 253, 0.3); box-shadow: 0 4px 16px rgba(168, 85, 247, 0.06), inset 0 1px 0 rgba(255,255,255,0.8);">\n`;
         content += `      <div style="font-size: 16px; margin-bottom: 2px;">🥑</div>\n`;
         content += `      <div style="color: #7c3aed; font-weight: bold; font-size: 14px;">${item.fat}g</div>\n`;
         content += `      <div style="color: #8b5cf6; font-size: 9px; text-transform: uppercase; font-weight: 600;">FAT</div>\n`;
