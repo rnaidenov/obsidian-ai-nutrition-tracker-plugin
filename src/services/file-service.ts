@@ -301,7 +301,7 @@ export class FileService {
       if (isDarkTheme) {
         // Glassy dark theme card
         const entryId = `ntr-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`;
-        content += `\n<div id="${entryId}" data-ntr-food="${item.food.replace(/"/g, '&quot;')}" data-ntr-quantity="${item.quantity.replace(/"/g, '&quot;')}" data-ntr-calories="${item.calories}" data-ntr-protein="${item.protein}" data-ntr-carbs="${item.carbs}" data-ntr-fat="${item.fat}" style="background: linear-gradient(135deg, rgba(30, 41, 59, 0.75), rgba(51, 65, 85, 0.75)); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-radius: 16px; padding: 14px; margin: 10px 0; box-shadow: 0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.1); border: 1px solid rgba(148,163,184,0.2); position: relative;">\n`;
+        content += `\n<div id="${entryId}" data-ntr-food="${item.food.replace(/"/g, '&quot;')}" data-ntr-quantity="${item.quantity.replace(/"/g, '&quot;')}" data-ntr-calories="${item.calories}" data-ntr-protein="${item.protein}" data-ntr-carbs="${item.carbs}" data-ntr-fat="${item.fat}" style="background: linear-gradient(135deg, rgba(30, 41, 59, 0.75), rgba(51, 65, 85, 0.75)); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-radius: 16px; padding: 14px; margin: 10px 0; box-shadow: 0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.1); border: 1px solid rgba(148,163,184,0.2); position: relative; overflow: hidden;">\n`;
         content += `  <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">\n`;
         content += `    <div style="display: flex; align-items: center;">\n`;
         content += `      <span style="font-size: 32px; margin-right: 10px;">${emoji}</span>\n`;
@@ -311,7 +311,7 @@ export class FileService {
         content += `      </div>\n`;
         content += `    </div>\n`;
         if (timeStr) {
-          content += `    <div style="position: absolute; top: 8px; right: 10px; background: linear-gradient(135deg, rgba(0,0,0,0.15), rgba(30,41,59,0.1)); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); padding: 2px 6px; border-radius: 8px; font-size: 10px; color: #cbd5e1; border: 1px solid rgba(255,255,255,0.08);">🕐 ${timeStr}</div>\n`;
+          content += `    <div style="position: absolute; top: 8px; right: 8px; background: linear-gradient(135deg, rgba(0,0,0,0.15), rgba(30,41,59,0.1)); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); padding: 2px 6px; border-radius: 8px; font-size: 10px; color: #cbd5e1; border: 1px solid rgba(255,255,255,0.08); max-width: calc(100% - 120px); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">🕐 ${timeStr}</div>\n`;
         }
         content += `    <button class="nutrition-edit-btn" data-food="${item.food.replace(/"/g, '&quot;')}" data-quantity="${item.quantity.replace(/"/g, '&quot;')}" data-calories="${item.calories}" data-protein="${item.protein}" data-carbs="${item.carbs}" data-fat="${item.fat}" style="background: linear-gradient(135deg, rgba(148,163,184,0.12), rgba(100,116,139,0.08)); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); border: 1px solid rgba(148,163,184,0.25); border-radius: 8px; padding: 4px 8px; color: #cbd5e1; font-size: 10px; cursor: pointer; margin-left: 8px; box-shadow: 0 2px 8px rgba(148,163,184,0.1), inset 0 1px 0 rgba(255,255,255,0.1);">✏️ Edit</button>\n`;
         content += `  </div>\n`;
@@ -341,7 +341,7 @@ export class FileService {
       } else {
         // Glassy light theme card
         const entryId = `ntr-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`;
-        content += `\n<div id="${entryId}" data-ntr-food="${item.food.replace(/"/g, '&quot;')}" data-ntr-quantity="${item.quantity.replace(/"/g, '&quot;')}" data-ntr-calories="${item.calories}" data-ntr-protein="${item.protein}" data-ntr-carbs="${item.carbs}" data-ntr-fat="${item.fat}" style="background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(248, 250, 252, 0.9)); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-radius: 16px; padding: 14px; margin: 10px 0; box-shadow: 0 8px 32px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.9); border: 1px solid rgba(255,255,255,0.6); position: relative;">\n`;
+        content += `\n<div id="${entryId}" data-ntr-food="${item.food.replace(/"/g, '&quot;')}" data-ntr-quantity="${item.quantity.replace(/"/g, '&quot;')}" data-ntr-calories="${item.calories}" data-ntr-protein="${item.protein}" data-ntr-carbs="${item.carbs}" data-ntr-fat="${item.fat}" style="background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(248, 250, 252, 0.9)); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-radius: 16px; padding: 14px; margin: 10px 0; box-shadow: 0 8px 32px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.9); border: 1px solid rgba(255,255,255,0.6); position: relative; overflow: hidden;">\n`;
         content += `  <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">\n`;
         content += `    <div style="display: flex; align-items: center;">\n`;
         content += `      <span style="font-size: 32px; margin-right: 10px;">${emoji}</span>\n`;
@@ -351,7 +351,7 @@ export class FileService {
         content += `      </div>\n`;
         content += `    </div>\n`;
         if (timeStr) {
-          content += `    <div style="position: absolute; top: 8px; right: 10px; background: linear-gradient(135deg, rgba(255,255,255,0.7), rgba(248,250,252,0.4)); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); padding: 2px 6px; border-radius: 8px; font-size: 10px; color: #64748b; border: 1px solid rgba(255,255,255,0.6);">🕐 ${timeStr}</div>\n`;
+          content += `    <div style="position: absolute; top: 8px; right: 8px; background: linear-gradient(135deg, rgba(255,255,255,0.7), rgba(248,250,252,0.4)); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); padding: 2px 6px; border-radius: 8px; font-size: 10px; color: #64748b; border: 1px solid rgba(255,255,255,0.6); max-width: calc(100% - 120px); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">🕐 ${timeStr}</div>\n`;
         }
         content += `    <button class="nutrition-edit-btn" data-food="${item.food.replace(/"/g, '&quot;')}" data-quantity="${item.quantity.replace(/"/g, '&quot;')}" data-calories="${item.calories}" data-protein="${item.protein}" data-carbs="${item.carbs}" data-fat="${item.fat}" style="background: linear-gradient(135deg, rgba(255,255,255,0.7), rgba(248,250,252,0.5)); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); border: 1px solid rgba(255,255,255,0.6); border-radius: 8px; padding: 4px 8px; color: #475569; font-size: 10px; cursor: pointer; margin-left: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.8);">✏️ Edit</button>\n`;
         content += `  </div>\n`;
@@ -432,7 +432,7 @@ export class FileService {
       };
       
       // Main container
-      content += `<div id="${entryId}" class="nutrition-food-entry-simple ${entryId}" data-food="${item.food.replace(/"/g, '&quot;')}" data-quantity="${item.quantity.replace(/"/g, '&quot;')}" data-calories="${item.calories}" data-protein="${item.protein}" data-carbs="${item.carbs}" data-fat="${item.fat}" style="margin: 12px 0; padding: 16px 20px; background: ${styles.background}; border-left: 4px solid ${styles.borderColor}; border-radius: 0 12px 12px 0; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); box-shadow: ${styles.shadow};">\n\n`;
+      content += `<div id="${entryId}" class="nutrition-food-entry-simple ${entryId}" data-food="${item.food.replace(/"/g, '&quot;')}" data-quantity="${item.quantity.replace(/"/g, '&quot;')}" data-calories="${item.calories}" data-protein="${item.protein}" data-carbs="${item.carbs}" data-fat="${item.fat}" style="margin: 12px 0; padding: 16px 20px; background: ${styles.background}; border-left: 4px solid ${styles.borderColor}; border-radius: 0 12px 12px 0; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); box-shadow: ${styles.shadow}; overflow: hidden;">\n\n`;
       
       // Header with food name and edit button
       content += `<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">\n`;
@@ -465,16 +465,18 @@ export class FileService {
     
     let summary = '## 📊 Daily Summary\n\n';
     
-    // Create glassy card wrapper for the summary content
+    // Create glassy card wrapper similar to food cards but lighter
     const cardStyles = isDark ? {
-      background: 'linear-gradient(135deg, rgba(30, 41, 59, 0.75), rgba(51, 65, 85, 0.75))',
-      border: '1px solid rgba(148, 163, 184, 0.2)',
+      background: 'linear-gradient(135deg, rgba(51, 65, 85, 0.6), rgba(30, 41, 59, 0.5))',
+      border: '1px solid rgba(148, 163, 184, 0.25)',
+      shadow: '0 8px 32px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.08)',
       textColor: '#f8fafc',
       subtleColor: '#cbd5e1',
       footerColor: '#94a3b8'
     } : {
-      background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(248, 250, 252, 0.9))',
-      border: '1px solid rgba(255, 255, 255, 0.6)',
+      background: 'linear-gradient(135deg, rgb(240 240 240 / 80%), rgba(248, 250, 252, 0.7))',
+      border: '1px solid rgba(255, 255, 255, 0.7)',
+      shadow: '0 8px 32px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.9)',
       textColor: '#0f172a',
       subtleColor: '#475569',
       footerColor: '#64748b'
@@ -511,7 +513,26 @@ export class FileService {
     }
     
     // Build the entire card as a single line (like food item cards)
-    summary += `<div style="background: ${cardStyles.background}; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-radius: 16px; padding: 20px; margin: 12px 0; box-shadow: 0 8px 32px rgba(0,0,0,${isDark ? '0.3' : '0.08'}), inset 0 1px 0 rgba(255,255,255,${isDark ? '0.1' : '0.9'}); border: ${cardStyles.border};"><h3 style="color: ${cardStyles.textColor}; margin-top: 0; margin-bottom: 16px; font-size: 18px; font-weight: 500; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; letter-spacing: -0.5px;">🎯 Totals vs Goals</h3><div style="border-top: 1px solid rgba(255, 255, 255, ${isDark ? '0.1' : '0.2'}); margin-bottom: 16px;"></div>${nutritionRows}<div style="text-align: center; margin: 16px 0; padding: 12px; background: rgba(255, 255, 255, ${isDark ? '0.05' : '0.1'}); border-radius: 12px; border: 1px solid rgba(255, 255, 255, ${isDark ? '0.1' : '0.2'});"><h3 style="color: ${cardStyles.textColor}; margin: 0; font-size: 20px; font-weight: 500; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; letter-spacing: -0.8px;">${this.getOverallStatusEmoji(overallProgress)} Overall Progress: ${overallProgress}%</h3></div></div>\n\n`;
+    // Create ultra-subtle glassy overall progress section
+    const progressBg = isDark 
+      ? 'rgba(255, 255, 255, 0.08)'
+      : 'linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(248, 248, 248, 0.15))';
+    
+    const progressBorder = isDark 
+      ? 'rgba(255, 255, 255, 0.15)'
+      : 'rgba(255, 255, 255, 0.25)';
+    
+    // Enhanced divider with dark grey/resin color
+    const dividerStyle = isDark 
+      ? 'background: linear-gradient(90deg, transparent, rgba(60, 60, 60, 0.8), transparent); height: 1px; border: none;'
+      : 'background: linear-gradient(90deg, transparent, rgba(80, 80, 80, 0.4), transparent); height: 1px; border: none;';
+    
+    // Enhanced overall progress border with gradient
+    const enhancedProgressBorder = isDark 
+      ? 'background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(148, 163, 184, 0.15)); padding: 1px; border-radius: 13px;'
+      : 'background: linear-gradient(135deg, rgba(0, 0, 0, 0.15), rgba(100, 100, 100, 0.1)); padding: 1px; border-radius: 13px;';
+    
+    summary += `<div style="background: ${cardStyles.background}; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-radius: 16px; padding: 20px; margin: 12px 0; box-shadow: ${cardStyles.shadow}; border: ${cardStyles.border};"><h3 style="color: ${cardStyles.textColor}; margin-top: 0; margin-bottom: 16px; font-size: 18px; font-weight: 500; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; letter-spacing: -0.5px;">🎯 Totals vs Goals</h3><div style="${dividerStyle} margin-bottom: 16px;"></div>${nutritionRows}<div style="${enhancedProgressBorder} text-align: center; margin: 32px 0 0;"><div style="background: ${progressBg}; border-radius: 12px; padding: 12px;"><h3 style="color: ${cardStyles.textColor}; margin: 0; font-size: 20px; font-weight: 500; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; letter-spacing: -0.8px;">${this.getOverallStatusEmoji(overallProgress)} Overall Progress: ${overallProgress}%</h3></div></div></div>\n\n`;
     
     return summary;
   }
@@ -531,23 +552,35 @@ export class FileService {
       const percentage = this.calculatePercentage(nutrient.current, nutrient.goal);
       const { gradient, textColor, borderColor } = this.getProgressGradient(percentage, isDark);
       
-      // Minimalistic glassy track background
+      // Ultra-subtle glassy track background with enhanced borders
       const trackBg = isDark 
-        ? 'rgba(255, 255, 255, 0.05)'
-        : 'rgba(0, 0, 0, 0.04)';
+        ? 'linear-gradient(135deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01))'
+        : 'linear-gradient(135deg, rgba(0, 0, 0, 0.02), rgba(0, 0, 0, 0.01))';
       
-      const trackBorder = isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.08)';
+      const trackBorder = isDark 
+        ? 'rgba(255, 255, 255, 0.12)' 
+        : 'rgba(0, 0, 0, 0.12)';
+      
+      const trackShadow = isDark 
+        ? 'inset 0 1px 2px rgba(0, 0, 0, 0.1), 0 1px 0 rgba(255, 255, 255, 0.03)'
+        : 'inset 0 1px 2px rgba(0, 0, 0, 0.06), 0 1px 0 rgba(255, 255, 255, 0.8)';
       
       content += `<span style="color: ${isDark ? '#e0e0e0' : '#333'}; font-weight: 500; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 15px; letter-spacing: -0.3px;">${nutrient.emoji} ${nutrient.name}:</span> <span style="color: ${isDark ? '#a0a0a0' : '#666'}; font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace; font-size: 13px; font-weight: 400;">${Math.round(nutrient.current)} / ${nutrient.goal} ${nutrient.unit}</span> `;
       content += `<span style="color: ${textColor}; font-weight: 500; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 14px;">(${percentage}%)</span>\n`;
       
-      // Minimalistic glassy progress bar with colored border
-      content += `<div style="width: 100%; background: ${trackBg}; border: 1px solid ${trackBorder}; border-radius: 8px; height: 18px; margin: 6px 0 12px 0; padding: 1px; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);">\n`;
-      content += `  <div style="width: ${Math.min(percentage, 100)}%; background: ${gradient}; height: 100%; border-radius: 7px; border: 1px solid ${borderColor}; transition: all 0.3s ease; position: relative; overflow: hidden;">\n`;
+      // Ultra-minimalistic glassy progress bar with enhanced visibility
+      content += `<div style="width: 100%; background: ${trackBg}; border: 1px solid ${trackBorder}; border-radius: 10px; height: 16px; margin: 6px 0 12px 0; padding: 2px; backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); box-shadow: ${trackShadow};">\n`;
+      content += `  <div style="width: ${Math.min(percentage, 100)}%; background: ${gradient}; height: 100%; border-radius: 8px; border: 1px solid ${borderColor}; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); position: relative; overflow: hidden; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);">\n`;
       
-      // Subtle glass shine effect
+      // Enhanced glass shine effect with theme adaptation
       if (percentage > 0) {
-        content += `    <div style="position: absolute; top: 0; left: 0; right: 0; height: 40%; background: linear-gradient(180deg, rgba(255,255,255,${isDark ? '0.08' : '0.15'}), transparent); border-radius: 7px 7px 0 0;"></div>\n`;
+        const shineOpacity = isDark ? 0.06 : 0.12;
+        const shineFade = shineOpacity * 0.3;
+        content += `    <div style="position: absolute; top: 0; left: 0; right: 0; height: 50%; background: linear-gradient(180deg, rgba(255,255,255,${shineOpacity}) 0%, rgba(255,255,255,${shineFade}) 70%, transparent 100%); border-radius: 8px 8px 0 0;"></div>\n`;
+        
+        // Subtle inner glow
+        const glowOpacity = isDark ? 0.03 : 0.04;
+        content += `    <div style="position: absolute; inset: 0; border-radius: 8px; box-shadow: inset 0 0 8px rgba(255,255,255,${glowOpacity});"></div>\n`;
       }
       
       content += `  </div>\n`;
@@ -570,55 +603,58 @@ export class FileService {
   }
 
   private getProgressGradient(percentage: number, isDark: boolean): { gradient: string, textColor: string, borderColor: string } {
-    // Smooth color transitions: Red (0%) → Orange (50%) → Green (100%)
+    // Smooth, muted color transitions: Red (0%) → Orange (50%) → Green (100%)
+    // Cap at 100% to prevent color changes beyond completion
+    const cappedPercentage = Math.min(percentage, 100);
     let r, g, b;
     
     if (isDark) {
-      // Dark theme: Use existing darker colors
-      if (percentage <= 50) {
-        // Red to Orange transition (0% to 50%)
-        const factor = percentage / 50;
-        r = 239; // Red component stays high
-        g = Math.round(68 + (165 - 68) * factor); // 68 (red) to 165 (orange)
-        b = Math.round(68 * (1 - factor)); // 68 (red) to 0 (orange)
+      // Dark theme: Natural, muted colors with good visibility
+      if (cappedPercentage <= 50) {
+        // Red to Yellow transition (0% to 50%) - natural warm tones
+        const factor = cappedPercentage / 50;
+        r = Math.round(200 + (220 - 200) * factor); // 200 (natural red) to 220 (natural yellow)
+        g = Math.round(90 + (180 - 90) * factor);   // 90 (natural red) to 180 (natural yellow)
+        b = Math.round(90 + (85 - 90) * factor);    // 90 (natural red) to 85 (natural yellow)
       } else {
-        // Orange to Green transition (50% to 100%)
-        const factor = (percentage - 50) / 50;
-        r = Math.round(249 - (249 - 34) * factor); // 249 (orange) to 34 (green)
-        g = Math.round(165 + (197 - 165) * factor); // 165 (orange) to 197 (green)
-        b = Math.round(22 + (94 - 22) * factor); // 22 (orange) to 94 (green)
+        // Yellow to Green transition (50% to 100%) - natural warm to cool
+        const factor = (cappedPercentage - 50) / 50;
+        r = Math.round(220 - (220 - 110) * factor); // 220 (natural yellow) to 110 (natural green)
+        g = Math.round(180 - (180 - 170) * factor); // 180 (natural yellow) to 170 (natural green)
+        b = Math.round(85 + (110 - 85) * factor);   // 85 (natural yellow) to 110 (natural green)
       }
     } else {
-      // Light theme: Use lighter, more pure colors
-      if (percentage <= 50) {
-        // Red to Orange transition (0% to 50%) - lighter, more pure
-        const factor = percentage / 50;
-        r = 255; // Pure red component
-        g = Math.round(80 + (200 - 80) * factor); // 80 (red) to 200 (orange)
-        b = Math.round(80 * (1 - factor)); // 80 (red) to 0 (orange)
+      // Light theme: Natural, muted colors - traffic light progression
+      if (cappedPercentage <= 50) {
+        // Red to Yellow transition (0% to 50%) - natural coral to warm yellow
+        const factor = cappedPercentage / 50;
+        r = Math.round(190 + (210 - 190) * factor); // 190 (natural coral) to 210 (natural yellow)
+        g = Math.round(110 + (175 - 110) * factor); // 110 (natural coral) to 175 (natural yellow)
+        b = Math.round(110 + (90 - 110) * factor);  // 110 (natural coral) to 90 (natural yellow)
       } else {
-        // Orange to Green transition (50% to 100%) - lighter, more pure
-        const factor = (percentage - 50) / 50;
-        r = Math.round(255 - (255 - 50) * factor); // 255 (orange) to 50 (green)
-        g = Math.round(200 + (55) * factor); // 200 (orange) to 255 (green)
-        b = Math.round(0 + (50) * factor); // 0 (orange) to 50 (green)
+        // Yellow to Green transition (50% to 100%) - natural yellow to sage
+        const factor = (cappedPercentage - 50) / 50;
+        r = Math.round(210 - (210 - 130) * factor); // 210 (natural yellow) to 130 (natural sage)
+        g = Math.round(175 - (175 - 150) * factor); // 175 (natural yellow) to 150 (natural sage)
+        b = Math.round(90 + (120 - 90) * factor);   // 90 (natural yellow) to 120 (natural sage)
       }
     }
     
-    // Create subtle, glassy gradients with theme-appropriate opacity
-    const opacity = isDark ? 0.4 : 0.5;
-    const primaryColor = `rgba(${r}, ${g}, ${b}, ${opacity})`;
-    const secondaryColor = `rgba(${r}, ${g}, ${b}, ${opacity * 0.7})`;
+    // Create glassy gradients with enhanced visibility for dark theme
+    const baseOpacity = isDark ? 0.45 : 0.3;
+    const primaryColor = `rgba(${r}, ${g}, ${b}, ${baseOpacity})`;
+    const secondaryColor = `rgba(${r}, ${g}, ${b}, ${baseOpacity * 0.6})`;
     
-    const gradient = `linear-gradient(135deg, ${primaryColor}, ${secondaryColor})`;
+    // Multi-stop gradient for more sophisticated glass effect
+    const gradient = `linear-gradient(135deg, ${primaryColor} 0%, rgba(${r}, ${g}, ${b}, ${baseOpacity * 0.8}) 50%, ${secondaryColor} 100%)`;
     
-    // Border color - slightly more opaque than the gradient
-    const borderColor = `rgba(${r}, ${g}, ${b}, ${isDark ? 0.6 : 0.7})`;
+    // Enhanced border visibility for dark theme
+    const borderOpacity = isDark ? 0.6 : 0.45;
+    const borderColor = `rgba(${r}, ${g}, ${b}, ${borderOpacity})`;
     
-    // Text color for percentage - theme-appropriate
-    const textColor = isDark 
-      ? `rgba(${r}, ${g}, ${b}, 0.9)` 
-      : `rgba(${Math.max(0, r-40)}, ${Math.max(0, g-40)}, ${Math.max(0, b-40)}, 0.9)`;
+    // Text color - enhanced visibility for dark theme
+    const textOpacity = isDark ? 0.95 : 0.75;
+    const textColor = `rgba(${Math.round(r * 0.9)}, ${Math.round(g * 0.9)}, ${Math.round(b * 0.9)}, ${textOpacity})`;
     
     return { gradient, textColor, borderColor };
   }
