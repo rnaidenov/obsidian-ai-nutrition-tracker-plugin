@@ -1,0 +1,96 @@
+import { TFile, Vault, TAbstractFile } from 'obsidian';
+
+export class FileUtils {
+  constructor(private vault: Vault) {}
+
+  async ensureDirectoryExists(path: string): Promise<void> {
+    console.log('Ensuring directory exists for path:', path);
+    const dirs = path.split('/');
+    let currentPath = '';
+    
+    for (const dir of dirs) {
+      currentPath = currentPath ? `${currentPath}/${dir}` : dir;
+      console.log('Checking/creating directory:', currentPath);
+      
+      const exists = this.vault.getAbstractFileByPath(currentPath);
+      if (!exists) {
+        console.log('Directory does not exist, creating:', currentPath);
+        try {
+          await this.vault.createFolder(currentPath);
+          console.log('Successfully created directory:', currentPath);
+        } catch (error) {
+          console.error('Failed to create directory:', currentPath, error);
+          throw new Error(`Failed to create directory ${currentPath}: ${error.message}`);
+        }
+      } else {
+        console.log('Directory already exists:', currentPath);
+      }
+    }
+    console.log('Directory creation completed for path:', path);
+  }
+
+  async saveImage(imageFile: File, imageStoragePath: string): Promise<string> {
+    try {
+      await this.ensureDirectoryExists(imageStoragePath);
+      
+      const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+      const extension = imageFile.name.split('.').pop() || 'jpg';
+      const filename = `food-image-${timestamp}.${extension}`;
+      const imagePath = `${imageStoragePath}/${filename}`;
+      
+      // Convert File to ArrayBuffer
+      const arrayBuffer = await imageFile.arrayBuffer();
+      await this.vault.createBinary(imagePath, arrayBuffer);
+      
+      return imagePath;
+    } catch (error) {
+      console.error('Error saving image:', error);
+      throw new Error(`Failed to save image: ${error.message}`);
+    }
+  }
+
+  getTodayString(): string {
+    const today = new Date();
+    return today.toISOString().split('T')[0]; // YYYY-MM-DD
+  }
+
+  generateMealId(): string {
+    return 'meal_' + Date.now().toString(36) + '_' + Math.random().toString(36).substr(2, 9);
+  }
+
+  sanitizeMealName(name: string): string {
+    return name.replace(/[^a-zA-Z0-9\s-]/g, '').replace(/\s+/g, '-').toLowerCase();
+  }
+
+  isMealNote(file: TAbstractFile, mealStoragePath: string, logStoragePath: string): boolean {
+    if (!(file instanceof TFile)) return false;
+    
+    // Check if file is in meal storage path and has .md extension
+    const normalizedPath = file.path.replace(/\\/g, '/');
+    const normalizedMealPath = mealStoragePath.replace(/\\/g, '/');
+    const normalizedLogPath = logStoragePath.replace(/\\/g, '/');
+    
+    // Must be in meal storage path
+    const inMealPath = normalizedPath.startsWith(normalizedMealPath);
+    
+    // Must NOT be in log storage path (prevent cross-contamination)
+    const inLogPath = normalizedPath.startsWith(normalizedLogPath);
+    
+    // Must have .md extension and not be meals.json
+    const validExtension = file.extension === 'md' && file.name !== 'meals.json';
+    
+    // Must not be a food log (food logs typically have format "YYYY-MM-DD.md")
+    const isFoodLog = /^\d{4}-\d{2}-\d{2}\.md$/.test(file.name);
+    
+    console.log(`🔍 File detection for "${file.path}":`);
+    console.log(`  - In meal path: ${inMealPath}`);
+    console.log(`  - In log path: ${inLogPath}`);
+    console.log(`  - Valid extension: ${validExtension}`);
+    console.log(`  - Is food log pattern: ${isFoodLog}`);
+    
+    const isMealNote = inMealPath && !inLogPath && validExtension && !isFoodLog;
+    console.log(`  - RESULT: Is meal note = ${isMealNote}`);
+    
+    return isMealNote;
+  }
+} 
