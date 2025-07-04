@@ -15,6 +15,7 @@ export class FoodInputModal extends Modal {
   private processButton: HTMLButtonElement | null = null;
   private processingIndicator: HTMLElement | null = null;
   private initialData: any = null;
+  private editingContext: 'meal' | 'foodlog' = 'foodlog';
 
   constructor(
     app: App, 
@@ -31,6 +32,10 @@ export class FoodInputModal extends Modal {
     this.description = `${data.quantity} ${data.food}`;
   }
 
+  setEditingContext(context: 'meal' | 'foodlog') {
+    this.editingContext = context;
+  }
+
   async onOpen() {
     const { contentEl } = this;
     contentEl.empty();
@@ -38,14 +43,25 @@ export class FoodInputModal extends Modal {
     // Load available meals
     await this.loadMeals();
 
-    const title = this.initialData ? 'Edit Food Entry' : 'Add Food Entry';
+    let title = 'Add Food Entry';
+    if (this.initialData) {
+      title = this.editingContext === 'meal' ? 'Edit Meal Item' : 'Edit Food Entry';
+    }
     contentEl.createEl('h2', { text: title });
 
     // Add editing notice
     if (this.initialData) {
       const isDarkTheme = document.body.classList.contains('theme-dark');
+      let noticeText = '';
+      
+      if (this.editingContext === 'meal') {
+        noticeText = `🍽️ Editing meal item: ${this.initialData.quantity} ${this.initialData.food} (${this.initialData.calories} kcal). This will update the meal template for future use only. Past food logs remain unchanged.`;
+      } else {
+        noticeText = `✏️ Editing: ${this.initialData.quantity} ${this.initialData.food} (${this.initialData.calories} kcal). Modify description as needed - this will edit the existing entry.`;
+      }
+      
       const notice = contentEl.createEl('p', { 
-        text: `✏️ Editing: ${this.initialData.quantity} ${this.initialData.food} (${this.initialData.calories} kcal). Modify description as needed - this will edit the existing entry.`,
+        text: noticeText,
         cls: 'nutrition-tracker-edit-notice'
       });
       
@@ -229,7 +245,11 @@ export class FoodInputModal extends Modal {
     cancelButton.addEventListener('click', () => this.close());
     cancelButton.disabled = this.isProcessing;
     
-    const buttonText = this.initialData ? 'Update Food' : 'Process Food';
+    let buttonText = 'Process Food';
+    if (this.initialData) {
+      buttonText = this.editingContext === 'meal' ? 'Update Meal Item' : 'Update Food';
+    }
+    
     this.processButton = buttonContainer.createEl('button', { 
       text: this.isProcessing ? 'Processing...' : buttonText,
       cls: 'mod-cta'
@@ -248,7 +268,10 @@ export class FoodInputModal extends Modal {
       // Enable button if we have meals OR (description/images) AND (if save as meal, must have name)
       this.processButton.disabled = this.isProcessing || (!hasSelectedMeals && !hasDescription && !hasImages) || !hasMealName;
       
-      const buttonText = this.initialData ? 'Update Food' : 'Process Food';
+      let buttonText = 'Process Food';
+      if (this.initialData) {
+        buttonText = this.editingContext === 'meal' ? 'Update Meal Item' : 'Update Food';
+      }
       this.processButton.textContent = this.isProcessing ? 'Processing...' : buttonText;
     }
     
@@ -391,10 +414,17 @@ export class FoodInputModal extends Modal {
         }
       }
 
-      // Create or update food log
+      // Create or update based on context
       if (this.initialData) {
-        await this.fileService.createOrUpdateFoodLog(allFoodItems, this.initialData);
+        if (this.editingContext === 'meal') {
+          // Update meal template
+          await this.fileService.updateMealItem(this.initialData, allFoodItems[0]);
+        } else {
+          // Update food log
+          await this.fileService.createOrUpdateFoodLog(allFoodItems, this.initialData);
+        }
       } else {
+        // Always create food log for new entries
         await this.fileService.createOrUpdateFoodLog(allFoodItems);
       }
       

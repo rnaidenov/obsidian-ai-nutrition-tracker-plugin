@@ -1,4 +1,4 @@
-import { TFile, Vault, Notice } from 'obsidian';
+import { TFile, Vault, Notice, TAbstractFile } from 'obsidian';
 import { FoodItem, NutritionData, Meal } from '../types/nutrition';
 import { PluginSettings } from '../types/settings';
 import { LLMService } from './llm-service';
@@ -279,9 +279,9 @@ export class FileService {
     
     // Generate food items based on layout style
     if (this.settings.layoutStyle === 'cards') {
-      content += this.generateCardLayout(foodItems);
+      content += this.generateCardLayout(foodItems, 'foodlog');
     } else {
-      content += this.generateSimpleLayout(foodItems);
+      content += this.generateSimpleLayout(foodItems, 'foodlog');
     }
     
     if (isNewFile) {
@@ -293,7 +293,7 @@ export class FileService {
     return content;
   }
 
-  private generateCardLayout(foodItems: FoodItem[]): string {
+  private generateCardLayout(foodItems: FoodItem[], context?: 'meal' | 'foodlog'): string {
     let content = '';
     const isDarkTheme = this.getEffectiveTheme() === 'dark';
     
@@ -304,6 +304,9 @@ export class FileService {
           hour: '2-digit', 
           minute: '2-digit' 
         }) : '';
+      
+      // Add context to identify where the edit originated from
+      const editContext = context || 'foodlog';
       
       if (isDarkTheme) {
         // Glassy dark theme card
@@ -320,7 +323,7 @@ export class FileService {
         }
         content += `      </div>\n`;
         content += `    </div>\n`;
-        content += `    <button class="nutrition-edit-btn" data-food="${item.food.replace(/"/g, '&quot;')}" data-quantity="${item.quantity.replace(/"/g, '&quot;')}" data-calories="${item.calories}" data-protein="${item.protein}" data-carbs="${item.carbs}" data-fat="${item.fat}" style="background: linear-gradient(135deg, rgba(148,163,184,0.12), rgba(100,116,139,0.08)); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); border: 1px solid rgba(148,163,184,0.25); border-radius: 8px; padding: 6px 10px; color: #cbd5e1; font-size: 10px; cursor: pointer; margin-left: 12px; box-shadow: 0 2px 8px rgba(148,163,184,0.1), inset 0 1px 0 rgba(255,255,255,0.1); flex-shrink: 0;">✏️ Edit</button>\n`;
+        content += `    <button class="nutrition-edit-btn" data-food="${item.food.replace(/"/g, '&quot;')}" data-quantity="${item.quantity.replace(/"/g, '&quot;')}" data-calories="${item.calories}" data-protein="${item.protein}" data-carbs="${item.carbs}" data-fat="${item.fat}" data-edit-context="${editContext}" style="background: linear-gradient(135deg, rgba(148,163,184,0.12), rgba(100,116,139,0.08)); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); border: 1px solid rgba(148,163,184,0.25); border-radius: 8px; padding: 6px 10px; color: #cbd5e1; font-size: 10px; cursor: pointer; margin-left: 12px; box-shadow: 0 2px 8px rgba(148,163,184,0.1), inset 0 1px 0 rgba(255,255,255,0.1); flex-shrink: 0;">✏️ Edit</button>\n`;
         content += `  </div>\n`;
         content += `  <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;">\n`;
         content += `    <div style="text-align: center; padding: 8px; background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(185, 28, 28, 0.1)); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); border-radius: 12px; border: 1px solid rgba(239, 68, 68, 0.25); box-shadow: 0 4px 16px rgba(239, 68, 68, 0.1);">\n`;
@@ -360,7 +363,7 @@ export class FileService {
         }
         content += `      </div>\n`;
         content += `    </div>\n`;
-        content += `    <button class="nutrition-edit-btn" data-food="${item.food.replace(/"/g, '&quot;')}" data-quantity="${item.quantity.replace(/"/g, '&quot;')}" data-calories="${item.calories}" data-protein="${item.protein}" data-carbs="${item.carbs}" data-fat="${item.fat}" style="background: linear-gradient(135deg, rgba(255,255,255,0.7), rgba(248,250,252,0.5)); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); border: 1px solid rgba(255,255,255,0.6); border-radius: 8px; padding: 6px 10px; color: #475569; font-size: 10px; cursor: pointer; margin-left: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.8); flex-shrink: 0;">✏️ Edit</button>\n`;
+        content += `    <button class="nutrition-edit-btn" data-food="${item.food.replace(/"/g, '&quot;')}" data-quantity="${item.quantity.replace(/"/g, '&quot;')}" data-calories="${item.calories}" data-protein="${item.protein}" data-carbs="${item.carbs}" data-fat="${item.fat}" data-edit-context="${editContext}" style="background: linear-gradient(135deg, rgba(255,255,255,0.7), rgba(248,250,252,0.5)); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); border: 1px solid rgba(255,255,255,0.6); border-radius: 8px; padding: 6px 10px; color: #475569; font-size: 10px; cursor: pointer; margin-left: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.8); flex-shrink: 0;">✏️ Edit</button>\n`;
         content += `  </div>\n`;
         content += `  <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;">\n`;
         content += `    <div style="text-align: center; padding: 8px; background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(254, 226, 226, 0.9)); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); border-radius: 12px; border: 1px solid rgba(252, 165, 165, 0.3); box-shadow: 0 4px 16px rgba(239, 68, 68, 0.06), inset 0 1px 0 rgba(255,255,255,0.8);">\n`;
@@ -399,9 +402,10 @@ export class FileService {
     return this.settings.displayTheme as 'light' | 'dark';
   }
 
-  private generateSimpleLayout(foodItems: FoodItem[]): string {
+  private generateSimpleLayout(foodItems: FoodItem[], context?: 'meal' | 'foodlog'): string {
     let content = '';
     const isDark = this.getEffectiveTheme() === 'dark';
+    const editContext = context || 'foodlog';
     
     for (const item of foodItems) {
       const emoji = item.emoji || '🍽️';
@@ -444,7 +448,7 @@ export class FileService {
       // Header with food name and edit button
       content += `<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">\n`;
       content += `<h3 style="margin: 0; color: ${styles.textColor}; font-size: 18px; font-weight: 600;">${emoji} ${item.food}</h3>\n`;
-      content += `<button class="nutrition-edit-btn" data-food="${item.food.replace(/"/g, '&quot;')}" data-quantity="${item.quantity.replace(/"/g, '&quot;')}" data-calories="${item.calories}" data-protein="${item.protein}" data-carbs="${item.carbs}" data-fat="${item.fat}" style="background: ${styles.editBtnBg}; border: 1px solid ${styles.editBtnBorder}; color: ${styles.subtleColor}; cursor: pointer; font-size: 12px; padding: 4px 8px; border-radius: 6px; transition: all 0.2s ease; opacity: 0.8;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.8'">✏️</button>\n`;
+      content += `<button class="nutrition-edit-btn" data-food="${item.food.replace(/"/g, '&quot;')}" data-quantity="${item.quantity.replace(/"/g, '&quot;')}" data-calories="${item.calories}" data-protein="${item.protein}" data-carbs="${item.carbs}" data-fat="${item.fat}" data-edit-context="${editContext}" style="background: ${styles.editBtnBg}; border: 1px solid ${styles.editBtnBorder}; color: ${styles.subtleColor}; cursor: pointer; font-size: 12px; padding: 4px 8px; border-radius: 6px; transition: all 0.2s ease; opacity: 0.8;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.8'">✏️</button>\n`;
       content += `</div>\n\n`;
       
       // Quantity and time
@@ -877,12 +881,6 @@ export class FileService {
   }
 
   async saveMeal(name: string, foodItems: FoodItem[], description?: string, images?: string[]): Promise<Meal> {
-    console.log('=== SAVING MEAL ===');
-    console.log('Meal name:', name);
-    console.log('Food items:', foodItems);
-    console.log('Settings mealStoragePath:', this.settings.mealStoragePath);
-    console.log('Computed meals file path:', this.getMealsFilePath());
-    
     const meal: Meal = {
       id: this.generateMealId(),
       name: name.trim(),
@@ -896,19 +894,14 @@ export class FileService {
       updatedAt: new Date().toISOString()
     };
 
-    console.log('Created meal object:', meal);
-
     try {
-      console.log('Getting existing meals...');
+      // Save to JSON storage
       const meals = await this.getMeals();
-      console.log('Found existing meals:', meals.length);
-      
       meals.push(meal);
-      console.log('Total meals to save:', meals.length);
-      
-      console.log('Saving meals to file...');
       await this.saveMealsToFile(meals);
-      console.log('Meals saved successfully');
+      
+      // Create individual markdown note for the meal
+      await this.createMealNote(meal);
       
       new Notice(`✅ Meal "${name}" saved successfully`);
       return meal;
@@ -954,14 +947,21 @@ export class FileService {
         throw new Error(`Meal with ID ${mealId} not found`);
       }
 
-      meals[mealIndex] = {
-        ...meals[mealIndex],
+      const oldMeal = meals[mealIndex];
+      const updatedMeal = {
+        ...oldMeal,
         ...updates,
         updatedAt: new Date().toISOString()
       };
+      
+      meals[mealIndex] = updatedMeal;
 
       await this.saveMealsToFile(meals);
-      new Notice(`✅ Meal "${meals[mealIndex].name}" updated successfully`);
+      
+      // Update the markdown note
+      await this.updateMealNote(oldMeal, updatedMeal);
+      
+      new Notice(`✅ Meal "${updatedMeal.name}" updated successfully`);
     } catch (error) {
       console.error('Error updating meal:', error);
       throw new Error(`Failed to update meal: ${error.message}`);
@@ -977,11 +977,15 @@ export class FileService {
         throw new Error(`Meal with ID ${mealId} not found`);
       }
 
-      const mealName = meals[mealIndex].name;
+      const mealToDelete = meals[mealIndex];
       meals.splice(mealIndex, 1);
       
       await this.saveMealsToFile(meals);
-      new Notice(`✅ Meal "${mealName}" deleted successfully`);
+      
+      // Delete the markdown note
+      await this.deleteMealNote(mealToDelete);
+      
+      new Notice(`✅ Meal "${mealToDelete.name}" deleted successfully`);
     } catch (error) {
       console.error('Error deleting meal:', error);
       throw new Error(`Failed to delete meal: ${error.message}`);
@@ -1038,5 +1042,300 @@ export class FileService {
 
   private generateMealId(): string {
     return 'meal_' + Date.now().toString(36) + '_' + Math.random().toString(36).substr(2, 9);
+  }
+
+  private async createMealNote(meal: Meal): Promise<void> {
+    try {
+      // Sanitize meal name for filename
+      const sanitizedName = meal.name.replace(/[^a-zA-Z0-9\s-]/g, '').replace(/\s+/g, '-').toLowerCase();
+      const timestamp = new Date(meal.createdAt).toISOString().split('T')[0]; // YYYY-MM-DD
+      const filename = `${timestamp}-${sanitizedName}.md`;
+      const notePath = `${this.settings.mealStoragePath}/${filename}`;
+      
+      // Generate meal note content
+      const content = await this.generateMealNoteContent(meal);
+      
+      // Check if file already exists
+      const existingFile = this.vault.getAbstractFileByPath(notePath);
+      if (existingFile) {
+        // File exists, modify it
+        await this.vault.modify(existingFile as TFile, content);
+      } else {
+        // Create new file
+        await this.vault.create(notePath, content);
+      }
+      
+      console.log(`Created meal note: ${notePath}`);
+    } catch (error) {
+      console.error('Error creating meal note:', error);
+      // Don't throw here - we don't want to fail the whole meal save if note creation fails
+      new Notice(`Warning: Failed to create meal note: ${error.message}`);
+    }
+  }
+
+  private async updateMealNote(oldMeal: Meal, newMeal: Meal): Promise<void> {
+    try {
+      // Delete old note if name changed
+      if (oldMeal.name !== newMeal.name) {
+        await this.deleteMealNote(oldMeal);
+      }
+      
+      // Create/update new note
+      await this.createMealNote(newMeal);
+      
+      console.log(`Updated meal note for: ${newMeal.name}`);
+    } catch (error) {
+      console.error('Error updating meal note:', error);
+      new Notice(`Warning: Failed to update meal note: ${error.message}`);
+    }
+  }
+
+  private async deleteMealNote(meal: Meal): Promise<void> {
+    try {
+      const sanitizedName = meal.name.replace(/[^a-zA-Z0-9\s-]/g, '').replace(/\s+/g, '-').toLowerCase();
+      const timestamp = new Date(meal.createdAt).toISOString().split('T')[0]; // YYYY-MM-DD
+      const filename = `${timestamp}-${sanitizedName}.md`;
+      const notePath = `${this.settings.mealStoragePath}/${filename}`;
+      
+      const existingFile = this.vault.getAbstractFileByPath(notePath);
+      if (existingFile instanceof TFile) {
+        await this.vault.delete(existingFile);
+        console.log(`Deleted meal note: ${notePath}`);
+      }
+    } catch (error) {
+      console.error('Error deleting meal note:', error);
+      new Notice(`Warning: Failed to delete meal note: ${error.message}`);
+    }
+  }
+
+  private async generateMealNoteContent(meal: Meal): Promise<string> {
+    const createdDate = new Date(meal.createdAt).toLocaleDateString();
+    const totalCalories = meal.items.reduce((sum, item) => sum + item.calories, 0);
+    const totalProtein = meal.items.reduce((sum, item) => sum + item.protein, 0);
+    const totalCarbs = meal.items.reduce((sum, item) => sum + item.carbs, 0);
+    const totalFat = meal.items.reduce((sum, item) => sum + item.fat, 0);
+    
+    let content = `# 🍽️ ${meal.name}\n\n`;
+    content += `**Created:** ${createdDate}\n`;
+    content += `**Items:** ${meal.items.length}\n`;
+    content += `**Total Calories:** ${totalCalories} kcal\n\n`;
+    
+    // Add editing instructions
+    content += `> **✏️ Editing Instructions:**\n`;
+    content += `> - Edit this meal by modifying the food items below\n`;
+    content += `> - Changes will update the meal template for **future use only**\n`;
+    content += `> - **Past food logs will NOT be affected** - they remain as logged\n`;
+    content += `> - Save this file to sync changes back to meal storage\n\n`;
+    
+    if (meal.description) {
+      content += `## 📝 Description\n${meal.description}\n\n`;
+    }
+    
+    content += `## 🥗 Meal Items\n\n`;
+    
+    // Generate food items using the same card layout as food logs but with meal context
+    content += this.generateCardLayout(meal.items, 'meal');
+    
+    // Add meal summary
+    content += `## 📊 Meal Summary\n\n`;
+    content += `| Nutrient | Amount |\n`;
+    content += `|----------|--------|\n`;
+    content += `| 🔥 **Calories** | ${totalCalories} kcal |\n`;
+    content += `| 💪 **Protein** | ${totalProtein.toFixed(1)}g |\n`;
+    content += `| 🌾 **Carbs** | ${totalCarbs.toFixed(1)}g |\n`;
+    content += `| 🥑 **Fat** | ${totalFat.toFixed(1)}g |\n\n`;
+    
+    // Add meal metadata
+    content += `---\n\n`;
+    content += `**Meal ID:** \`${meal.id}\`\n`;
+    content += `**Created:** ${meal.createdAt}\n`;
+    content += `**Last Updated:** ${meal.updatedAt}\n\n`;
+    content += `*✨ Generated by AI Nutrition Tracker Plugin*\n`;
+    
+    return content;
+  }
+
+  // Methods for syncing meal notes back to JSON
+  isMealNote(file: TAbstractFile): boolean {
+    if (!(file instanceof TFile)) return false;
+    
+    // Check if file is in meal storage path and has .md extension
+    const normalizedPath = file.path.replace(/\\/g, '/');
+    const normalizedMealPath = this.settings.mealStoragePath.replace(/\\/g, '/');
+    const normalizedLogPath = this.settings.logStoragePath.replace(/\\/g, '/');
+    
+    // Must be in meal storage path
+    const inMealPath = normalizedPath.startsWith(normalizedMealPath);
+    
+    // Must NOT be in log storage path (prevent cross-contamination)
+    const inLogPath = normalizedPath.startsWith(normalizedLogPath);
+    
+    // Must have .md extension and not be meals.json
+    const validExtension = file.extension === 'md' && file.name !== 'meals.json';
+    
+    // Must not be a food log (food logs typically have format "YYYY-MM-DD.md")
+    const isFoodLog = /^\d{4}-\d{2}-\d{2}\.md$/.test(file.name);
+    
+    console.log(`🔍 File detection for "${file.path}":`);
+    console.log(`  - In meal path: ${inMealPath}`);
+    console.log(`  - In log path: ${inLogPath}`);
+    console.log(`  - Valid extension: ${validExtension}`);
+    console.log(`  - Is food log pattern: ${isFoodLog}`);
+    
+    const isMealNote = inMealPath && !inLogPath && validExtension && !isFoodLog;
+    console.log(`  - RESULT: Is meal note = ${isMealNote}`);
+    
+    return isMealNote;
+  }
+
+  async syncMealNoteToJSON(file: TFile): Promise<void> {
+    try {
+      console.log('🔄 Syncing meal note to JSON (MEAL TEMPLATE ONLY):', file.path);
+      console.log('📋 This will NOT affect any past food logs - only future uses of this meal');
+      
+      const content = await this.vault.read(file);
+      
+      // Double-check that this is actually a meal note by looking for meal ID
+      if (!content.includes('**Meal ID:**')) {
+        console.warn('❌ File does not contain meal ID - this is NOT a meal note, skipping sync:', file.path);
+        console.warn('File content preview:', content.substring(0, 200) + '...');
+        return;
+      }
+      
+      const parsedMeal = this.parseMealFromMarkdown(content);
+      
+      if (!parsedMeal) {
+        console.warn('Could not parse meal from markdown:', file.path);
+        return;
+      }
+      
+      // IMPORTANT: Only update the meal template in JSON storage
+      // This will NOT affect any existing food logs that used this meal
+      const meals = await this.getMeals();
+      const mealIndex = meals.findIndex(m => m.id === parsedMeal.id);
+      
+      if (mealIndex >= 0) {
+        const oldMeal = meals[mealIndex];
+        
+        // Update existing meal template
+        const updatedMeal = {
+          ...oldMeal,
+          name: parsedMeal.name,
+          items: parsedMeal.items,
+          description: parsedMeal.description,
+          updatedAt: new Date().toISOString()
+        };
+        
+        meals[mealIndex] = updatedMeal;
+        await this.saveMealsToFile(meals);
+        
+        console.log('✅ Meal TEMPLATE updated in JSON:', updatedMeal.name);
+        console.log('📝 Past food logs using this meal remain unchanged');
+        console.log('🔮 Future uses of this meal will use the updated version');
+        
+        new Notice(`✅ Meal template "${updatedMeal.name}" updated for future use`);
+      } else {
+        console.warn('Meal not found in JSON storage:', parsedMeal.id);
+        new Notice(`⚠️ Meal not found in storage - this might be an orphaned meal note`);
+      }
+    } catch (error) {
+      console.error('Error syncing meal note to JSON:', error);
+      new Notice(`❌ Failed to sync meal: ${error.message}`);
+    }
+  }
+
+  private parseMealFromMarkdown(content: string): Partial<Meal> | null {
+    try {
+      // Extract meal ID from metadata
+      const mealIdMatch = content.match(/\*\*Meal ID:\*\*\s*`([^`]+)`/);
+      if (!mealIdMatch) {
+        console.warn('No meal ID found in markdown');
+        return null;
+      }
+      
+      const mealId = mealIdMatch[1];
+      
+      // Extract meal name from title
+      const titleMatch = content.match(/^#\s*🍽️\s*(.+)$/m);
+      const mealName = titleMatch ? titleMatch[1].trim() : 'Unnamed Meal';
+      
+      // Extract description
+      const descriptionMatch = content.match(/## 📝 Description\n([\s\S]+?)\n\n/);
+      const description = descriptionMatch ? descriptionMatch[1].trim() : undefined;
+      
+      // Extract food items from card layout
+      const foodItems = this.extractFoodItemsFromContent(content);
+      
+      return {
+        id: mealId,
+        name: mealName,
+        items: foodItems,
+        description
+      };
+    } catch (error) {
+      console.error('Error parsing meal from markdown:', error);
+      return null;
+    }
+  }
+
+  // Method to regenerate meal note after sync (to update totals)
+  async regenerateMealNote(mealId: string): Promise<void> {
+    try {
+      const meal = await this.getMealById(mealId);
+      if (meal) {
+        await this.createMealNote(meal);
+        console.log('✅ Meal note regenerated:', meal.name);
+      }
+    } catch (error) {
+      console.error('Error regenerating meal note:', error);
+    }
+  }
+
+  // Method to update a specific item within a meal template
+  async updateMealItem(originalItem: { food: string, quantity: string, calories: number, protein: number, carbs: number, fat: number }, newItem: FoodItem): Promise<void> {
+    try {
+      console.log('🔄 Updating meal item:', originalItem.food, '→', newItem.food);
+      
+      const meals = await this.getMeals();
+      let mealFound = false;
+      
+      // Find the meal that contains this item
+      for (const meal of meals) {
+        const itemIndex = meal.items.findIndex(item => 
+          item.food === originalItem.food &&
+          item.quantity === originalItem.quantity &&
+          item.calories === originalItem.calories
+        );
+        
+        if (itemIndex >= 0) {
+          console.log('✅ Found item in meal:', meal.name);
+          
+          // Update the item in the meal
+          const { mealId, timestamp, ...itemWithoutMealData } = newItem;
+          meal.items[itemIndex] = itemWithoutMealData;
+          meal.updatedAt = new Date().toISOString();
+          
+          // Save updated meals
+          await this.saveMealsToFile(meals);
+          
+          // Regenerate the meal note
+          await this.createMealNote(meal);
+          
+          new Notice(`✅ Meal item updated: ${newItem.food} in "${meal.name}"`);
+          mealFound = true;
+          break;
+        }
+      }
+      
+      if (!mealFound) {
+        console.warn('⚠️ Could not find meal containing the item to update');
+        new Notice('⚠️ Could not find the meal containing this item');
+      }
+      
+    } catch (error) {
+      console.error('Error updating meal item:', error);
+      new Notice(`❌ Failed to update meal item: ${error.message}`);
+      throw error;
+    }
   }
 } 
