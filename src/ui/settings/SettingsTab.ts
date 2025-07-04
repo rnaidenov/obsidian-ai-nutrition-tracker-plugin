@@ -114,6 +114,17 @@ export class SettingsTab extends PluginSettingTab {
         }));
 
     new Setting(containerEl)
+      .setName('Meal Storage Path')
+      .setDesc('Folder path where saved meals will be stored')
+      .addText(text => text
+        .setPlaceholder('tracker/health/food/meals')
+        .setValue(this.plugin.settings.mealStoragePath)
+        .onChange(async (value) => {
+          this.plugin.settings.mealStoragePath = value || 'tracker/health/food/meals';
+          await this.plugin.saveSettings();
+        }));
+
+    new Setting(containerEl)
       .setName('Image Storage Path')
       .setDesc('Folder path where food images will be stored')
       .addText(text => text

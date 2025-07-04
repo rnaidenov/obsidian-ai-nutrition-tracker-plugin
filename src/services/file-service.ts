@@ -1,9 +1,16 @@
 import { TFile, Vault, Notice } from 'obsidian';
-import { FoodItem, NutritionData } from '../types/nutrition';
+import { FoodItem, NutritionData, Meal } from '../types/nutrition';
 import { PluginSettings } from '../types/settings';
+import { LLMService } from './llm-service';
 
 export class FileService {
-  constructor(private vault: Vault, private settings: PluginSettings) {}
+  private llmService: LLMService;
+  
+  constructor(private vault: Vault, private settings: PluginSettings) {
+    this.llmService = new LLMService(settings);
+    console.log('FileService initialized with settings:', settings);
+    console.log('Meal storage path:', settings.mealStoragePath);
+  }
 
   async createOrUpdateFoodLog(foodItems: FoodItem[], replaceEntry?: { food: string, quantity: string, calories: number, protein: number, carbs: number, fat: number }): Promise<void> {
     const today = this.getTodayString();
@@ -771,17 +778,29 @@ export class FileService {
   }
 
   private async ensureDirectoryExists(path: string): Promise<void> {
+    console.log('Ensuring directory exists for path:', path);
     const dirs = path.split('/');
     let currentPath = '';
     
     for (const dir of dirs) {
       currentPath = currentPath ? `${currentPath}/${dir}` : dir;
+      console.log('Checking/creating directory:', currentPath);
       
       const exists = this.vault.getAbstractFileByPath(currentPath);
       if (!exists) {
-        await this.vault.createFolder(currentPath);
+        console.log('Directory does not exist, creating:', currentPath);
+        try {
+          await this.vault.createFolder(currentPath);
+          console.log('Successfully created directory:', currentPath);
+        } catch (error) {
+          console.error('Failed to create directory:', currentPath, error);
+          throw new Error(`Failed to create directory ${currentPath}: ${error.message}`);
+        }
+      } else {
+        console.log('Directory already exists:', currentPath);
       }
     }
+    console.log('Directory creation completed for path:', path);
   }
 
   async saveImage(imageFile: File): Promise<string> {
@@ -850,5 +869,174 @@ export class FileService {
     if (percentage >= 30) return '🌱'; // Seedling for growing progress
     if (percentage >= 10) return '🏃‍♂️'; // Runner for getting started
     return '🌟'; // Star for motivation to begin
+  }
+
+  // Meal storage methods
+  private getMealsFilePath(): string {
+    return `${this.settings.mealStoragePath}/meals.json`;
+  }
+
+  async saveMeal(name: string, foodItems: FoodItem[], description?: string, images?: string[]): Promise<Meal> {
+    console.log('=== SAVING MEAL ===');
+    console.log('Meal name:', name);
+    console.log('Food items:', foodItems);
+    console.log('Settings mealStoragePath:', this.settings.mealStoragePath);
+    console.log('Computed meals file path:', this.getMealsFilePath());
+    
+    const meal: Meal = {
+      id: this.generateMealId(),
+      name: name.trim(),
+      items: foodItems.map(item => {
+        const { mealId, ...itemWithoutMealId } = item;
+        return itemWithoutMealId;
+      }),
+      description: description?.trim(),
+      images: images || [],
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+
+    console.log('Created meal object:', meal);
+
+    try {
+      console.log('Getting existing meals...');
+      const meals = await this.getMeals();
+      console.log('Found existing meals:', meals.length);
+      
+      meals.push(meal);
+      console.log('Total meals to save:', meals.length);
+      
+      console.log('Saving meals to file...');
+      await this.saveMealsToFile(meals);
+      console.log('Meals saved successfully');
+      
+      new Notice(`✅ Meal "${name}" saved successfully`);
+      return meal;
+    } catch (error) {
+      console.error('Error saving meal:', error);
+      new Notice(`❌ Failed to save meal: ${error.message}`);
+      throw new Error(`Failed to save meal: ${error.message}`);
+    }
+  }
+
+  async getMeals(): Promise<Meal[]> {
+    try {
+      const mealsPath = this.getMealsFilePath();
+      const mealsFile = this.vault.getAbstractFileByPath(mealsPath);
+      
+      if (!mealsFile || !(mealsFile instanceof TFile)) {
+        // File doesn't exist, return empty array
+        return [];
+      }
+
+      const content = await this.vault.read(mealsFile);
+      const meals = JSON.parse(content);
+      
+      // Validate meals format
+      if (!Array.isArray(meals)) {
+        console.warn('Invalid meals file format, returning empty array');
+        return [];
+      }
+
+      return meals;
+    } catch (error) {
+      console.error('Error loading meals:', error);
+      return [];
+    }
+  }
+
+  async updateMeal(mealId: string, updates: Partial<Meal>): Promise<void> {
+    try {
+      const meals = await this.getMeals();
+      const mealIndex = meals.findIndex(m => m.id === mealId);
+      
+      if (mealIndex === -1) {
+        throw new Error(`Meal with ID ${mealId} not found`);
+      }
+
+      meals[mealIndex] = {
+        ...meals[mealIndex],
+        ...updates,
+        updatedAt: new Date().toISOString()
+      };
+
+      await this.saveMealsToFile(meals);
+      new Notice(`✅ Meal "${meals[mealIndex].name}" updated successfully`);
+    } catch (error) {
+      console.error('Error updating meal:', error);
+      throw new Error(`Failed to update meal: ${error.message}`);
+    }
+  }
+
+  async deleteMeal(mealId: string): Promise<void> {
+    try {
+      const meals = await this.getMeals();
+      const mealIndex = meals.findIndex(m => m.id === mealId);
+      
+      if (mealIndex === -1) {
+        throw new Error(`Meal with ID ${mealId} not found`);
+      }
+
+      const mealName = meals[mealIndex].name;
+      meals.splice(mealIndex, 1);
+      
+      await this.saveMealsToFile(meals);
+      new Notice(`✅ Meal "${mealName}" deleted successfully`);
+    } catch (error) {
+      console.error('Error deleting meal:', error);
+      throw new Error(`Failed to delete meal: ${error.message}`);
+    }
+  }
+
+  async getMealById(mealId: string): Promise<Meal | null> {
+    try {
+      const meals = await this.getMeals();
+      return meals.find(m => m.id === mealId) || null;
+    } catch (error) {
+      console.error('Error getting meal by ID:', error);
+      return null;
+    }
+  }
+
+  private async saveMealsToFile(meals: Meal[]): Promise<void> {
+    try {
+      const mealsPath = this.getMealsFilePath();
+      console.log('Saving meals to file path:', mealsPath);
+      
+      // Ensure directory exists
+      console.log('Ensuring directory exists for:', this.settings.mealStoragePath);
+      await this.ensureDirectoryExists(this.settings.mealStoragePath);
+      
+      const content = JSON.stringify(meals, null, 2);
+      console.log('Meals content to save:', content);
+      
+      const existingFile = this.vault.getAbstractFileByPath(mealsPath);
+      console.log('Existing file found:', !!existingFile);
+      
+      if (existingFile instanceof TFile) {
+        console.log('Modifying existing file...');
+        await this.vault.modify(existingFile, content);
+        console.log('Successfully modified existing file');
+      } else {
+        console.log('Creating new file...');
+        await this.vault.create(mealsPath, content);
+        console.log('Successfully created new file');
+      }
+      
+      // Verify file was created/updated
+      const verifyFile = this.vault.getAbstractFileByPath(mealsPath);
+      console.log('Verification: File exists after save:', !!verifyFile);
+      
+    } catch (error) {
+      console.error('Error saving meals to file:', error);
+      console.error('Meals path:', this.getMealsFilePath());
+      console.error('Storage path:', this.settings.mealStoragePath);
+      console.error('Full error:', error);
+      throw error;
+    }
+  }
+
+  private generateMealId(): string {
+    return 'meal_' + Date.now().toString(36) + '_' + Math.random().toString(36).substr(2, 9);
   }
 } 

@@ -43,6 +43,15 @@ export default class NutritionTrackerPlugin extends Plugin {
       }
     });
 
+    // Add debug command for testing meal functionality
+    this.addCommand({
+      id: 'test-meal-save',
+      name: 'Test Meal Save (Debug)',
+      callback: async () => {
+        await this.testMealSave();
+      }
+    });
+
     // Add settings tab
     this.addSettingTab(new SettingsTab(this.app, this));
 
@@ -121,7 +130,16 @@ export default class NutritionTrackerPlugin extends Plugin {
   }
 
   async loadSettings() {
-    this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+    const loadedData = await this.loadData();
+    this.settings = Object.assign({}, DEFAULT_SETTINGS, loadedData);
+    
+    // Migration: Ensure mealStoragePath exists for existing installations
+    if (!this.settings.mealStoragePath) {
+      this.settings.mealStoragePath = 'tracker/health/food/meals';
+      await this.saveSettings();
+    }
+    
+    console.log('Loaded settings:', this.settings);
     
     // Update services with new settings if they exist
     if (this.llmService) {
@@ -155,6 +173,48 @@ export default class NutritionTrackerPlugin extends Plugin {
       }
     } catch (error) {
       new Notice(`Error opening today's food log: ${error.message}`);
+    }
+  }
+
+  private async testMealSave() {
+    console.log('=== TESTING MEAL SAVE ===');
+    new Notice('Testing meal save functionality...');
+    
+    try {
+      // Create a test meal
+      const testFoodItems = [
+        {
+          food: 'Test Banana',
+          quantity: '1 medium',
+          calories: 105,
+          protein: 1.3,
+          carbs: 27,
+          fat: 0.4,
+          emoji: '🍌',
+          timestamp: new Date().toISOString()
+        }
+      ];
+      
+      console.log('Test food items:', testFoodItems);
+      console.log('Current settings:', this.settings);
+      console.log('Meal storage path:', this.settings.mealStoragePath);
+      
+      await this.fileService.saveMeal(
+        'Test Meal - ' + new Date().toLocaleTimeString(),
+        testFoodItems,
+        'This is a test meal'
+      );
+      
+      new Notice('✅ Test meal saved successfully! Check console for details.');
+      
+      // Try to load meals to verify
+      const meals = await this.fileService.getMeals();
+      console.log('Loaded meals after test:', meals);
+      new Notice(`Found ${meals.length} meals in storage`);
+      
+    } catch (error) {
+      console.error('Test meal save failed:', error);
+      new Notice(`❌ Test meal save failed: ${error.message}`);
     }
   }
 } 

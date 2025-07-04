@@ -2,10 +2,15 @@ import { App, Modal, Setting, Notice } from 'obsidian';
 import { PluginSettings } from '../../types/settings';
 import { LLMService } from '../../services/llm-service';
 import { FileService } from '../../services/file-service';
+import { Meal, FoodItem } from '../../types/nutrition';
 
 export class FoodInputModal extends Modal {
   private description: string = '';
   private selectedImages: File[] = [];
+  private selectedMeals: Meal[] = [];
+  private availableMeals: Meal[] = [];
+  private saveAsMeal: boolean = false;
+  private mealName: string = '';
   private isProcessing: boolean = false;
   private processButton: HTMLButtonElement | null = null;
   private processingIndicator: HTMLElement | null = null;
@@ -26,9 +31,12 @@ export class FoodInputModal extends Modal {
     this.description = `${data.quantity} ${data.food}`;
   }
 
-  onOpen() {
+  async onOpen() {
     const { contentEl } = this;
     contentEl.empty();
+
+    // Load available meals
+    await this.loadMeals();
 
     const title = this.initialData ? 'Edit Food Entry' : 'Add Food Entry';
     contentEl.createEl('h2', { text: title });
@@ -48,30 +56,73 @@ export class FoodInputModal extends Modal {
       }
     }
 
+    // Meal selection dropdown
+    if (this.availableMeals.length > 0) {
+      const mealSelectionSetting = new Setting(contentEl)
+        .setName('Add saved meals')
+        .setDesc('Select from your saved meals to add to this entry')
+        .addDropdown(dropdown => {
+          dropdown.addOption('', 'Select a meal...');
+          this.availableMeals.forEach(meal => {
+            dropdown.addOption(meal.id, `${meal.name} (${meal.items.length} items)`);
+          });
+          dropdown.onChange(async (value) => {
+            if (value) {
+              await this.addMeal(value);
+              dropdown.setValue(''); // Reset dropdown
+            }
+          });
+        });
+      mealSelectionSetting.settingEl.addClass('nutrition-tracker-meal-selection');
+    }
+
+    // Show selected meals
+    if (this.selectedMeals.length > 0) {
+      const selectedMealsContainer = contentEl.createDiv('nutrition-tracker-selected-meals');
+      selectedMealsContainer.createEl('h3', { text: 'Selected Meals' });
+      
+      this.selectedMeals.forEach((meal, index) => {
+        const mealDiv = selectedMealsContainer.createDiv('nutrition-tracker-selected-meal');
+        const mealInfo = mealDiv.createDiv('nutrition-tracker-meal-info');
+        
+        mealInfo.createEl('strong', { text: meal.name });
+        const itemsText = meal.items.map(item => `${item.quantity} ${item.food}`).join(', ');
+        mealInfo.createEl('p', { text: itemsText, cls: 'nutrition-tracker-meal-items' });
+        
+        const totalCalories = meal.items.reduce((sum, item) => sum + item.calories, 0);
+        mealInfo.createEl('p', { text: `Total: ${totalCalories} kcal`, cls: 'nutrition-tracker-meal-calories' });
+        
+        // Remove button
+        const removeBtn = mealDiv.createEl('button', { 
+          text: '✕',
+          cls: 'nutrition-tracker-remove-meal'
+        });
+        removeBtn.addEventListener('click', () => this.removeMeal(index));
+      });
+    }
+
     // Food description input
     const foodDescSetting = new Setting(contentEl)
-      .setName('Food description')
-      .setDesc('Describe what you ate, and / or supplement your images with additional details')
+      .setName('Additional food description')
+      .setDesc('Add extra items or details (optional - will be processed with AI)')
       .addTextArea(text => {
         text
-          .setPlaceholder('Enter food description...')
+          .setPlaceholder('Enter additional food description...')
           .setValue(this.description)
           .onChange(value => {
             this.description = value;
             this.updateButtonState();
           });
         
-        // Add class for CSS targeting
         text.inputEl.addClass('nutrition-tracker-food-input');
       });
     
-    // Add class to the setting container
     foodDescSetting.settingEl.addClass('nutrition-tracker-food-setting');
 
     // Image upload
     const imageUploadSetting = new Setting(contentEl)
-      .setName('Food images')
-      .setDesc('Upload images of your food for AI analysis')
+      .setName('Additional food images')
+      .setDesc('Upload additional images for AI analysis (optional)')
       .addButton(button => {
         button
           .setButtonText('Add Images')
@@ -79,7 +130,6 @@ export class FoodInputModal extends Modal {
           .setDisabled(this.isProcessing);
       });
     
-    // Add class to keep this setting horizontal
     imageUploadSetting.settingEl.addClass('nutrition-tracker-image-setting');
 
     // Show selected images preview
@@ -89,19 +139,16 @@ export class FoodInputModal extends Modal {
       this.selectedImages.forEach((image, index) => {
         const imagePreview = imagesContainer.createDiv('nutrition-tracker-image-preview');
         
-        // Create image element
         const img = imagePreview.createEl('img', { 
           cls: 'nutrition-tracker-preview-image' 
         });
         
-        // Create image data URL for preview
         const reader = new FileReader();
         reader.onload = (e) => {
           img.src = e.target?.result as string;
         };
         reader.readAsDataURL(image);
         
-        // Image info and controls
         const imageInfo = imagePreview.createDiv('nutrition-tracker-image-info');
         const imageDetails = imageInfo.createDiv('nutrition-tracker-image-details');
         imageDetails.createEl('p', { text: `📷 ${image.name}` });
@@ -110,7 +157,6 @@ export class FoodInputModal extends Modal {
           cls: 'nutrition-tracker-image-size'
         });
         
-        // Add remove button for individual image
         const removeBtn = imageInfo.createEl('button', { 
           text: '✕',
           cls: 'nutrition-tracker-remove-image'
@@ -121,7 +167,6 @@ export class FoodInputModal extends Modal {
         });
       });
 
-      // Add clear all button if multiple images
       if (this.selectedImages.length > 1) {
         const clearAllBtn = imagesContainer.createEl('button', {
           text: `Clear All Images (${this.selectedImages.length})`,
@@ -134,7 +179,43 @@ export class FoodInputModal extends Modal {
       }
     }
 
-    // Processing status indicator (always create but hide when not processing)
+    // Save as meal section
+    const saveAsMealSetting = new Setting(contentEl)
+      .setName('Save as meal')
+      .setDesc('Save this combination as a reusable meal')
+      .addToggle(toggle => {
+        toggle
+          .setValue(this.saveAsMeal)
+          .onChange(value => {
+            this.saveAsMeal = value;
+            this.onOpen(); // Refresh to show/hide meal name input
+          });
+      });
+
+    // Add CSS class for better styling
+    saveAsMealSetting.settingEl.addClass('nutrition-tracker-save-meal-toggle');
+
+    if (this.saveAsMeal) {
+      const mealNameSetting = new Setting(contentEl)
+        .setName('Meal name')
+        .setDesc('Enter a name for this meal')
+        .addText(text => {
+          text
+            .setPlaceholder('Enter meal name...')
+            .setValue(this.mealName)
+            .onChange(value => {
+              this.mealName = value;
+              this.updateButtonState();
+            });
+          
+          // Add CSS class for styling
+          text.inputEl.addClass('nutrition-tracker-meal-name-input');
+        });
+      
+      mealNameSetting.settingEl.addClass('nutrition-tracker-meal-name-setting');
+    }
+
+    // Processing status indicator
     this.processingIndicator = contentEl.createEl('p', { 
       text: '🔄 Processing food with AI...',
       cls: 'nutrition-tracker-processing'
@@ -159,11 +240,14 @@ export class FoodInputModal extends Modal {
 
   private updateButtonState() {
     if (this.processButton) {
-      // Enable button if either description has content OR images are selected
       const hasDescription = this.description.trim().length > 0;
       const hasImages = this.selectedImages.length > 0;
+      const hasSelectedMeals = this.selectedMeals.length > 0;
+      const hasMealName = this.saveAsMeal ? this.mealName.trim().length > 0 : true;
       
-      this.processButton.disabled = this.isProcessing || (!hasDescription && !hasImages);
+      // Enable button if we have meals OR (description/images) AND (if save as meal, must have name)
+      this.processButton.disabled = this.isProcessing || (!hasSelectedMeals && !hasDescription && !hasImages) || !hasMealName;
+      
       const buttonText = this.initialData ? 'Update Food' : 'Process Food';
       this.processButton.textContent = this.isProcessing ? 'Processing...' : buttonText;
     }
@@ -171,6 +255,28 @@ export class FoodInputModal extends Modal {
     if (this.processingIndicator) {
       this.processingIndicator.style.display = this.isProcessing ? 'block' : 'none';
     }
+  }
+
+  private async loadMeals() {
+    try {
+      this.availableMeals = await this.fileService.getMeals();
+    } catch (error) {
+      console.error('Error loading meals:', error);
+      this.availableMeals = [];
+    }
+  }
+
+  private async addMeal(mealId: string) {
+    const meal = this.availableMeals.find(m => m.id === mealId);
+    if (meal && !this.selectedMeals.find(m => m.id === mealId)) {
+      this.selectedMeals.push(meal);
+      await this.onOpen(); // Refresh UI
+    }
+  }
+
+  private async removeMeal(index: number) {
+    this.selectedMeals.splice(index, 1);
+    await this.onOpen(); // Refresh UI
   }
 
   private selectImages() {
@@ -202,14 +308,23 @@ export class FoodInputModal extends Modal {
   }
 
   private async processFood() {
-    // Check if either description or images are provided
-    if (!this.description.trim() && this.selectedImages.length === 0) {
-      new Notice('Please enter a food description or upload images');
+    // Check if we have meals or additional input
+    const hasSelectedMeals = this.selectedMeals.length > 0;
+    const hasAdditionalInput = this.description.trim().length > 0 || this.selectedImages.length > 0;
+    
+    if (!hasSelectedMeals && !hasAdditionalInput) {
+      new Notice('Please select meals or add additional food description/images');
       return;
     }
 
-    // Check if API key is configured
-    if (!this.settings.openRouterApiKey) {
+    // Check if save as meal is enabled but no name provided
+    if (this.saveAsMeal && !this.mealName.trim()) {
+      new Notice('Please enter a meal name');
+      return;
+    }
+
+    // Check if API key is configured for LLM processing
+    if (hasAdditionalInput && !this.settings.openRouterApiKey) {
       new Notice('OpenRouter API key not configured. Please check plugin settings.');
       return;
     }
@@ -218,49 +333,85 @@ export class FoodInputModal extends Modal {
     this.updateButtonState();
 
     try {
-      // Process the food with AI
-      const processingMessage = this.selectedImages.length > 0 && !this.description.trim() 
-        ? `Processing ${this.selectedImages.length} food image(s) with AI...` 
-        : 'Processing food with AI...';
-      new Notice(processingMessage);
+      let allFoodItems: FoodItem[] = [];
       
-      const foodItems = await this.llmService.processFood(this.description, this.selectedImages.length > 0 ? this.selectedImages : undefined);
-      
-      if (foodItems.length === 0) {
-        new Notice('No food items could be processed from the input');
+      // Add items from selected meals
+      this.selectedMeals.forEach(meal => {
+        meal.items.forEach(item => {
+          allFoodItems.push({
+            ...item,
+            mealId: meal.id,
+            timestamp: new Date().toISOString()
+          });
+        });
+      });
+
+      // Process additional input with AI if provided
+      if (hasAdditionalInput) {
+        const processingMessage = this.selectedImages.length > 0 && !this.description.trim() 
+          ? `Processing ${this.selectedImages.length} additional food image(s) with AI...` 
+          : 'Processing additional food with AI...';
+        new Notice(processingMessage);
+        
+        const additionalFoodItems = await this.llmService.processFood(this.description, this.selectedImages.length > 0 ? this.selectedImages : undefined);
+        allFoodItems.push(...additionalFoodItems);
+      }
+
+      if (allFoodItems.length === 0) {
+        new Notice('No food items could be processed');
         return;
       }
 
       // Save images if provided
+      let savedImagePaths: string[] = [];
       if (this.selectedImages.length > 0) {
         try {
-          const imagePaths = await Promise.all(
+          savedImagePaths = await Promise.all(
             this.selectedImages.map(image => this.fileService.saveImage(image))
           );
-          new Notice(`${imagePaths.length} image(s) saved successfully`);
+          new Notice(`${savedImagePaths.length} image(s) saved successfully`);
         } catch (error) {
           console.error('Failed to save images:', error);
           new Notice('Warning: Failed to save some images, but continuing with food processing');
         }
       }
 
+      // Save as meal if requested
+      if (this.saveAsMeal) {
+        try {
+          await this.fileService.saveMeal(
+            this.mealName,
+            allFoodItems,
+            this.description || undefined,
+            savedImagePaths.length > 0 ? savedImagePaths : undefined
+          );
+        } catch (error) {
+          console.error('Failed to save meal:', error);
+          new Notice('Warning: Failed to save meal, but continuing with food processing');
+        }
+      }
+
       // Create or update food log
       if (this.initialData) {
-        // Replace the original entry
-        await this.fileService.createOrUpdateFoodLog(foodItems, this.initialData);
+        await this.fileService.createOrUpdateFoodLog(allFoodItems, this.initialData);
       } else {
-        // Create new entry
-        await this.fileService.createOrUpdateFoodLog(foodItems);
+        await this.fileService.createOrUpdateFoodLog(allFoodItems);
       }
       
-      // Show success message with details
-      const totalCalories = foodItems.reduce((sum, item) => sum + item.calories, 0);
-      if (this.initialData) {
-        new Notice(`✅ Successfully replaced "${this.initialData.food}" with ${foodItems.length} item(s) (${totalCalories} kcal)`);
-      } else {
-        new Notice(`✅ Successfully processed ${foodItems.length} food item(s) with ${totalCalories} calories`);
+      // Show success message
+      const totalCalories = allFoodItems.reduce((sum, item) => sum + item.calories, 0);
+      const mealCount = this.selectedMeals.length;
+      const additionalCount = allFoodItems.length - this.selectedMeals.reduce((sum, meal) => sum + meal.items.length, 0);
+      
+      let message = `✅ Successfully processed ${allFoodItems.length} food item(s) (${totalCalories} kcal)`;
+      if (mealCount > 0) {
+        message += ` - ${mealCount} meal(s)`;
+      }
+      if (additionalCount > 0) {
+        message += ` + ${additionalCount} additional item(s)`;
       }
       
+      new Notice(message);
       this.close();
     } catch (error) {
       console.error('Error processing food:', error);

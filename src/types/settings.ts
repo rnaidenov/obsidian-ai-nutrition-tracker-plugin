@@ -5,6 +5,7 @@ export interface PluginSettings {
   llmModel: string;
   nutritionGoals: NutritionGoals;
   logStoragePath: string;
+  mealStoragePath: string;
   templatePath: string;
   imageStoragePath: string;
   autoCreateDailyNotes: boolean;
@@ -26,6 +27,7 @@ export const DEFAULT_SETTINGS: PluginSettings = {
     fat: 80
   },
   logStoragePath: 'tracker/health/food/log',
+  mealStoragePath: 'tracker/health/food/meals',
   templatePath: 'templates/Food Log Template.md',
   imageStoragePath: 'tracker/health/food/log/images',
   autoCreateDailyNotes: true,
