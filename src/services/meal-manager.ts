@@ -184,8 +184,7 @@ export class MealManager {
     try {
       // Sanitize meal name for filename
       const sanitizedName = this.fileUtils.sanitizeMealName(meal.name);
-      const timestamp = new Date(meal.createdAt).toISOString().split('T')[0]; // YYYY-MM-DD
-      const filename = `${timestamp}-${sanitizedName}.md`;
+      const filename = `${sanitizedName}.md`;
       const notePath = `${this.settings.mealStoragePath}/${filename}`;
       
       // Generate meal note content
@@ -229,8 +228,7 @@ export class MealManager {
   private async deleteMealNote(meal: Meal): Promise<void> {
     try {
       const sanitizedName = this.fileUtils.sanitizeMealName(meal.name);
-      const timestamp = new Date(meal.createdAt).toISOString().split('T')[0]; // YYYY-MM-DD
-      const filename = `${timestamp}-${sanitizedName}.md`;
+      const filename = `${sanitizedName}.md`;
       const notePath = `${this.settings.mealStoragePath}/${filename}`;
       
       const existingFile = this.vault.getAbstractFileByPath(notePath);
@@ -327,6 +325,9 @@ export class MealManager {
       if (mealIndex >= 0) {
         const oldMeal = meals[mealIndex];
         
+        // Check if name changed (file was renamed)
+        const nameChanged = oldMeal.name !== parsedMeal.name;
+        
         // Update existing meal template
         const updatedMeal = {
           ...oldMeal,
@@ -339,11 +340,17 @@ export class MealManager {
         meals[mealIndex] = updatedMeal;
         await this.saveMealsToFile(meals);
         
-        console.log('✅ Meal TEMPLATE updated in JSON:', updatedMeal.name);
-        console.log('📝 Past food logs using this meal remain unchanged');
-        console.log('🔮 Future uses of this meal will use the updated version');
-        
-        new Notice(`✅ Meal template "${updatedMeal.name}" updated for future use`);
+        if (nameChanged) {
+          // If name changed, we need to handle the old file
+          await this.handleMealNameChange(oldMeal, updatedMeal, file);
+          console.log('✅ Meal name updated from:', oldMeal.name, 'to:', updatedMeal.name);
+          new Notice(`✅ Meal renamed from "${oldMeal.name}" to "${updatedMeal.name}"`);
+        } else {
+          console.log('✅ Meal TEMPLATE updated in JSON:', updatedMeal.name);
+          console.log('📝 Past food logs using this meal remain unchanged');
+          console.log('🔮 Future uses of this meal will use the updated version');
+          new Notice(`✅ Meal template "${updatedMeal.name}" updated for future use`);
+        }
       } else {
         console.warn('Meal not found in JSON storage:', parsedMeal.id);
         new Notice(`⚠️ Meal not found in storage - this might be an orphaned meal note`);
@@ -413,5 +420,142 @@ export class MealManager {
       new Notice(`❌ Failed to update meal item: ${error.message}`);
       throw error;
     }
+  }
+
+  // Handle when a meal's name has changed via file rename
+  private async handleMealNameChange(oldMeal: Meal, newMeal: Meal, currentFile: TFile): Promise<void> {
+    try {
+      console.log('🔄 Handling meal name change from:', oldMeal.name, 'to:', newMeal.name);
+      
+      // Calculate what the old filename should have been
+      const oldSanitizedName = this.fileUtils.sanitizeMealName(oldMeal.name);
+      const oldFilename = `${oldSanitizedName}.md`;
+      const oldNotePath = `${this.settings.mealStoragePath}/${oldFilename}`;
+      
+      // Calculate what the new filename should be
+      const newSanitizedName = this.fileUtils.sanitizeMealName(newMeal.name);
+      const newFilename = `${newSanitizedName}.md`;
+      const newNotePath = `${this.settings.mealStoragePath}/${newFilename}`;
+      
+      // If the current file doesn't match the expected new filename, rename it
+      if (currentFile.path !== newNotePath) {
+        console.log('📝 Renaming file from:', currentFile.path, 'to:', newNotePath);
+        
+        // Check if a file with the new name already exists
+        const existingNewFile = this.vault.getAbstractFileByPath(newNotePath);
+        if (existingNewFile && existingNewFile !== currentFile) {
+          console.warn('⚠️ File with new name already exists, will overwrite');
+          if (existingNewFile instanceof TFile) {
+            await this.vault.delete(existingNewFile);
+          }
+        }
+        
+        // Rename the file to match the new meal name
+        const newFileBasename = newFilename.replace('.md', '');
+        await this.vault.rename(currentFile, newNotePath);
+        
+        console.log('✅ File renamed to match new meal name');
+      }
+      
+      // Clean up old file if it exists and is different from current file
+      if (oldNotePath !== currentFile.path) {
+        const oldFile = this.vault.getAbstractFileByPath(oldNotePath);
+        if (oldFile instanceof TFile && oldFile !== currentFile) {
+          console.log('🗑️ Cleaning up old meal file:', oldNotePath);
+          await this.vault.delete(oldFile);
+        }
+      }
+      
+    } catch (error) {
+      console.error('Error handling meal name change:', error);
+      // Don't throw here - the meal data has already been updated successfully
+      new Notice(`Warning: Could not rename meal file: ${error.message}`);
+    }
+  }
+
+  // Handle when a meal file is renamed externally (via Obsidian file rename)
+  async handleFileRename(oldPath: string, newPath: string): Promise<void> {
+    try {
+      // Extract meal name from filename (remove .md extension and unsanitize)
+      const oldFilename = oldPath.split('/').pop()?.replace('.md', '') || '';
+      const newFilename = newPath.split('/').pop()?.replace('.md', '') || '';
+      
+      // Skip if not in meal storage path
+      if (!newPath.startsWith(this.settings.mealStoragePath) || !oldPath.startsWith(this.settings.mealStoragePath)) {
+        return;
+      }
+      
+      console.log('🔄 Meal file renamed externally:', oldFilename, '→', newFilename);
+      
+      // Read the file to get the meal ID
+      const file = this.vault.getAbstractFileByPath(newPath);
+      if (!(file instanceof TFile)) {
+        console.warn('Renamed file is not a valid file:', newPath);
+        return;
+      }
+      
+      const content = await this.vault.read(file);
+      if (!content.includes('**Meal ID:**')) {
+        console.log('File does not contain meal ID, skipping:', newPath);
+        return;
+      }
+      
+      const parsedMeal = this.contentParser.parseMealFromMarkdown(content);
+      if (!parsedMeal || !parsedMeal.id) {
+        console.warn('Could not parse meal from renamed file:', newPath);
+        return;
+      }
+      
+      // Find the meal in JSON storage
+      const meals = await this.getMeals();
+      const mealIndex = meals.findIndex(m => m.id === parsedMeal.id);
+      
+      if (mealIndex >= 0) {
+        const oldMeal = meals[mealIndex];
+        
+        // Convert filename back to a readable name (reverse sanitization as much as possible)
+        const newMealName = this.convertFilenameToMealName(newFilename);
+        
+        // Only proceed if the name actually changed
+        if (oldMeal.name === newMealName) {
+          console.log('Meal name unchanged, skipping update');
+          return;
+        }
+        
+        console.log('🔄 Updating meal name from:', oldMeal.name, 'to:', newMealName);
+        
+        // Update the meal name in JSON storage
+        const updatedMeal = {
+          ...oldMeal,
+          name: newMealName,
+          updatedAt: new Date().toISOString()
+        };
+        
+        meals[mealIndex] = updatedMeal;
+        await this.saveMealsToFile(meals);
+        
+        // Regenerate the entire file content with the new name in the heading
+        console.log('📝 Updating markdown content with new heading');
+        await this.createMealNote(updatedMeal);
+        
+        console.log('✅ Meal name and heading updated due to file rename:', newMealName);
+        new Notice(`✅ Meal renamed to "${newMealName}" - heading and storage updated automatically`);
+      } else {
+        console.warn('Could not find meal in JSON storage for renamed file:', newPath);
+      }
+      
+    } catch (error) {
+      console.error('Error handling meal file rename:', error);
+      new Notice(`Warning: Could not sync meal name change: ${error.message}`);
+    }
+  }
+
+  // Convert a sanitized filename back to a readable meal name
+  private convertFilenameToMealName(filename: string): string {
+    // Replace hyphens with spaces and capitalize words
+    return filename
+      .replace(/-/g, ' ')
+      .replace(/\b\w/g, (char) => char.toUpperCase())
+      .trim();
   }
 } 

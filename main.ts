@@ -93,6 +93,15 @@ export default class NutritionTrackerPlugin extends Plugin {
     
     // Set up file modification listener for meal notes
     this.setupMealNoteSyncHandler();
+
+    // Set up file rename listener
+    this.registerEvent(
+      this.app.vault.on('rename', async (file, oldPath) => {
+        if (file instanceof TFile) {
+          await this.fileService.handleFileRename(oldPath, file.path);
+        }
+      })
+    );
   }
 
   async onunload() {

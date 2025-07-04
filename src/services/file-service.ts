@@ -73,6 +73,18 @@ export class FileService {
     return this.mealManager.updateMealItem(originalItem, newItem);
   }
 
+  async handleMealFileRename(oldPath: string, newPath: string): Promise<void> {
+    return this.mealManager.handleFileRename(oldPath, newPath);
+  }
+
+  // Convenient method to check if a file path is a meal note before handling rename
+  async handleFileRename(oldPath: string, newPath: string): Promise<void> {
+    // Only handle meal file renames
+    if (oldPath.startsWith(this.settings.mealStoragePath) || newPath.startsWith(this.settings.mealStoragePath)) {
+      await this.handleMealFileRename(oldPath, newPath);
+    }
+  }
+
   // File Operations - delegate to FileUtils
   async saveImage(imageFile: File): Promise<string> {
     return this.fileUtils.saveImage(imageFile, this.settings.imageStoragePath);
