@@ -9,14 +9,14 @@ export interface LLMResponse {
 export class LLMService {
   constructor(private settings: PluginSettings) {}
 
-  async processFood(description: string, image?: File): Promise<FoodItem[]> {
+  async processFood(description: string, images?: File[]): Promise<FoodItem[]> {
     if (!this.settings.openRouterApiKey) {
       throw new Error('OpenRouter API key not configured. Please set it in plugin settings.');
     }
 
     try {
       const prompt = this.buildNutritionPrompt(description);
-      const messages = await this.buildMessages(prompt, image);
+      const messages = await this.buildMessages(prompt, images);
 
       const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
         method: 'POST',
@@ -55,11 +55,21 @@ export class LLMService {
 
   private buildNutritionPrompt(description: string): string {
     return `
-You are a nutrition expert. Analyze the following food description and return accurate nutrition data in JSON format.
+You are a nutrition expert. Analyze the provided food information and return accurate nutrition data in JSON format.
 
-Food description: "${description}"
+${description ? `Text description: "${description}"` : ''}
 
-Please provide detailed nutrition information for each food item mentioned. Be as accurate as possible with portions and nutrition values based on typical serving sizes.
+IMPORTANT INSTRUCTIONS:
+1. If images are provided, first analyze ALL food items visible in the images
+2. If text is also provided, treat it as ADDITIONAL information that supplements the image analysis
+3. Include ALL food items from BOTH sources - never exclude items from either the images or text
+4. The text may specify quantities, add extra items, or clarify what's in the images
+
+Example: If images show "protein shake + scrambled eggs" and text says "2 eggs", you should include:
+- The protein shake (from image)
+- 2 scrambled eggs (combining image visibility with text quantity)
+
+Please provide detailed nutrition information for each food item from ALL sources.
 
 Return ONLY valid JSON in this exact format:
 {
@@ -76,18 +86,27 @@ Return ONLY valid JSON in this exact format:
   ]
 }
 
+ANALYSIS PROCESS:
+1. First, identify all food items visible in any provided images
+2. Then, add or modify items based on the text description
+3. Combine information from both sources for complete analysis
+4. Use specific quantities from text when provided
+5. Include every distinct food item from both images and text
+
 Rules:
 - Break down complex meals into individual components
 - Use realistic portion sizes
 - Round nutrition values to 1 decimal place
-- Include all identifiable foods from the description
+- Include ALL identifiable foods from images AND text
 - If portion size is unclear, assume reasonable serving sizes
 - Choose the most appropriate single emoji for each food item
+- When text provides specific quantities, use those exact amounts
+- NEVER exclude items - combine all sources
 - Only return the JSON object, no other text
     `;
   }
 
-  private async buildMessages(prompt: string, image?: File): Promise<any[]> {
+  private async buildMessages(prompt: string, images?: File[]): Promise<any[]> {
     const messages: any[] = [
       {
         role: 'system',
@@ -95,17 +114,20 @@ Rules:
       }
     ];
 
-    if (image) {
-      // Convert image to base64 for multimodal models
-      const base64Image = await this.imageToBase64(image);
+    if (images && images.length > 0) {
+      // Convert all images to base64 for multimodal models
+      const imageContents = await Promise.all(
+        images.map(async (image) => ({
+          type: 'image_url',
+          image_url: { url: `data:${image.type};base64,${await this.imageToBase64(image)}` }
+        }))
+      );
+
       messages.push({
         role: 'user',
         content: [
           { type: 'text', text: prompt },
-          { 
-            type: 'image_url', 
-            image_url: { url: `data:${image.type};base64,${base64Image}` }
-          }
+          ...imageContents
         ]
       });
     } else {

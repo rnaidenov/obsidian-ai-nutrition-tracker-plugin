@@ -45,6 +45,7 @@
   font-family: var(--font-interface) !important;
   resize: vertical !important;
   box-sizing: border-box !important;
+  margin-left: 0 !important;
 }
 
 /* Layout for the food description setting */
@@ -53,6 +54,20 @@
   flex-direction: column !important;
   border: none !important;
   padding: 10px 0 !important;
+  align-items: flex-start !important;
+}
+
+.nutrition-tracker-food-setting .setting-item-info {
+  margin-bottom: 10px !important;
+  width: 100% !important;
+  margin-left: 0 !important;
+}
+
+.nutrition-tracker-food-setting .setting-item-control {
+  width: 100% !important;
+  min-height: 64px !important;
+  display: flex !important;
+  margin-left: 0 !important;
 }
 
 /* Keep image setting horizontal */
@@ -68,17 +83,6 @@
 .nutrition-tracker-image-setting .setting-item-info {
   flex-grow: 1 !important;
   margin-right: 15px !important;
-}
-
-.nutrition-tracker-food-setting .setting-item-info {
-  margin-bottom: 10px !important;
-}
-
-.nutrition-tracker-food-setting .setting-item-control {
-  width: 100% !important;
-  min-height: 64px !important;
-  display: flex !important;
-  margin-left: 0 !important;
 }
 
 /* Fallback with :has() selector */
@@ -200,38 +204,121 @@ textarea[placeholder*="Enter food description"] {
 }
 
 /* Food Input Modal Styles */
-.nutrition-tracker-selected-image {
-  background: var(--background-secondary);
-  padding: 15px;
-  border-radius: 8px;
-  margin: 5px 0 15px 0;
-  border: 1px solid var(--background-modifier-border);
+/* Image Preview Styles */
+.nutrition-tracker-images-container {
+  margin: 8px 0 12px 0;
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.nutrition-tracker-image-preview {
+  background: var(--background-secondary);
+  padding: 12px;
+  border-radius: 6px;
+  border: 1px solid var(--background-modifier-border);
   width: 100%;
   box-sizing: border-box;
 }
 
-.nutrition-tracker-selected-image p {
+.nutrition-tracker-preview-image {
+  width: 100%;
+  max-width: 200px;
+  height: auto;
+  max-height: 120px;
+  object-fit: cover;
+  border-radius: 4px;
+  margin-bottom: 8px;
+  border: 1px solid var(--background-modifier-border-hover);
+  display: block;
+}
+
+.nutrition-tracker-image-info {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.nutrition-tracker-image-details {
+  flex-grow: 1;
+  min-width: 0;
+}
+
+.nutrition-tracker-image-details p {
   margin: 0;
   color: var(--text-normal);
-  font-size: 0.9em;
+  font-size: 0.85em;
+  line-height: 1.3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.nutrition-tracker-image-size {
+  color: var(--text-muted) !important;
+  font-size: 0.75em !important;
+  margin-top: 2px !important;
 }
 
 .nutrition-tracker-remove-image {
-  background: var(--interactive-accent);
-  color: var(--text-on-accent);
-  border: none;
-  padding: 5px 10px;
+  background: transparent;
+  color: var(--text-muted);
+  border: 1px solid var(--background-modifier-border);
+  padding: 4px 8px;
   border-radius: 4px;
   cursor: pointer;
-  font-size: 0.8em;
-  transition: background-color 0.2s;
+  font-size: 0.75em;
+  transition: all 0.2s;
+  white-space: nowrap;
+  flex-shrink: 0;
+  min-width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .nutrition-tracker-remove-image:hover {
-  background: var(--interactive-accent-hover);
+  background: var(--background-modifier-hover);
+  color: var(--text-normal);
+  border-color: var(--background-modifier-border-hover);
+}
+
+.nutrition-tracker-clear-all-images {
+  background: transparent;
+  color: var(--text-muted);
+  border: 1px solid var(--background-modifier-border);
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.8em;
+  transition: all 0.2s;
+  margin-top: 4px;
+  align-self: flex-start;
+}
+
+.nutrition-tracker-clear-all-images:hover {
+  background: var(--background-modifier-hover);
+  color: var(--text-normal);
+  border-color: var(--background-modifier-border-hover);
+}
+
+/* Grid layout for multiple images when there are many */
+.nutrition-tracker-images-container:has(.nutrition-tracker-image-preview:nth-child(4)) {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 8px;
+}
+
+.nutrition-tracker-images-container:has(.nutrition-tracker-image-preview:nth-child(4)) .nutrition-tracker-clear-all-images {
+  grid-column: 1 / -1;
+  justify-self: flex-start;
+}
+
+/* Dark theme adjustments for image preview */
+.theme-dark .nutrition-tracker-preview-image {
+  border-color: var(--background-modifier-border-hover);
 }
 
 .nutrition-tracker-processing {

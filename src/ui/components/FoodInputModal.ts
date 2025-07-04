@@ -5,7 +5,7 @@ import { FileService } from '../../services/file-service';
 
 export class FoodInputModal extends Modal {
   private description: string = '';
-  private selectedImage: File | null = null;
+  private selectedImages: File[] = [];
   private isProcessing: boolean = false;
   private processButton: HTMLButtonElement | null = null;
   private processingIndicator: HTMLElement | null = null;
@@ -51,7 +51,7 @@ export class FoodInputModal extends Modal {
     // Food description input
     const foodDescSetting = new Setting(contentEl)
       .setName('Food description')
-      .setDesc('Describe what you ate (e.g., "2 eggs scrambled with butter, 1 slice of whole grain toast")')
+      .setDesc('Describe what you ate, and / or supplement your images with additional details')
       .addTextArea(text => {
         text
           .setPlaceholder('Enter food description...')
@@ -70,32 +70,68 @@ export class FoodInputModal extends Modal {
 
     // Image upload
     const imageUploadSetting = new Setting(contentEl)
-      .setName('Food image (optional)')
-      .setDesc('Upload an image of your food for better accuracy')
+      .setName('Food images')
+      .setDesc('Upload images of your food for AI analysis')
       .addButton(button => {
         button
-          .setButtonText('Choose Image')
-          .onClick(() => this.selectImage())
+          .setButtonText('Add Images')
+          .onClick(() => this.selectImages())
           .setDisabled(this.isProcessing);
       });
     
     // Add class to keep this setting horizontal
     imageUploadSetting.settingEl.addClass('nutrition-tracker-image-setting');
 
-    // Show selected image info
-    if (this.selectedImage) {
-      const imageInfo = contentEl.createDiv('nutrition-tracker-selected-image');
-      imageInfo.createEl('p', { text: `Selected: ${this.selectedImage.name}` });
+    // Show selected images preview
+    if (this.selectedImages.length > 0) {
+      const imagesContainer = contentEl.createDiv('nutrition-tracker-images-container');
       
-      // Add remove button
-      const removeBtn = imageInfo.createEl('button', { 
-        text: '✕ Remove',
-        cls: 'nutrition-tracker-remove-image'
+      this.selectedImages.forEach((image, index) => {
+        const imagePreview = imagesContainer.createDiv('nutrition-tracker-image-preview');
+        
+        // Create image element
+        const img = imagePreview.createEl('img', { 
+          cls: 'nutrition-tracker-preview-image' 
+        });
+        
+        // Create image data URL for preview
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          img.src = e.target?.result as string;
+        };
+        reader.readAsDataURL(image);
+        
+        // Image info and controls
+        const imageInfo = imagePreview.createDiv('nutrition-tracker-image-info');
+        const imageDetails = imageInfo.createDiv('nutrition-tracker-image-details');
+        imageDetails.createEl('p', { text: `📷 ${image.name}` });
+        imageDetails.createEl('p', { 
+          text: `${(image.size / 1024 / 1024).toFixed(1)} MB`,
+          cls: 'nutrition-tracker-image-size'
+        });
+        
+        // Add remove button for individual image
+        const removeBtn = imageInfo.createEl('button', { 
+          text: '✕',
+          cls: 'nutrition-tracker-remove-image'
+        });
+        removeBtn.addEventListener('click', () => {
+          this.selectedImages.splice(index, 1);
+          this.onOpen();
+        });
       });
-      removeBtn.addEventListener('click', () => {
-        this.selectedImage = null;
-        this.onOpen();
-      });
+
+      // Add clear all button if multiple images
+      if (this.selectedImages.length > 1) {
+        const clearAllBtn = imagesContainer.createEl('button', {
+          text: `Clear All Images (${this.selectedImages.length})`,
+          cls: 'nutrition-tracker-clear-all-images'
+        });
+        clearAllBtn.addEventListener('click', () => {
+          this.selectedImages = [];
+          this.onOpen();
+        });
+      }
     }
 
     // Processing status indicator (always create but hide when not processing)
@@ -123,7 +159,11 @@ export class FoodInputModal extends Modal {
 
   private updateButtonState() {
     if (this.processButton) {
-      this.processButton.disabled = this.isProcessing || !this.description.trim();
+      // Enable button if either description has content OR images are selected
+      const hasDescription = this.description.trim().length > 0;
+      const hasImages = this.selectedImages.length > 0;
+      
+      this.processButton.disabled = this.isProcessing || (!hasDescription && !hasImages);
       const buttonText = this.initialData ? 'Update Food' : 'Process Food';
       this.processButton.textContent = this.isProcessing ? 'Processing...' : buttonText;
     }
@@ -133,22 +173,28 @@ export class FoodInputModal extends Modal {
     }
   }
 
-  private selectImage() {
+  private selectImages() {
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = 'image/*';
+    input.multiple = true;
     
     input.onchange = (e) => {
-      const file = (e.target as HTMLInputElement).files?.[0];
-      if (file) {
-        // Validate file size (max 10MB)
-        if (file.size > 10 * 1024 * 1024) {
-          new Notice('Image file too large. Please select an image under 10MB.');
-          return;
-        }
+      const files = Array.from((e.target as HTMLInputElement).files || []);
+      if (files.length > 0) {
+        // Validate file sizes (max 10MB each)
+        const validFiles = files.filter(file => {
+          if (file.size > 10 * 1024 * 1024) {
+            new Notice(`${file.name} is too large. Please select images under 10MB.`);
+            return false;
+          }
+          return true;
+        });
         
-        this.selectedImage = file;
-        this.onOpen(); // Refresh the modal to show selected file
+        if (validFiles.length > 0) {
+          this.selectedImages.push(...validFiles);
+          this.onOpen(); // Refresh the modal to show selected files
+        }
       }
     };
     
@@ -156,8 +202,9 @@ export class FoodInputModal extends Modal {
   }
 
   private async processFood() {
-    if (!this.description.trim()) {
-      new Notice('Please enter a food description');
+    // Check if either description or images are provided
+    if (!this.description.trim() && this.selectedImages.length === 0) {
+      new Notice('Please enter a food description or upload images');
       return;
     }
 
@@ -172,22 +219,28 @@ export class FoodInputModal extends Modal {
 
     try {
       // Process the food with AI
-      new Notice('Processing food with AI...');
-      const foodItems = await this.llmService.processFood(this.description, this.selectedImage || undefined);
+      const processingMessage = this.selectedImages.length > 0 && !this.description.trim() 
+        ? `Processing ${this.selectedImages.length} food image(s) with AI...` 
+        : 'Processing food with AI...';
+      new Notice(processingMessage);
+      
+      const foodItems = await this.llmService.processFood(this.description, this.selectedImages.length > 0 ? this.selectedImages : undefined);
       
       if (foodItems.length === 0) {
-        new Notice('No food items could be processed from the description');
+        new Notice('No food items could be processed from the input');
         return;
       }
 
-      // Save image if provided
-      if (this.selectedImage) {
+      // Save images if provided
+      if (this.selectedImages.length > 0) {
         try {
-          const imagePath = await this.fileService.saveImage(this.selectedImage);
-          new Notice(`Image saved to: ${imagePath}`);
+          const imagePaths = await Promise.all(
+            this.selectedImages.map(image => this.fileService.saveImage(image))
+          );
+          new Notice(`${imagePaths.length} image(s) saved successfully`);
         } catch (error) {
-          console.error('Failed to save image:', error);
-          new Notice('Warning: Failed to save image, but continuing with food processing');
+          console.error('Failed to save images:', error);
+          new Notice('Warning: Failed to save some images, but continuing with food processing');
         }
       }
 
