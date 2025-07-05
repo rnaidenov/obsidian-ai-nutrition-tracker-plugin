@@ -389,4 +389,83 @@ export class LayoutGenerator {
     
     return summary;
   }
+
+  async generateMealProgressSummaryWithId(totals: NutritionData, mealId: string): Promise<string> {
+    const goals = this.settings.nutritionGoals;
+    const isDark = this.themeUtils.getEffectiveTheme() === 'dark';
+    
+    let summary = '## 🎯 Meal vs Goals\n\n';
+    
+    // Create glassy card wrapper similar to food cards but lighter
+    const cardStyles = isDark ? {
+      background: 'linear-gradient(135deg, rgba(51, 65, 85, 0.6), rgba(30, 41, 59, 0.5))',
+      border: '1px solid rgba(148, 163, 184, 0.25)',
+      shadow: '0 8px 32px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.08)',
+      textColor: '#f8fafc',
+      subtleColor: '#cbd5e1',
+      footerColor: '#94a3b8'
+    } : {
+      background: 'linear-gradient(135deg, rgb(240 240 240 / 80%), rgba(248, 250, 252, 0.7))',
+      border: '1px solid rgba(255, 255, 255, 0.7)',
+      shadow: '0 8px 32px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.9)',
+      textColor: '#0f172a',
+      subtleColor: '#475569',
+      footerColor: '#64748b'
+    };
+    
+    // Create the entire card as a single-line HTML structure (like food item cards)
+    const nutrients = [
+      { name: 'Calories', emoji: '🔥', current: totals.calories, goal: goals.calories, unit: 'kcal' },
+      { name: 'Protein', emoji: '💪', current: totals.protein, goal: goals.protein, unit: 'g' },
+      { name: 'Carbs', emoji: '🌾', current: totals.carbs, goal: goals.carbs, unit: 'g' },
+      { name: 'Fat', emoji: '🥑', current: totals.fat, goal: goals.fat, unit: 'g' }
+    ];
+    
+    // Overall status
+    const overallProgress = Math.round((
+      this.contentParser.calculatePercentage(totals.calories, goals.calories) +
+      this.contentParser.calculatePercentage(totals.protein, goals.protein) +
+      this.contentParser.calculatePercentage(totals.carbs, goals.carbs) +
+      this.contentParser.calculatePercentage(totals.fat, goals.fat)
+    ) / 4);
+    
+    // Generate nutrition rows
+    let nutritionRows = '';
+    if (this.settings.progressBarStyle === 'modern-bars') {
+      // For modern bars, get the progress bars but strip newlines and fix bold formatting
+      nutritionRows = this.generateModernProgressBars(totals, goals).replace(/\n+/g, '').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    } else {
+      for (const nutrient of nutrients) {
+        const percentage = this.contentParser.calculatePercentage(nutrient.current, nutrient.goal);
+        const progressBar = this.settings.progressBarStyle === 'percentage-only' ? '' : this.themeUtils.getProgressBar(nutrient.current, nutrient.goal);
+        
+        nutritionRows += `<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding: 8px 0;"><span style="color: ${cardStyles.textColor}; font-weight: 500; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">${nutrient.emoji} ${nutrient.name}:</span><span style="color: ${cardStyles.subtleColor}; font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace; font-size: 13px; font-weight: 400;">${Math.round(nutrient.current)} / ${nutrient.goal} ${nutrient.unit}</span><span style="color: ${cardStyles.textColor}; font-weight: 400; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">${progressBar} ${percentage}%</span></div>`;
+      }
+    }
+    
+    // Build the entire card as a single line (like food item cards)
+    // Create ultra-subtle glassy overall progress section
+    const progressBg = isDark 
+      ? 'rgba(255, 255, 255, 0.08)'
+      : 'linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(248, 248, 248, 0.15))';
+    
+    const progressBorder = isDark 
+      ? 'rgba(255, 255, 255, 0.15)'
+      : 'rgba(255, 255, 255, 0.25)';
+    
+    // Enhanced divider with dark grey/resin color
+    const dividerStyle = isDark 
+      ? 'background: linear-gradient(90deg, transparent, rgba(60, 60, 60, 0.8), transparent); height: 1px; border: none;'
+      : 'background: linear-gradient(90deg, transparent, rgba(80, 80, 80, 0.4), transparent); height: 1px; border: none;';
+    
+    // Enhanced overall progress border with gradient
+    const enhancedProgressBorder = isDark 
+      ? 'background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(148, 163, 184, 0.15)); padding: 1px; border-radius: 13px;'
+      : 'background: linear-gradient(135deg, rgba(0, 0, 0, 0.15), rgba(100, 100, 100, 0.1)); padding: 1px; border-radius: 13px;';
+    
+    // Include meal ID as data attribute in the main container
+    summary += `<div data-meal-id="${mealId}" style="background: ${cardStyles.background}; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-radius: 16px; padding: 20px; margin: 12px 0; box-shadow: ${cardStyles.shadow}; border: ${cardStyles.border};"><h3 style="color: ${cardStyles.textColor}; margin-top: 0; margin-bottom: 16px; font-size: 18px; font-weight: 500; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; letter-spacing: -0.5px;">🎯 Meal vs Goals</h3><div style="${dividerStyle} margin-bottom: 16px;"></div>${nutritionRows}<div style="${enhancedProgressBorder} text-align: center; margin: 32px 0 0;"><div style="background: ${progressBg}; border-radius: 12px; padding: 12px;"><h3 style="color: ${cardStyles.textColor}; margin: 0; font-size: 20px; font-weight: 500; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; letter-spacing: -0.8px;">${this.themeUtils.getOverallStatusEmoji(overallProgress)} Overall Progress: ${overallProgress}%</h3></div></div></div>\n\n`;
+    
+    return summary;
+  }
 } 

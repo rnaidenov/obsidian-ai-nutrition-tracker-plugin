@@ -81,20 +81,16 @@ export class ContentParser {
 
   parseMealFromMarkdown(content: string): Partial<Meal> | null {
     try {
-      // Extract meal ID from metadata
-      const mealIdMatch = content.match(/\*\*Meal ID:\*\*\s*`([^`]+)`/);
+      // Extract meal ID from HTML data attribute
+      const mealIdMatch = content.match(/data-meal-id="([^"]+)"/);
       if (!mealIdMatch) {
-        console.warn('No meal ID found in markdown');
+        console.warn('No meal ID found in content');
         return null;
       }
       
       const mealId = mealIdMatch[1];
       
-      // Extract meal name from title
-      const titleMatch = content.match(/^#\s*🍽️\s*(.+)$/m);
-      const mealName = titleMatch ? titleMatch[1].trim() : 'Unnamed Meal';
-      
-      // Extract description
+      // Extract description (if exists)
       const descriptionMatch = content.match(/## 📝 Description\n([\s\S]+?)\n\n/);
       const description = descriptionMatch ? descriptionMatch[1].trim() : undefined;
       
@@ -103,7 +99,6 @@ export class ContentParser {
       
       return {
         id: mealId,
-        name: mealName,
         items: foodItems,
         description
       };
