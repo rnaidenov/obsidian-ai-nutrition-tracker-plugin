@@ -113,74 +113,6 @@ export class LayoutGenerator {
     return content;
   }
 
-  generateSimpleLayout(foodItems: FoodItem[], context?: 'meal' | 'foodlog'): string {
-    let content = '';
-    const isDark = this.themeUtils.getEffectiveTheme() === 'dark';
-    const editContext = context || 'foodlog';
-    
-    for (const item of foodItems) {
-      const emoji = item.emoji || '🍽️';
-      const entryId = `entry-${item.food.replace(/[^a-zA-Z0-9]/g, '-')}-${item.quantity.replace(/[^a-zA-Z0-9]/g, '-')}-${item.calories}`;
-      
-      // Time formatting
-      let timeDisplay = '';
-      if (item.timestamp) {
-        const time = new Date(item.timestamp).toLocaleTimeString('en-US', { 
-          hour: '2-digit', 
-          minute: '2-digit' 
-        });
-        timeDisplay = ` 🕐 ${time}`;
-      }
-      
-      // Clean theme-based styling
-      const styles = isDark ? {
-        background: 'linear-gradient(135deg, rgba(51, 65, 85, 0.6), rgba(30, 41, 59, 0.4))',
-        borderColor: 'rgba(139, 92, 246, 0.6)',
-        textColor: '#f8fafc',
-        subtleColor: '#cbd5e1',
-        quantityBg: 'rgba(255, 255, 255, 0.1)',
-        shadow: '0 4px 16px rgba(0, 0, 0, 0.3)',
-        editBtnBg: 'rgba(255, 255, 255, 0.08)',
-        editBtnBorder: 'rgba(255, 255, 255, 0.15)'
-      } : {
-        background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.8), rgba(248, 250, 252, 0.6))',
-        borderColor: 'rgba(139, 92, 246, 0.5)',
-        textColor: '#0f172a',
-        subtleColor: '#475569',
-        quantityBg: 'rgba(0, 0, 0, 0.05)',
-        shadow: '0 4px 16px rgba(0, 0, 0, 0.08)',
-        editBtnBg: 'rgba(0, 0, 0, 0.04)',
-        editBtnBorder: 'rgba(0, 0, 0, 0.08)'
-      };
-      
-      // Main container
-      content += `<div id="${entryId}" class="nutrition-food-entry-simple ${entryId}" data-food="${item.food.replace(/"/g, '&quot;')}" data-quantity="${item.quantity.replace(/"/g, '&quot;')}" data-calories="${item.calories}" data-protein="${item.protein}" data-carbs="${item.carbs}" data-fat="${item.fat}" style="margin: 12px 0; padding: 16px 20px; background: ${styles.background}; border-left: 4px solid ${styles.borderColor}; border-radius: 0 12px 12px 0; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); box-shadow: ${styles.shadow}; overflow: hidden;">\n\n`;
-      
-      // Header with food name and edit button
-      content += `<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">\n`;
-      content += `<h3 style="margin: 0; color: ${styles.textColor}; font-size: 18px; font-weight: 600;">${emoji} ${item.food}</h3>\n`;
-      content += `<button class="nutrition-edit-btn" data-food="${item.food.replace(/"/g, '&quot;')}" data-quantity="${item.quantity.replace(/"/g, '&quot;')}" data-calories="${item.calories}" data-protein="${item.protein}" data-carbs="${item.carbs}" data-fat="${item.fat}" data-edit-context="${editContext}" style="background: ${styles.editBtnBg}; border: 1px solid ${styles.editBtnBorder}; color: ${styles.subtleColor}; cursor: pointer; font-size: 12px; padding: 4px 8px; border-radius: 6px; transition: all 0.2s ease; opacity: 0.8;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.8'">✏️</button>\n`;
-      content += `</div>\n\n`;
-      
-      // Quantity and time
-      content += `<div style="color: ${styles.textColor}; font-weight: 500; margin-bottom: 10px;">\n`;
-      content += `<span style="background: ${styles.quantityBg}; padding: 2px 8px; border-radius: 6px; font-size: 14px;">${item.quantity}</span>${timeDisplay}\n`;
-      content += `</div>\n\n`;
-      
-      // Nutrition info
-      content += `<div style="color: ${styles.subtleColor}; font-size: 14px; line-height: 1.5;">\n`;
-      content += `🔥 <span style="color: ${isDark ? '#f87171' : '#dc2626'}; font-weight: 600;">${item.calories} kcal</span> ・ `;
-      content += `💪 <span style="color: ${isDark ? '#4ade80' : '#16a34a'}; font-weight: 600;">${item.protein}g protein</span> ・ `;
-      content += `🌾 <span style="color: ${isDark ? '#fbbf24' : '#d97706'}; font-weight: 600;">${item.carbs}g carbs</span> ・ `;
-      content += `🥑 <span style="color: ${isDark ? '#a78bfa' : '#7c3aed'}; font-weight: 600;">${item.fat}g fat</span>\n`;
-      content += `</div>\n\n`;
-      
-      content += `</div>\n\n`;
-    }
-    
-    return content;
-  }
-
   async generateDailySummary(totals: NutritionData): Promise<string> {
     const goals = this.settings.nutritionGoals;
     const isDark = this.themeUtils.getEffectiveTheme() === 'dark';
@@ -220,22 +152,9 @@ export class LayoutGenerator {
       this.contentParser.calculatePercentage(totals.fat, goals.fat)
     ) / 4);
     
-    // Generate nutrition rows
-    let nutritionRows = '';
-    if (this.settings.progressBarStyle === 'modern-bars') {
-      // For modern bars, get the progress bars but strip newlines and fix bold formatting
-      nutritionRows = this.generateModernProgressBars(totals, goals).replace(/\n+/g, '').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-    } else {
-      for (const nutrient of nutrients) {
-        const percentage = this.contentParser.calculatePercentage(nutrient.current, nutrient.goal);
-        const progressBar = this.settings.progressBarStyle === 'percentage-only' ? '' : this.themeUtils.getProgressBar(nutrient.current, nutrient.goal);
-        
-        nutritionRows += `<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding: 8px 0;"><span style="color: ${cardStyles.textColor}; font-weight: 500; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">${nutrient.emoji} ${nutrient.name}:</span><span style="color: ${cardStyles.subtleColor}; font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace; font-size: 13px; font-weight: 400;">${Math.round(nutrient.current)} / ${nutrient.goal} ${nutrient.unit}</span><span style="color: ${cardStyles.textColor}; font-weight: 400; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">${progressBar} ${percentage}%</span></div>`;
-      }
-    }
-    
-    // Build the entire card as a single line (like food item cards)
-    // Create ultra-subtle glassy overall progress section
+
+    const nutritionRows = this.generateModernProgressBars(totals, goals).replace(/\n+/g, '').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+
     const progressBg = isDark 
       ? 'rgba(255, 255, 255, 0.08)'
       : 'linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(248, 248, 248, 0.15))';
@@ -351,19 +270,10 @@ export class LayoutGenerator {
       this.contentParser.calculatePercentage(totals.fat, goals.fat)
     ) / 4);
     
-    // Generate nutrition rows
+    // Generate nutrition rows with modern progress bars
     let nutritionRows = '';
-    if (this.settings.progressBarStyle === 'modern-bars') {
-      // For modern bars, get the progress bars but strip newlines and fix bold formatting
-      nutritionRows = this.generateModernProgressBars(totals, goals).replace(/\n+/g, '').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-    } else {
-      for (const nutrient of nutrients) {
-        const percentage = this.contentParser.calculatePercentage(nutrient.current, nutrient.goal);
-        const progressBar = this.settings.progressBarStyle === 'percentage-only' ? '' : this.themeUtils.getProgressBar(nutrient.current, nutrient.goal);
-        
-        nutritionRows += `<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding: 8px 0;"><span style="color: ${cardStyles.textColor}; font-weight: 500; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">${nutrient.emoji} ${nutrient.name}:</span><span style="color: ${cardStyles.subtleColor}; font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace; font-size: 13px; font-weight: 400;">${Math.round(nutrient.current)} / ${nutrient.goal} ${nutrient.unit}</span><span style="color: ${cardStyles.textColor}; font-weight: 400; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">${progressBar} ${percentage}%</span></div>`;
-      }
-    }
+    // Get the modern progress bars and strip newlines and fix bold formatting
+    nutritionRows = this.generateModernProgressBars(totals, goals).replace(/\n+/g, '').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
     
     // Build the entire card as a single line (like food item cards)
     // Create ultra-subtle glassy overall progress section
@@ -429,19 +339,10 @@ export class LayoutGenerator {
       this.contentParser.calculatePercentage(totals.fat, goals.fat)
     ) / 4);
     
-    // Generate nutrition rows
+    // Generate nutrition rows with modern progress bars
     let nutritionRows = '';
-    if (this.settings.progressBarStyle === 'modern-bars') {
-      // For modern bars, get the progress bars but strip newlines and fix bold formatting
-      nutritionRows = this.generateModernProgressBars(totals, goals).replace(/\n+/g, '').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-    } else {
-      for (const nutrient of nutrients) {
-        const percentage = this.contentParser.calculatePercentage(nutrient.current, nutrient.goal);
-        const progressBar = this.settings.progressBarStyle === 'percentage-only' ? '' : this.themeUtils.getProgressBar(nutrient.current, nutrient.goal);
-        
-        nutritionRows += `<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding: 8px 0;"><span style="color: ${cardStyles.textColor}; font-weight: 500; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">${nutrient.emoji} ${nutrient.name}:</span><span style="color: ${cardStyles.subtleColor}; font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace; font-size: 13px; font-weight: 400;">${Math.round(nutrient.current)} / ${nutrient.goal} ${nutrient.unit}</span><span style="color: ${cardStyles.textColor}; font-weight: 400; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">${progressBar} ${percentage}%</span></div>`;
-      }
-    }
+    // Get the modern progress bars and strip newlines and fix bold formatting
+    nutritionRows = this.generateModernProgressBars(totals, goals).replace(/\n+/g, '').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
     
     // Build the entire card as a single line (like food item cards)
     // Create ultra-subtle glassy overall progress section

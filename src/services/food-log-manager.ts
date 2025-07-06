@@ -119,12 +119,7 @@ export class FoodLogManager {
       content += `## 🥗 Today's Meals\n\n`;
     }
     
-    // Generate food items based on layout style
-    if (this.settings.layoutStyle === 'cards') {
-      content += this.layoutGenerator.generateCardLayout(foodItems, 'foodlog');
-    } else {
-      content += this.layoutGenerator.generateSimpleLayout(foodItems, 'foodlog');
-    }
+    content += this.layoutGenerator.generateCardLayout(foodItems, 'foodlog');
     
     if (isNewFile) {
       content += await this.layoutGenerator.generateDailySummary(totals);

@@ -36,9 +36,4 @@ export interface NutritionGoals {
   fat: number;
 }
 
-export interface DailyLog {
-  date: string;
-  items: FoodItem[];
-  totals: NutritionData;
-  goals: NutritionGoals;
-} 
+ 

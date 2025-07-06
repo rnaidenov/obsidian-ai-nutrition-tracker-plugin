@@ -92,39 +92,7 @@ export class ThemeUtils {
     return '🌟'; // Star for motivation to begin
   }
 
-  getProgressBar(current: number, goal: number): string {
-    const percentage = this.calculatePercentage(current, goal);
-    const filledBlocks = Math.min(10, Math.round(percentage / 10));
-    const emptyBlocks = 10 - filledBlocks;
-    const isDark = this.getEffectiveTheme() === 'dark';
-    
-    let bar = '';
-    
-    // Enhanced emoji selection with smooth transitions
-    for (let i = 0; i < 10; i++) {
-      const blockPercentage = ((i + 1) * 10);
-      
-      if (blockPercentage <= percentage) {
-        // This block is filled - choose color based on overall percentage
-        if (percentage >= 90) {
-          bar += '🟢'; // Bright green for excellent progress
-        } else if (percentage >= 70) {
-          bar += i < 7 ? '🟢' : '🟡'; // Mix of green and yellow
-        } else if (percentage >= 50) {
-          bar += i < 5 ? '🟠' : '🟡'; // Mix of orange and yellow  
-        } else if (percentage >= 30) {
-          bar += i < 3 ? '🔴' : '🟠'; // Mix of red and orange
-        } else {
-          bar += '🔴'; // Red for low progress
-        }
-      } else {
-        // Empty block - use theme-appropriate empty indicator
-        bar += isDark ? '⚫' : '⚪';
-      }
-    }
-    
-    return bar;
-  }
+
 
   private calculatePercentage(current: number, goal: number): number {
     if (goal === 0) return 0;

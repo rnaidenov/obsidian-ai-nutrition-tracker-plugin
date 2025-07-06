@@ -119,17 +119,11 @@ export class FileService {
     return this.layoutGenerator.generateCardLayout(foodItems, context);
   }
 
-  private generateSimpleLayout(foodItems: FoodItem[], context?: 'meal' | 'foodlog'): string {
-    return this.layoutGenerator.generateSimpleLayout(foodItems, context);
-  }
-
   private async generateDailySummary(totals: NutritionData): Promise<string> {
     return this.layoutGenerator.generateDailySummary(totals);
   }
 
-  private getProgressBar(current: number, goal: number): string {
-    return this.themeUtils.getProgressBar(current, goal);
-  }
+
 
   private getOverallStatusEmoji(percentage: number): string {
     return this.themeUtils.getOverallStatusEmoji(percentage);

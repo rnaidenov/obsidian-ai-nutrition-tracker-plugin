@@ -6,15 +6,10 @@ export interface PluginSettings {
   nutritionGoals: NutritionGoals;
   logStoragePath: string;
   mealStoragePath: string;
-  templatePath: string;
   imageStoragePath: string;
-  autoCreateDailyNotes: boolean;
-  dateFormat: string;
   
   // Display Settings
-  layoutStyle: 'simple' | 'cards';
   displayTheme: 'auto' | 'light' | 'dark';
-  progressBarStyle: 'emoji-dots' | 'modern-bars' | 'percentage-only';
 }
 
 export const DEFAULT_SETTINGS: PluginSettings = {
@@ -28,13 +23,8 @@ export const DEFAULT_SETTINGS: PluginSettings = {
   },
   logStoragePath: 'tracker/health/food/log',
   mealStoragePath: 'tracker/health/food/meals',
-  templatePath: 'templates/Food Log Template.md',
   imageStoragePath: 'tracker/health/food/log/images',
-  autoCreateDailyNotes: true,
-  dateFormat: 'YYYY-MM-DD',
   
   // Display Settings Defaults
-  layoutStyle: 'cards',
-  displayTheme: 'auto',
-  progressBarStyle: 'emoji-dots'
+  displayTheme: 'auto'
 }; 

@@ -135,40 +135,7 @@ export class SettingsTab extends PluginSettingTab {
           await this.plugin.saveSettings();
         }));
 
-    new Setting(containerEl)
-      .setName('Template Path')
-      .setDesc('Path to your food log template file')
-      .addText(text => text
-        .setPlaceholder('templates/Food Log Template.md')
-        .setValue(this.plugin.settings.templatePath)
-        .onChange(async (value) => {
-          this.plugin.settings.templatePath = value || 'templates/Food Log Template.md';
-          await this.plugin.saveSettings();
-        }));
 
-    // Other Settings Section
-    containerEl.createEl('h3', { text: 'Other Settings' });
-
-    new Setting(containerEl)
-      .setName('Auto-create daily notes')
-      .setDesc('Automatically create daily food log notes if they don\'t exist')
-      .addToggle(toggle => toggle
-        .setValue(this.plugin.settings.autoCreateDailyNotes)
-        .onChange(async (value) => {
-          this.plugin.settings.autoCreateDailyNotes = value;
-          await this.plugin.saveSettings();
-        }));
-
-    new Setting(containerEl)
-      .setName('Date Format')
-      .setDesc('Date format for daily logs (YYYY-MM-DD, DD-MM-YYYY, etc.)')
-      .addText(text => text
-        .setPlaceholder('YYYY-MM-DD')
-        .setValue(this.plugin.settings.dateFormat)
-        .onChange(async (value) => {
-          this.plugin.settings.dateFormat = value || 'YYYY-MM-DD';
-          await this.plugin.saveSettings();
-        }));
 
     // Display Settings Section
     containerEl.createEl('h3', { text: '🎨 Display Settings' });
@@ -184,21 +151,6 @@ export class SettingsTab extends PluginSettingTab {
           .setValue(this.plugin.settings.displayTheme)
           .onChange(async (value: 'auto' | 'light' | 'dark') => {
             this.plugin.settings.displayTheme = value;
-            await this.plugin.saveSettings();
-          });
-      });
-
-    new Setting(containerEl)
-      .setName('Progress Bar Style')
-      .setDesc('How nutrition progress is displayed')
-      .addDropdown(dropdown => {
-        dropdown
-          .addOption('emoji-dots', 'Emoji Dots (🔴🟡🟢)')
-          .addOption('modern-bars', 'Modern Progress Bars')
-          .addOption('percentage-only', 'Percentage Only')
-          .setValue(this.plugin.settings.progressBarStyle)
-          .onChange(async (value: 'emoji-dots' | 'modern-bars' | 'percentage-only') => {
-            this.plugin.settings.progressBarStyle = value;
             await this.plugin.saveSettings();
           });
       });
