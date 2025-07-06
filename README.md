@@ -28,7 +28,8 @@ Save your favorite meals for quick reuse! Perfect for:
 Create a meal once, then add it to future logs with a single click.
 
 <img width="462" alt="image" src="https://github.com/user-attachments/assets/9e33389a-1a77-4a68-a915-7422d90f8288" />
-
+<img width="194" alt="image" src="https://github.com/user-attachments/assets/3b173eb7-326e-4e33-ae78-4b32eb018cd2" />
+<img width="553" alt="image" src="https://github.com/user-attachments/assets/c7bed974-123a-4855-acf4-d217e81ef14e" />
 
 ### 🤖 AI Analysis
 Choose from powerful models like Claude 3.5 Sonnet, GPT-4, or Gemini to analyze your food and extract:
@@ -38,8 +39,6 @@ Choose from powerful models like Claude 3.5 Sonnet, GPT-4, or Gemini to analyze 
 - 🥑 Fat
 
 <img width="460" alt="image" src="https://github.com/user-attachments/assets/2c63ee9b-b4d0-4984-82d5-dedfaa81fdd4" />
-<img width="194" alt="image" src="https://github.com/user-attachments/assets/3b173eb7-326e-4e33-ae78-4b32eb018cd2" />
-<img width="553" alt="image" src="https://github.com/user-attachments/assets/c7bed974-123a-4855-acf4-d217e81ef14e" />
 
 ## 🎨 Beautiful Food Logs
 
