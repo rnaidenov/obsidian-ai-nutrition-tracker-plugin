@@ -16,6 +16,15 @@ Transform your nutrition tracking with AI-powered food analysis. No more tedious
 ### 📷 Image Input
 Upload photos of your meals for visual analysis - perfect for complex dishes or when you want extra accuracy.
 
+### 🍽️ Saved Meals
+Save your favorite meals for quick reuse! Perfect for:
+- Daily breakfast routines
+- Regular lunch orders
+- Frequent snacks
+- Meal prep portions
+
+Create a meal once, then add it to future logs with a single click.
+
 ### 🤖 AI Analysis
 Choose from powerful models like Claude 3.5 Sonnet, GPT-4, or Gemini to analyze your food and extract:
 - 🔥 Calories
@@ -95,7 +104,6 @@ Track your nutrition goals with visual progress bars:
 
 ### Optional
 - Set daily nutrition goals
-- Choose display style (Cards or Simple)
 - Pick progress bar style (Emoji dots, Modern bars, or Percentage)
 
 ## 💡 Usage Tips
@@ -111,16 +119,22 @@ Track your nutrition goals with visual progress bars:
 - Packaged foods with labels
 - When you want extra accuracy
 
+**Saved Meals Save Time:**
+- Save meals you eat regularly
+- Edit saved meals to adjust portions
+- Quickly log repeated meals without re-describing them
+- Perfect for meal prep and routine eating
+
 ## 🎯 Features
 
 - 🤖 Multiple AI models (Claude, GPT, Gemini)
 - 📝 Natural language food descriptions
 - 📷 Photo analysis for meals
+- 🍽️ Save and edit meals for quick reuse
 - 🎨 Beautiful card or simple layouts
 - 🌙 Light and dark themes
 - 📊 Visual progress tracking
 - 📁 Automatic file organization
-- 🔧 Customizable templates
 
 ---
 
