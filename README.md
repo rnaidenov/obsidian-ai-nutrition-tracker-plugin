@@ -34,7 +34,7 @@ Choose from powerful models like Claude 3.5 Sonnet, GPT-4, or Gemini to analyze 
 
 ## 🎨 Beautiful Food Logs
 
-### Card Layout
+### Card Layout (Light Theme)
 <div style="background: linear-gradient(135deg, #f8fafc, #f1f5f9); border-radius: 16px; padding: 20px; margin: 16px 0; box-shadow: 0 4px 20px rgba(0,0,0,0.08);">
   <div style="display: flex; align-items: center; margin-bottom: 12px;">
     <span style="font-size: 24px; margin-right: 12px;">🥗</span>
@@ -66,6 +66,42 @@ Choose from powerful models like Claude 3.5 Sonnet, GPT-4, or Gemini to analyze 
       <div style="font-size: 20px; margin-bottom: 4px;">🥑</div>
       <div style="color: #6b21a8; font-weight: bold;">28g</div>
       <div style="color: #7c3aed; font-size: 11px;">FAT</div>
+    </div>
+  </div>
+</div>
+
+### Card Layout (Dark Theme)
+<div style="background: linear-gradient(135deg, #2d3748, #4a5568); border-radius: 16px; padding: 20px; margin: 16px 0; box-shadow: 0 8px 32px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1);">
+  <div style="display: flex; align-items: center; margin-bottom: 12px;">
+    <span style="font-size: 24px; margin-right: 12px;">🥗</span>
+    <div>
+      <h3 style="color: #f7fafc; margin: 0; font-size: 18px; font-weight: 600;">Grilled Chicken Caesar Salad</h3>
+      <div style="color: #a0aec0; font-size: 14px; margin-top: 4px;">
+        <span style="margin-right: 16px;">📏 1 large bowl</span>
+        <span>🕐 1:30 PM</span>
+      </div>
+    </div>
+  </div>
+  <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;">
+    <div style="text-align: center; padding: 12px; background: rgba(254, 226, 226, 0.1); border-radius: 10px; border: 1px solid rgba(254, 226, 226, 0.2);">
+      <div style="font-size: 20px; margin-bottom: 4px;">🔥</div>
+      <div style="color: #fed7d7; font-weight: bold;">450</div>
+      <div style="color: #fc8181; font-size: 11px;">KCAL</div>
+    </div>
+    <div style="text-align: center; padding: 12px; background: rgba(220, 252, 231, 0.1); border-radius: 10px; border: 1px solid rgba(220, 252, 231, 0.2);">
+      <div style="font-size: 20px; margin-bottom: 4px;">💪</div>
+      <div style="color: #c6f6d5; font-weight: bold;">35g</div>
+      <div style="color: #68d391; font-size: 11px;">PROTEIN</div>
+    </div>
+    <div style="text-align: center; padding: 12px; background: rgba(254, 243, 199, 0.1); border-radius: 10px; border: 1px solid rgba(254, 243, 199, 0.2);">
+      <div style="font-size: 20px; margin-bottom: 4px;">🌾</div>
+      <div style="color: #faf089; font-weight: bold;">12g</div>
+      <div style="color: #f6e05e; font-size: 11px;">CARBS</div>
+    </div>
+    <div style="text-align: center; padding: 12px; background: rgba(237, 233, 254, 0.1); border-radius: 10px; border: 1px solid rgba(237, 233, 254, 0.2);">
+      <div style="font-size: 20px; margin-bottom: 4px;">🥑</div>
+      <div style="color: #d6bcfa; font-weight: bold;">28g</div>
+      <div style="color: #b794f6; font-size: 11px;">FAT</div>
     </div>
   </div>
 </div>
