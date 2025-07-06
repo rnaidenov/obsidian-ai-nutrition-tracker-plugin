@@ -6,6 +6,8 @@ Transform your nutrition tracking with AI-powered food analysis. No more tedious
 
 **Smart Food Logging**: Describe your meals in natural language or upload photos, and AI automatically extracts nutrition data and creates beautiful food logs in your Obsidian vault.
 
+<img width="489" alt="image" src="https://github.com/user-attachments/assets/c90feeff-2c7a-4a23-ab6f-b447f4527a18" />
+
 ### 📝 Text Input
 ```
 "2 slices whole wheat toast with avocado and a cup of coffee"
@@ -25,6 +27,9 @@ Save your favorite meals for quick reuse! Perfect for:
 
 Create a meal once, then add it to future logs with a single click.
 
+<img width="462" alt="image" src="https://github.com/user-attachments/assets/9e33389a-1a77-4a68-a915-7422d90f8288" />
+
+
 ### 🤖 AI Analysis
 Choose from powerful models like Claude 3.5 Sonnet, GPT-4, or Gemini to analyze your food and extract:
 - 🔥 Calories
@@ -32,97 +37,18 @@ Choose from powerful models like Claude 3.5 Sonnet, GPT-4, or Gemini to analyze 
 - 🌾 Carbohydrates
 - 🥑 Fat
 
+<img width="460" alt="image" src="https://github.com/user-attachments/assets/2c63ee9b-b4d0-4984-82d5-dedfaa81fdd4" />
+<img width="194" alt="image" src="https://github.com/user-attachments/assets/3b173eb7-326e-4e33-ae78-4b32eb018cd2" />
+<img width="553" alt="image" src="https://github.com/user-attachments/assets/c7bed974-123a-4855-acf4-d217e81ef14e" />
+
 ## 🎨 Beautiful Food Logs
 
-### Card Layout (Light Theme)
-<div style="background: linear-gradient(135deg, #f8fafc, #f1f5f9); border-radius: 16px; padding: 20px; margin: 16px 0; box-shadow: 0 4px 20px rgba(0,0,0,0.08);">
-  <div style="display: flex; align-items: center; margin-bottom: 12px;">
-    <span style="font-size: 24px; margin-right: 12px;">🥗</span>
-    <div>
-      <h3 style="color: #1a202c; margin: 0; font-size: 18px; font-weight: 600;">Grilled Chicken Caesar Salad</h3>
-      <div style="color: #4a5568; font-size: 14px; margin-top: 4px;">
-        <span style="margin-right: 16px;">📏 1 large bowl</span>
-        <span>🕐 1:30 PM</span>
-      </div>
-    </div>
-  </div>
-  <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;">
-    <div style="text-align: center; padding: 12px; background: linear-gradient(135deg, #fee2e2, #fecaca); border-radius: 10px;">
-      <div style="font-size: 20px; margin-bottom: 4px;">🔥</div>
-      <div style="color: #b91c1c; font-weight: bold;">450</div>
-      <div style="color: #dc2626; font-size: 11px;">KCAL</div>
-    </div>
-    <div style="text-align: center; padding: 12px; background: linear-gradient(135deg, #dcfce7, #bbf7d0); border-radius: 10px;">
-      <div style="font-size: 20px; margin-bottom: 4px;">💪</div>
-      <div style="color: #15803d; font-weight: bold;">35g</div>
-      <div style="color: #16a34a; font-size: 11px;">PROTEIN</div>
-    </div>
-    <div style="text-align: center; padding: 12px; background: linear-gradient(135deg, #fef3c7, #fde68a); border-radius: 10px;">
-      <div style="font-size: 20px; margin-bottom: 4px;">🌾</div>
-      <div style="color: #a16207; font-weight: bold;">12g</div>
-      <div style="color: #d97706; font-size: 11px;">CARBS</div>
-    </div>
-    <div style="text-align: center; padding: 12px; background: linear-gradient(135deg, #ede9fe, #ddd6fe); border-radius: 10px;">
-      <div style="font-size: 20px; margin-bottom: 4px;">🥑</div>
-      <div style="color: #6b21a8; font-weight: bold;">28g</div>
-      <div style="color: #7c3aed; font-size: 11px;">FAT</div>
-    </div>
-  </div>
-</div>
+### Light Theme
+<img width="623" alt="image" src="https://github.com/user-attachments/assets/f648a224-4f79-480e-aaaf-95d0966db5b0" />
 
-### Card Layout (Dark Theme)
-<div style="background: linear-gradient(135deg, #2d3748, #4a5568); border-radius: 16px; padding: 20px; margin: 16px 0; box-shadow: 0 8px 32px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1);">
-  <div style="display: flex; align-items: center; margin-bottom: 12px;">
-    <span style="font-size: 24px; margin-right: 12px;">🥗</span>
-    <div>
-      <h3 style="color: #f7fafc; margin: 0; font-size: 18px; font-weight: 600;">Grilled Chicken Caesar Salad</h3>
-      <div style="color: #a0aec0; font-size: 14px; margin-top: 4px;">
-        <span style="margin-right: 16px;">📏 1 large bowl</span>
-        <span>🕐 1:30 PM</span>
-      </div>
-    </div>
-  </div>
-  <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;">
-    <div style="text-align: center; padding: 12px; background: rgba(254, 226, 226, 0.1); border-radius: 10px; border: 1px solid rgba(254, 226, 226, 0.2);">
-      <div style="font-size: 20px; margin-bottom: 4px;">🔥</div>
-      <div style="color: #fed7d7; font-weight: bold;">450</div>
-      <div style="color: #fc8181; font-size: 11px;">KCAL</div>
-    </div>
-    <div style="text-align: center; padding: 12px; background: rgba(220, 252, 231, 0.1); border-radius: 10px; border: 1px solid rgba(220, 252, 231, 0.2);">
-      <div style="font-size: 20px; margin-bottom: 4px;">💪</div>
-      <div style="color: #c6f6d5; font-weight: bold;">35g</div>
-      <div style="color: #68d391; font-size: 11px;">PROTEIN</div>
-    </div>
-    <div style="text-align: center; padding: 12px; background: rgba(254, 243, 199, 0.1); border-radius: 10px; border: 1px solid rgba(254, 243, 199, 0.2);">
-      <div style="font-size: 20px; margin-bottom: 4px;">🌾</div>
-      <div style="color: #faf089; font-weight: bold;">12g</div>
-      <div style="color: #f6e05e; font-size: 11px;">CARBS</div>
-    </div>
-    <div style="text-align: center; padding: 12px; background: rgba(237, 233, 254, 0.1); border-radius: 10px; border: 1px solid rgba(237, 233, 254, 0.2);">
-      <div style="font-size: 20px; margin-bottom: 4px;">🥑</div>
-      <div style="color: #d6bcfa; font-weight: bold;">28g</div>
-      <div style="color: #b794f6; font-size: 11px;">FAT</div>
-    </div>
-  </div>
-</div>
 
-### Simple Layout
-```markdown
-### 🥗 Grilled Chicken Caesar Salad
-**1 large bowl** ・ 🕐 1:30 PM
-🔥 450 kcal ・ 💪 35g protein ・ 🌾 12g carbs ・ 🥑 28g fat
-```
-
-## 📊 Daily Progress Tracking
-
-Track your nutrition goals with visual progress bars:
-
-| Nutrient | Current | Goal | Progress |
-|----------|---------|------|----------|
-| 🔥 Calories | **1,450** kcal | 2000 kcal | 🔴🔴🔴🔴🔴🔴🔴⚪⚪⚪ **73%** |
-| 💪 Protein | **89g** | 150g | 🔴🔴🔴🔴🔴🔴⚪⚪⚪⚪ **59%** |
-| 🌾 Carbs | **156g** | 200g | 🔴🔴🔴🔴🔴🔴🔴🔴⚪⚪ **78%** |
-| 🥑 Fat | **67g** | 80g | 🔴🔴🔴🔴🔴🔴🔴🔴⚪⚪ **84%** |
+### Dark Theme
+<img width="603" alt="image" src="https://github.com/user-attachments/assets/351cbb48-89a5-4cd1-b7b3-279fe40cfc91" />
 
 ## 🚀 Getting Started
 
@@ -175,4 +101,5 @@ Track your nutrition goals with visual progress bars:
 ---
 
 *Transform your nutrition tracking experience - no more tedious logging, just natural descriptions and beautiful results.* 
+<br>
 For issues, questions, or feature requests, please create an issue on GitHub. 
