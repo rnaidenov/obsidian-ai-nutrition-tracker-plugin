@@ -61,7 +61,7 @@ Choose from powerful models like Claude 3.5 Sonnet, GPT-4, or Gemini to analyze 
 
 ### Required
 - OpenRouter API key (get one at [openrouter.ai](https://openrouter.ai))
-- Choose your AI model (Gemini 2.5 Flash recommended)
+- Choose your AI model or choose a custom one from https://openrouter.ai/models 
 
 ### Optional
 - Set daily nutrition goals
