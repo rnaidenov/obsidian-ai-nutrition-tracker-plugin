@@ -33,20 +33,46 @@ export class SettingsTab extends PluginSettingTab {
       .setName('LLM Model')
       .setDesc('The AI model to use for food analysis')
       .addDropdown(dropdown => dropdown
-        .addOption('anthropic/claude-3.5-sonnet', 'Claude 3.5 Sonnet (Recommended)')
-        .addOption('openai/gpt-4o', 'GPT-4O')
-        .addOption('openai/gpt-4o-mini', 'GPT-4O Mini (Cheaper)')
-        .addOption('google/gemini-2.5-pro', 'Gemini 2.5 Pro (Most Capable)')
-        .addOption('google/gemini-2.5-flash-preview-05-20', 'Gemini 2.5 Flash (Fast & Smart)')
+        .addOption('google/gemini-2.5-flash-preview-05-20', 'Gemini 2.5 Flash (Fast & Smart - Recommended)')
         .addOption('google/gemini-2.5-flash-preview-05-20:thinking', 'Gemini 2.5 Flash Thinking (Reasoning)')
+        .addOption('google/gemini-2.5-pro', 'Gemini 2.5 Pro (Most Capable)')
         .addOption('google/gemini-2.0-flash-001', 'Gemini 2.0 Flash (Balanced)')
         .addOption('google/gemini-2.0-flash-lite-001', 'Gemini 2.0 Flash Lite (Cheapest)')
-        .addOption('google/gemini-flash-1.5', 'Gemini 1.5 Flash (Legacy)')
+        .addOption('anthropic/claude-sonnet-4', 'Claude 3.7 Sonnet')
+        .addOption('anthropic/claude-3.7-sonnet', 'Claude 3.7 Sonnet')
+        .addOption('anthropic/claude-3.5-sonnet', 'Claude 3.5 Sonnet')
+        .addOption('openai/gpt-4o', 'GPT-4O')
+        .addOption('openai/gpt-4o-mini', 'GPT-4O Mini (Cheaper)')
         .setValue(this.plugin.settings.llmModel)
         .onChange(async (value) => {
           this.plugin.settings.llmModel = value;
           await this.plugin.saveSettings();
         }));
+
+    new Setting(containerEl)
+      .setName('Use Custom Model')
+      .setDesc('Enable this to use a custom model instead of the predefined options')
+      .addToggle(toggle => toggle
+        .setValue(this.plugin.settings.useCustomModel)
+        .onChange(async (value) => {
+          this.plugin.settings.useCustomModel = value;
+          await this.plugin.saveSettings();
+          this.display(); // Refresh the display to show/hide custom model input
+        }));
+
+    // Only show custom model input when custom model is enabled
+    if (this.plugin.settings.useCustomModel) {
+      new Setting(containerEl)
+        .setName('Custom Model Name')
+        .setDesc('Enter the model name/identifier (e.g., "anthropic/claude-3.5-sonnet", "openai/gpt-4o", "meta-llama/llama-3.1-405b")')
+        .addText(text => text
+          .setPlaceholder('Enter model name...')
+          .setValue(this.plugin.settings.customModelName)
+          .onChange(async (value) => {
+            this.plugin.settings.customModelName = value;
+            await this.plugin.saveSettings();
+          }));
+    }
 
     // Nutrition Goals Section
     containerEl.createEl('h3', { text: 'Daily Nutrition Goals' });

@@ -3,6 +3,8 @@ import { NutritionGoals } from './nutrition';
 export interface PluginSettings {
   openRouterApiKey: string;
   llmModel: string;
+  useCustomModel: boolean;
+  customModelName: string;
   nutritionGoals: NutritionGoals;
   logStoragePath: string;
   mealStoragePath: string;
@@ -15,6 +17,8 @@ export interface PluginSettings {
 export const DEFAULT_SETTINGS: PluginSettings = {
   openRouterApiKey: '',
   llmModel: 'anthropic/claude-3.5-sonnet',
+  useCustomModel: false,
+  customModelName: '',
   nutritionGoals: {
     calories: 2000,
     protein: 150,

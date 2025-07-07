@@ -9,14 +9,26 @@ export interface LLMResponse {
 export class LLMService {
   constructor(private settings: PluginSettings) {}
 
+  private getEffectiveModel(): string {
+    if (this.settings.useCustomModel && this.settings.customModelName.trim()) {
+      return this.settings.customModelName.trim();
+    }
+    return this.settings.llmModel;
+  }
+
   async processFood(description: string, images?: File[]): Promise<FoodItem[]> {
     if (!this.settings.openRouterApiKey) {
       throw new Error('OpenRouter API key not configured. Please set it in plugin settings.');
     }
 
+    if (this.settings.useCustomModel && !this.settings.customModelName.trim()) {
+      throw new Error('Custom model is enabled but no model name is specified. Please set a custom model name in plugin settings.');
+    }
+
     try {
       const prompt = this.buildNutritionPrompt(description);
       const messages = await this.buildMessages(prompt, images);
+      const effectiveModel = this.getEffectiveModel();
 
       const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
         method: 'POST',
@@ -27,7 +39,7 @@ export class LLMService {
           'X-Title': 'Nutrition Tracker Plugin'
         },
         body: JSON.stringify({
-          model: this.settings.llmModel,
+          model: effectiveModel,
           messages: messages,
           response_format: { type: 'json_object' },
           max_tokens: 1000,
