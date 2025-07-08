@@ -1,5 +1,5 @@
 import { Plugin, TFile, Notice } from 'obsidian';
-import { FoodInputModal } from './src/ui/components/FoodInputModal';
+import { FoodInputModal } from './src/ui/components/FoodInputModal/FoodInputModal';
 import { SettingsTab } from './src/ui/settings/SettingsTab';
 import { PluginSettings, DEFAULT_SETTINGS } from './src/types/settings';
 import { LLMService } from './src/services/llm-service';

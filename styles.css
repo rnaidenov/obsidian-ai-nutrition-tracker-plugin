@@ -267,6 +267,10 @@
   color: var(--text-muted);
 }
 
+.nutrition-tracker-save-meal-setting {
+  flex-direction: row !important;
+}
+
 /* Better toggle styling */
 .nutrition-tracker-save-meal-toggle {
   display: flex !important;
