@@ -1,6 +1,5 @@
 import { FoodItem } from '../types/nutrition';
 import { PluginSettings } from '../types/settings';
-import { Notice } from 'obsidian';
 
 export interface LLMResponse {
   items: FoodItem[];

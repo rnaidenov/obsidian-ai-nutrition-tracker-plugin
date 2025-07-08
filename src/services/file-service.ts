@@ -84,9 +84,5 @@ export class FileService {
     return this.fileUtils.saveImage(imageFile, this.settings.imageStoragePath);
   }
 
-  // Content parsing and manipulation methods
-  private replaceCardInPosition(content: string, originalEntry: { food: string, quantity: string, calories: number, protein: number, carbs: number, fat: number }, newFoodItems: FoodItem[]): { success: boolean, content: string } {
-    const newCardContent = this.layoutGenerator.generateCardLayout(newFoodItems);
-    return this.contentParser.replaceCardInPosition(content, originalEntry, newCardContent);
-  }
+
 } 
