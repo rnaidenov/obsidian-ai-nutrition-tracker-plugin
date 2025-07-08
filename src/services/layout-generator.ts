@@ -13,6 +13,14 @@ export class LayoutGenerator {
   }
 
   generateCardLayout(foodItems: FoodItem[], context?: 'meal' | 'foodlog', mealId?: string): string {
+    console.log('🛠️ generateCardLayout called with:', {
+      itemCount: foodItems.length,
+      context,
+      mealId,
+      hasContext: !!context,
+      hasMealId: !!mealId
+    });
+    
     let content = '';
     const isDarkTheme = this.themeUtils.getEffectiveTheme() === 'dark';
     
@@ -118,6 +126,7 @@ export class LayoutGenerator {
     
     // Add CTA buttons at the end
     if (context) {
+      console.log('🛠️ Adding CTA buttons with context:', context, 'and mealId:', mealId);
       content += this.generateCTAButtons(context, mealId);
     }
     
@@ -125,28 +134,31 @@ export class LayoutGenerator {
   }
 
   generateCTAButtons(context: 'meal' | 'foodlog', mealId?: string): string {
-    const isDarkTheme = this.themeUtils.getEffectiveTheme() === 'dark';
-    const buttonText = context === 'meal' ? '➕ Add More Items to Meal' : '➕ Add More Items to Food Log';
-    const buttonId = context === 'meal' ? 'add-more-meal-items' : 'add-more-foodlog-items';
+    const buttonId = `nutrition-add-cta-${Date.now()}-${Math.random().toString(36).substring(7)}`;
     const mealIdAttr = mealId ? ` data-meal-id="${mealId}"` : '';
     
-    if (isDarkTheme) {
-      return `
-<div style="display: flex; justify-content: center; margin: 20px 0;">
-  <button id="${buttonId}" class="nutrition-add-cta-btn" data-context="${context}"${mealIdAttr} style="background: linear-gradient(135deg, rgba(59, 130, 246, 0.3), rgba(37, 99, 235, 0.2)); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 2px solid rgba(59, 130, 246, 0.4); border-radius: 12px; padding: 12px 24px; color: #93c5fd; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 16px rgba(59, 130, 246, 0.2); display: flex; align-items: center; gap: 8px;" onmouseover="this.style.background='linear-gradient(135deg, rgba(59, 130, 246, 0.4), rgba(37, 99, 235, 0.3))'; this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(59, 130, 246, 0.3)';" onmouseout="this.style.background='linear-gradient(135deg, rgba(59, 130, 246, 0.3), rgba(37, 99, 235, 0.2))'; this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 16px rgba(59, 130, 246, 0.2)';" onclick="this.style.transform='scale(0.95)'; setTimeout(() => this.style.transform='translateY(-2px)', 150);">
-    ${buttonText}
-  </button>
-</div>
-`;
-    } else {
-      return `
-<div style="display: flex; justify-content: center; margin: 20px 0;">
-  <button id="${buttonId}" class="nutrition-add-cta-btn" data-context="${context}"${mealIdAttr} style="background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(37, 99, 235, 0.05)); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 2px solid rgba(59, 130, 246, 0.3); border-radius: 12px; padding: 12px 24px; color: #3b82f6; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 16px rgba(59, 130, 246, 0.1); display: flex; align-items: center; gap: 8px;" onmouseover="this.style.background='linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(37, 99, 235, 0.1))'; this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(59, 130, 246, 0.2)';" onmouseout="this.style.background='linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(37, 99, 235, 0.05))'; this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 16px rgba(59, 130, 246, 0.1)';" onclick="this.style.transform='scale(0.95)'; setTimeout(() => this.style.transform='translateY(-2px)', 150);">
-    ${buttonText}
-  </button>
-</div>
-`;
-    }
+    console.log('🎯 generateCTAButtons called with:', {
+      context,
+      mealId,
+      buttonId,
+      mealIdAttr,
+      willHaveMealId: !!mealId
+    });
+    
+    const buttonContent = context === 'meal' ? 
+      `<span>➕ Add More Items to Meal</span>` :
+      `<span>➕ Add More Items to Food Log</span>`;
+    
+    const buttonHtml = `
+      <div style="text-align: center; margin-top: 20px;">
+        <button id="${buttonId}" class="nutrition-add-cta-btn" data-context="${context}"${mealIdAttr} style="background: linear-gradient(135deg, rgba(59, 130, 246, 0.3), rgba(37, 99, 235, 0.2)); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 12px; padding: 12px 24px; color: var(--text-normal); font-weight: 600; cursor: pointer; transition: all 0.3s ease; font-size: 14px; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);">
+          ${buttonContent}
+        </button>
+      </div>
+    `;
+    
+    console.log('🎯 Generated CTA button HTML:', buttonHtml);
+    return buttonHtml;
   }
 
   async generateDailySummary(totals: NutritionData): Promise<string> {

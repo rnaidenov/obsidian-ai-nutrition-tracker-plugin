@@ -14,46 +14,69 @@ export class FoodProcessor {
   async processFood(
     selectedMeals: Meal[],
     description: string,
-    selectedImages: File[],
+    images: File[],
     saveAsMeal: boolean,
     mealName: string,
-    initialData?: any,
-    editingContext?: 'meal' | 'foodlog',
+    initialData?: FoodItem,
+    editingContext?: 'foodlog' | 'meal',
     targetMealId?: string
   ): Promise<{ success: boolean; message?: string }> {
+    console.log('🔄 FoodProcessor.processFood called with:', {
+      selectedMeals: selectedMeals.length,
+      description,
+      images: images.length,
+      saveAsMeal,
+      mealName,
+      hasInitialData: !!initialData,
+      editingContext,
+      targetMealId
+    });
+    
     try {
       // Validate inputs
       const hasSelectedMeals = selectedMeals.length > 0;
-      const hasAdditionalInput = description.trim().length > 0 || selectedImages.length > 0;
+      const hasAdditionalInput = description.trim().length > 0 || images.length > 0;
       
-      if (!hasSelectedMeals && !hasAdditionalInput) {
-        return { success: false, message: 'Please select meals or add additional food description/images' };
+      if (targetMealId) {
+        console.log('🎯 Processing for targetMealId:', targetMealId);
+        // When adding to a specific meal, we just need additional input
+        if (!hasAdditionalInput) {
+          return { success: false, message: 'Please add food description or images to add to the meal' };
+        }
+      } else {
+        // Normal flow: need meals or additional input
+        if (!hasSelectedMeals && !hasAdditionalInput) {
+          return { success: false, message: 'Please select meals or add additional food description/images' };
+        }
       }
 
       if (saveAsMeal && !mealName.trim()) {
         return { success: false, message: 'Please enter a meal name' };
       }
 
-      if (hasAdditionalInput && !this.settings.openRouterApiKey) {
+      if (images.length > 0 && !this.settings.openRouterApiKey) {
         return { success: false, message: 'OpenRouter API key not configured. Please check plugin settings.' };
       }
 
       // Process food items
       let allFoodItems: FoodItem[] = [];
       
-      // Add selected meals
-      if (hasSelectedMeals) {
+      // Add selected meals (but not when adding to a specific meal to avoid duplication)
+      if (hasSelectedMeals && !targetMealId) {
+        console.log('🍽️ Adding selected meals to food items (not targeting specific meal)');
         selectedMeals.forEach(meal => {
           allFoodItems.push(...meal.items);
         });
+      } else if (targetMealId) {
+        console.log('🎯 Skipping selected meals because we are targeting meal:', targetMealId);
       }
       
       // Process additional input via LLM
       if (hasAdditionalInput) {
-        const processingMessage = `🤖 Processing ${description ? 'description' : ''}${description && selectedImages.length > 0 ? ' and ' : ''}${selectedImages.length > 0 ? `${selectedImages.length} image(s)` : ''}...`;
+        const processingMessage = `🤖 Processing ${description ? 'description' : ''}${description && images.length > 0 ? ' and ' : ''}${images.length > 0 ? `${images.length} image(s)` : ''}...`;
         new Notice(processingMessage);
         
-        const additionalItems = await this.llmService.processFood(description, selectedImages);
+        const additionalItems = await this.llmService.processFood(description, images);
         if (additionalItems.length === 0) {
           return { success: false, message: 'No food items could be processed' };
         }
@@ -63,10 +86,10 @@ export class FoodProcessor {
 
       // Save images if any
       let savedImagePaths: string[] = [];
-      if (selectedImages.length > 0) {
+      if (images.length > 0) {
         try {
           savedImagePaths = await Promise.all(
-            selectedImages.map(image => this.fileService.saveImage(image))
+            images.map(image => this.fileService.saveImage(image))
           );
           new Notice(`${savedImagePaths.length} image(s) saved successfully`);
         } catch (error) {
@@ -102,6 +125,7 @@ export class FoodProcessor {
         }
       } else if (targetMealId) {
         // Add items to specific meal
+        console.log('🎯 Adding items to specific meal:', targetMealId, 'Items:', allFoodItems.length);
         try {
           await this.fileService.addItemsToMeal(targetMealId, allFoodItems);
           return { success: true, message: `✅ Items added to meal successfully` };

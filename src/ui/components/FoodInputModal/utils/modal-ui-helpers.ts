@@ -11,17 +11,25 @@ export function createModalTitle(contentEl: HTMLElement, initialData: any, editi
   contentEl.createEl('h2', { text: title });
 }
 
-export function createEditingNotice(contentEl: HTMLElement, initialData: any, editingContext: 'meal' | 'foodlog') {
-  if (!initialData) return;
-  
-  const isDarkTheme = document.body.classList.contains('theme-dark');
+export function createEditingNotice(contentEl: HTMLElement, initialData: any, editingContext: 'meal' | 'foodlog', targetMealId?: string) {
+  // Show different notices based on the context
   let noticeText = '';
   
-  if (editingContext === 'meal') {
-    noticeText = `🍽️ Editing meal item: ${initialData.quantity} ${initialData.food} (${initialData.calories} kcal). This will update the meal template for future use only. Past food logs remain unchanged.`;
-  } else {
-    noticeText = `✏️ Editing: ${initialData.quantity} ${initialData.food} (${initialData.calories} kcal). Modify description as needed - this will edit the existing entry.`;
+  if (initialData) {
+    // Editing existing item
+    if (editingContext === 'meal') {
+      noticeText = `🍽️ Editing meal item: ${initialData.quantity} ${initialData.food} (${initialData.calories} kcal). This will update the meal template for future use only. Past food logs remain unchanged.`;
+    } else {
+      noticeText = `✏️ Editing: ${initialData.quantity} ${initialData.food} (${initialData.calories} kcal). Modify description as needed - this will edit the existing entry.`;
+    }
+  } else if (targetMealId) {
+    // Adding new items to specific meal
+    noticeText = `🍽️ Adding new items to this meal template. The items you add will be saved to the meal for future use.`;
   }
+  
+  if (!noticeText) return; // No notice needed
+  
+  const isDarkTheme = document.body.classList.contains('theme-dark');
   
   const notice = contentEl.createEl('p', { 
     text: noticeText,

@@ -243,6 +243,8 @@ export class MealManager {
   }
 
   private async generateMealNoteContent(meal: Meal): Promise<string> {
+    console.log('📝 Generating meal note content for:', meal.name, 'with ID:', meal.id);
+    
     const totalCalories = meal.items.reduce((sum, item) => sum + item.calories, 0);
     const totalProtein = meal.items.reduce((sum, item) => sum + item.protein, 0);
     const totalCarbs = meal.items.reduce((sum, item) => sum + item.carbs, 0);
@@ -262,6 +264,7 @@ export class MealManager {
     content += '## 🥗 Meal Items\n\n';
     
     // Generate food items using the same card layout as food logs but with meal context
+    console.log('🛠️ Calling generateCardLayout with meal context and ID:', meal.id);
     content += this.layoutGenerator.generateCardLayout(meal.items, 'meal', meal.id);
     
     // Add beautiful progress summary with hidden meal ID

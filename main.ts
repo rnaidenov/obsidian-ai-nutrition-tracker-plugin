@@ -104,6 +104,8 @@ export default class NutritionTrackerPlugin extends Plugin {
         }
       })
     );
+ 
+    this.setupEditButtonEventHandling();
   }
 
   async onunload() {
@@ -278,11 +280,23 @@ export default class NutritionTrackerPlugin extends Plugin {
         const mealId = target.getAttribute('data-meal-id');
         
         console.log('🎯 CTA button clicked:', context, mealId ? `(meal ID: ${mealId})` : '(no meal ID)');
+        console.log('🔍 Button attributes:', {
+          id: target.id,
+          className: target.className,
+          dataContext: target.getAttribute('data-context'),
+          dataMealId: target.getAttribute('data-meal-id'),
+          allAttributes: Array.from(target.attributes).map(attr => ({ name: attr.name, value: attr.value }))
+        });
         
         if (context === 'meal' && mealId) {
+          console.log('✅ Opening modal for meal:', mealId);
           // Open modal to add items to specific meal
           this.openFoodInputModalForMeal(mealId);
+        } else if (context === 'meal' && !mealId) {
+          console.error('❌ Meal context but no meal ID found!');
+          new Notice('❌ Error: Meal ID not found. Please try again or report this issue.');
         } else {
+          console.log('📝 Opening modal for food log');
           // Open modal to add items to food log
           this.openFoodInputModal();
         }
