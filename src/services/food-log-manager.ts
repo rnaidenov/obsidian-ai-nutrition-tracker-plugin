@@ -86,8 +86,11 @@ export class FoodLogManager {
   private async replaceInExistingLog(file: TFile, newFoodItems: FoodItem[], originalEntry: { food: string, quantity: string, calories: number, protein: number, carbs: number, fat: number }): Promise<void> {
     const existingContent = await this.vault.read(file);
     
+    // Generate the new card content first
+    const newCardContent = this.layoutGenerator.generateCardLayout(newFoodItems, 'foodlog');
+    
     // Find and replace the card in its original position
-    const replacement = this.replaceCardInPosition(existingContent, originalEntry, newFoodItems);
+    const replacement = this.contentParser.replaceCardInPosition(existingContent, originalEntry, newCardContent);
     if (replacement.success) {
       console.log('Successfully replaced entry in original position');
       // Recalculate totals and update summary
@@ -98,14 +101,6 @@ export class FoodLogManager {
       // Fallback to the old append logic
       await this.appendToExistingLog(file, newFoodItems);
     }
-  }
-
-  private replaceCardInPosition(content: string, originalEntry: { food: string, quantity: string, calories: number, protein: number, carbs: number, fat: number }, newFoodItems: FoodItem[]): { success: boolean, content: string } {
-    // Generate the new card content
-    const newCardContent = this.layoutGenerator.generateCardLayout(newFoodItems);
-    
-    // Replace the old card with the new card at the exact position
-    return this.contentParser.replaceCardInPosition(content, originalEntry, newCardContent);
   }
 
   private async generateFoodLogContent(foodItems: FoodItem[], isNewFile: boolean): Promise<string> {

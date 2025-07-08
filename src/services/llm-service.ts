@@ -217,22 +217,4 @@ Rules:
     
     return num;
   }
-
-
-
-  // Test the API connection
-  async testConnection(): Promise<boolean> {
-    try {
-      const response = await fetch('https://openrouter.ai/api/v1/models', {
-        headers: {
-          'Authorization': `Bearer ${this.settings.openRouterApiKey}`,
-        }
-      });
-      
-      return response.ok;
-    } catch (error) {
-      console.error('API connection test failed:', error);
-      return false;
-    }
-  }
 } 

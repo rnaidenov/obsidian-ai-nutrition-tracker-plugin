@@ -11,17 +11,6 @@ export class ThemeUtils {
     return this.settings.displayTheme as 'light' | 'dark';
   }
 
-  getPercentageColor(percentage: number): string {
-    const isDark = this.getEffectiveTheme() === 'dark';
-    
-    if (percentage <= 30) {
-      return isDark ? '#ef4444' : '#dc2626'; // Red
-    } else if (percentage <= 70) {
-      return isDark ? '#f59e0b' : '#d97706'; // Orange
-    } else {
-      return isDark ? '#10b981' : '#059669'; // Green
-    }
-  }
 
   getProgressGradient(percentage: number, isDark: boolean): { gradient: string, textColor: string, borderColor: string } {
     // Smooth, muted color transitions: Red (0%) → Orange (50%) → Green (100%)
@@ -92,10 +81,4 @@ export class ThemeUtils {
     return '🌟'; // Star for motivation to begin
   }
 
-
-
-  private calculatePercentage(current: number, goal: number): number {
-    if (goal === 0) return 0;
-    return Math.round((current / goal) * 100);
-  }
 } 

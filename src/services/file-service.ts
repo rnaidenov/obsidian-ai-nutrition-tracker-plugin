@@ -90,80 +90,9 @@ export class FileService {
     return this.fileUtils.saveImage(imageFile, this.settings.imageStoragePath);
   }
 
-  // Legacy methods for backward compatibility (these delegate to the new modular approach)
-  private getTodayString(): string {
-    return this.fileUtils.getTodayString();
-  }
-
-  private async ensureDirectoryExists(path: string): Promise<void> {
-    return this.fileUtils.ensureDirectoryExists(path);
-  }
-
-  private getEffectiveTheme(): 'light' | 'dark' {
-    return this.themeUtils.getEffectiveTheme();
-  }
-
-  private extractFoodItemsFromContent(content: string): FoodItem[] {
-    return this.contentParser.extractFoodItemsFromContent(content);
-  }
-
-  private calculateTotals(foodItems: FoodItem[]): NutritionData {
-    return this.contentParser.calculateTotals(foodItems);
-  }
-
-  private calculatePercentage(current: number, goal: number): number {
-    return this.contentParser.calculatePercentage(current, goal);
-  }
-
-  private generateCardLayout(foodItems: FoodItem[], context?: 'meal' | 'foodlog'): string {
-    return this.layoutGenerator.generateCardLayout(foodItems, context);
-  }
-
-  private async generateDailySummary(totals: NutritionData): Promise<string> {
-    return this.layoutGenerator.generateDailySummary(totals);
-  }
-
-
-
-  private getOverallStatusEmoji(percentage: number): string {
-    return this.themeUtils.getOverallStatusEmoji(percentage);
-  }
-
-  private generateModernProgressBars(totals: NutritionData, goals: any): string {
-    return this.layoutGenerator.generateModernProgressBars(totals, goals);
-  }
-
-  private getProgressGradient(percentage: number, isDark: boolean): { gradient: string, textColor: string, borderColor: string } {
-    return this.themeUtils.getProgressGradient(percentage, isDark);
-  }
-
-  private async generateMealProgressSummary(totals: NutritionData): Promise<string> {
-    return this.layoutGenerator.generateMealProgressSummary(totals);
-  }
-
   // Content parsing and manipulation methods
-  private findCardPosition(content: string, escapedFood: string, escapedQuantity: string, calories: number): { success: boolean, startIndex: number, endIndex: number } {
-    return this.contentParser.findCardPosition(content, escapedFood, escapedQuantity, calories);
-  }
-
-  private findCardBounds(content: string, startIndex: number): { success: boolean, endIndex: number } {
-    return this.contentParser.findCardBounds(content, startIndex);
-  }
-
-  private findAndReplaceCompleteCard(content: string, originalEntry: { food: string, quantity: string, calories: number, protein: number, carbs: number, fat: number }): { success: boolean, content: string } {
-    return this.contentParser.findAndReplaceCompleteCard(content, originalEntry);
-  }
-
-  private extractCompleteCard(content: string, startIndex: number): { success: boolean, content: string } {
-    return this.contentParser.extractCompleteCard(content, startIndex);
-  }
-
   private replaceCardInPosition(content: string, originalEntry: { food: string, quantity: string, calories: number, protein: number, carbs: number, fat: number }, newFoodItems: FoodItem[]): { success: boolean, content: string } {
-    const newCardContent = this.generateCardLayout(newFoodItems);
+    const newCardContent = this.layoutGenerator.generateCardLayout(newFoodItems);
     return this.contentParser.replaceCardInPosition(content, originalEntry, newCardContent);
-  }
-
-  private parseMealFromMarkdown(content: string): Partial<Meal> | null {
-    return this.contentParser.parseMealFromMarkdown(content);
   }
 } 
