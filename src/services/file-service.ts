@@ -1,27 +1,21 @@
-import { TFile, Vault, Notice, TAbstractFile } from 'obsidian';
-import { FoodItem, NutritionData, Meal } from '../types/nutrition';
+import { TFile, Vault, TAbstractFile } from 'obsidian';
+import { FoodItem, Meal } from '../types/nutrition';
 import { PluginSettings } from '../types/settings';
-import { LLMService } from './llm-service';
 import { FileUtils } from './file-utils';
-import { ThemeUtils } from './theme-utils';
 import { ContentParser } from './content-parser';
 import { LayoutGenerator } from './layout-generator';
 import { FoodLogManager } from './food-log-manager';
 import { MealManager } from './meal-manager';
 
 export class FileService {
-  private llmService: LLMService;
   private fileUtils: FileUtils;
-  private themeUtils: ThemeUtils;
   private contentParser: ContentParser;
   private layoutGenerator: LayoutGenerator;
   private foodLogManager: FoodLogManager;
   private mealManager: MealManager;
   
   constructor(private vault: Vault, private settings: PluginSettings) {
-    this.llmService = new LLMService(settings);
     this.fileUtils = new FileUtils(vault);
-    this.themeUtils = new ThemeUtils(settings);
     this.contentParser = new ContentParser();
     this.layoutGenerator = new LayoutGenerator(settings);
     this.foodLogManager = new FoodLogManager(vault, settings);
