@@ -12,7 +12,7 @@ export class LayoutGenerator {
     this.contentParser = new ContentParser();
   }
 
-  generateCardLayout(foodItems: FoodItem[], context?: 'meal' | 'foodlog'): string {
+  generateCardLayout(foodItems: FoodItem[], context?: 'meal' | 'foodlog', mealId?: string): string {
     let content = '';
     const isDarkTheme = this.themeUtils.getEffectiveTheme() === 'dark';
     
@@ -42,7 +42,10 @@ export class LayoutGenerator {
         }
         content += `      </div>\n`;
         content += `    </div>\n`;
-        content += `    <button class="nutrition-edit-btn" data-food="${item.food.replace(/"/g, '&quot;')}" data-quantity="${item.quantity.replace(/"/g, '&quot;')}" data-calories="${item.calories}" data-protein="${item.protein}" data-carbs="${item.carbs}" data-fat="${item.fat}" data-edit-context="${editContext}" style="background: linear-gradient(135deg, rgba(148,163,184,0.12), rgba(100,116,139,0.08)); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); border: 1px solid rgba(148,163,184,0.25); border-radius: 8px; padding: 6px 10px; color: #cbd5e1; font-size: 10px; cursor: pointer; margin-left: 12px; box-shadow: 0 2px 8px rgba(148,163,184,0.1), inset 0 1px 0 rgba(255,255,255,0.1); flex-shrink: 0;">✏️ Edit</button>\n`;
+        content += `    <div style="display: flex; gap: 8px; align-items: center;">\n`;
+        content += `      <button class="nutrition-edit-btn" data-food="${item.food.replace(/"/g, '&quot;')}" data-quantity="${item.quantity.replace(/"/g, '&quot;')}" data-calories="${item.calories}" data-protein="${item.protein}" data-carbs="${item.carbs}" data-fat="${item.fat}" data-edit-context="${editContext}" style="background: linear-gradient(135deg, rgba(148,163,184,0.12), rgba(100,116,139,0.08)); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); border: 1px solid rgba(148,163,184,0.25); border-radius: 8px; padding: 6px 10px; color: #cbd5e1; font-size: 10px; cursor: pointer; box-shadow: 0 2px 8px rgba(148,163,184,0.1), inset 0 1px 0 rgba(255,255,255,0.1); flex-shrink: 0; transition: all 0.2s ease;">✏️ Edit</button>\n`;
+        content += `      <button class="nutrition-delete-btn" data-food="${item.food.replace(/"/g, '&quot;')}" data-quantity="${item.quantity.replace(/"/g, '&quot;')}" data-calories="${item.calories}" data-protein="${item.protein}" data-carbs="${item.carbs}" data-fat="${item.fat}" data-edit-context="${editContext}" data-entry-id="${entryId}" style="background: linear-gradient(135deg, rgba(239,68,68,0.12), rgba(185,28,28,0.08)); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); border: 1px solid rgba(239,68,68,0.25); border-radius: 8px; padding: 6px 10px; color: #fca5a5; font-size: 10px; cursor: pointer; box-shadow: 0 2px 8px rgba(239,68,68,0.1), inset 0 1px 0 rgba(255,255,255,0.1); flex-shrink: 0; transition: all 0.2s ease;" onmouseover="this.style.background='linear-gradient(135deg, rgba(239,68,68,0.2), rgba(185,28,28,0.15))';" onmouseout="this.style.background='linear-gradient(135deg, rgba(239,68,68,0.12), rgba(185,28,28,0.08))';">🗑️ Delete</button>\n`;
+        content += `    </div>\n`;
         content += `  </div>\n`;
         content += `  <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;">\n`;
         content += `    <div style="text-align: center; padding: 8px; background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(185, 28, 28, 0.1)); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); border-radius: 12px; border: 1px solid rgba(239, 68, 68, 0.25); box-shadow: 0 4px 16px rgba(239, 68, 68, 0.1);">\n`;
@@ -82,7 +85,10 @@ export class LayoutGenerator {
         }
         content += `      </div>\n`;
         content += `    </div>\n`;
-        content += `    <button class="nutrition-edit-btn" data-food="${item.food.replace(/"/g, '&quot;')}" data-quantity="${item.quantity.replace(/"/g, '&quot;')}" data-calories="${item.calories}" data-protein="${item.protein}" data-carbs="${item.carbs}" data-fat="${item.fat}" data-edit-context="${editContext}" style="background: linear-gradient(135deg, rgba(255,255,255,0.7), rgba(248,250,252,0.5)); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); border: 1px solid rgba(255,255,255,0.6); border-radius: 8px; padding: 6px 10px; color: #475569; font-size: 10px; cursor: pointer; margin-left: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.8); flex-shrink: 0;">✏️ Edit</button>\n`;
+        content += `    <div style="display: flex; gap: 8px; align-items: center;">\n`;
+        content += `      <button class="nutrition-edit-btn" data-food="${item.food.replace(/"/g, '&quot;')}" data-quantity="${item.quantity.replace(/"/g, '&quot;')}" data-calories="${item.calories}" data-protein="${item.protein}" data-carbs="${item.carbs}" data-fat="${item.fat}" data-edit-context="${editContext}" style="background: linear-gradient(135deg, rgba(255,255,255,0.7), rgba(248,250,252,0.5)); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); border: 1px solid rgba(255,255,255,0.6); border-radius: 8px; padding: 6px 10px; color: #475569; font-size: 10px; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.8); flex-shrink: 0; transition: all 0.2s ease;">✏️ Edit</button>\n`;
+        content += `      <button class="nutrition-delete-btn" data-food="${item.food.replace(/"/g, '&quot;')}" data-quantity="${item.quantity.replace(/"/g, '&quot;')}" data-calories="${item.calories}" data-protein="${item.protein}" data-carbs="${item.carbs}" data-fat="${item.fat}" data-edit-context="${editContext}" data-entry-id="${entryId}" style="background: linear-gradient(135deg, rgba(255,255,255,0.7), rgba(254,226,226,0.5)); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); border: 1px solid rgba(252,165,165,0.6); border-radius: 8px; padding: 6px 10px; color: #dc2626; font-size: 10px; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.8); flex-shrink: 0; transition: all 0.2s ease;" onmouseover="this.style.background='linear-gradient(135deg, rgba(254,226,226,0.8), rgba(252,165,165,0.6))';" onmouseout="this.style.background='linear-gradient(135deg, rgba(255,255,255,0.7), rgba(254,226,226,0.5))';">🗑️ Delete</button>\n`;
+        content += `    </div>\n`;
         content += `  </div>\n`;
         content += `  <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;">\n`;
         content += `    <div style="text-align: center; padding: 8px; background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(254, 226, 226, 0.9)); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); border-radius: 12px; border: 1px solid rgba(252, 165, 165, 0.3); box-shadow: 0 4px 16px rgba(239, 68, 68, 0.06), inset 0 1px 0 rgba(255,255,255,0.8);">\n`;
@@ -90,7 +96,7 @@ export class LayoutGenerator {
         content += `      <div style="color: #dc2626; font-weight: bold; font-size: 14px;">${item.calories}</div>\n`;
         content += `      <div style="color: #ef4444; font-size: 9px; text-transform: uppercase; font-weight: 600;">KCAL</div>\n`;
         content += `    </div>\n`;
-        content += `    <div style="text-align: center; padding: 8px; background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(220, 252, 231, 0.9)); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); border-radius: 12px; border: 1px solid rgba(134, 239, 172, 0.3); box-shadow: 0 4px 16px rgba(34, 197, 94, 0.06), inset 0 1px 0 rgba(255,255,255,0.8);">\n`;
+        content += `    <div style="text-align: center; padding: 8px; background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(220, 252, 231, 0.9)); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); border-radius: 12px; border: 1px solid rgba(134, 239, 172, 0.3); box-shadow: 0 4px 16px rgba(34, 197, 2, 0.06), inset 0 1px 0 rgba(255,255,255,0.8);">\n`;
         content += `      <div style="font-size: 16px; margin-bottom: 2px;">💪</div>\n`;
         content += `      <div style="color: #16a34a; font-weight: bold; font-size: 14px;">${item.protein}g</div>\n`;
         content += `      <div style="color: #22c55e; font-size: 9px; text-transform: uppercase; font-weight: 600;">PROTEIN</div>\n`;
@@ -110,7 +116,37 @@ export class LayoutGenerator {
       }
     }
     
+    // Add CTA buttons at the end
+    if (context) {
+      content += this.generateCTAButtons(context, mealId);
+    }
+    
     return content;
+  }
+
+  generateCTAButtons(context: 'meal' | 'foodlog', mealId?: string): string {
+    const isDarkTheme = this.themeUtils.getEffectiveTheme() === 'dark';
+    const buttonText = context === 'meal' ? '➕ Add More Items to Meal' : '➕ Add More Items to Food Log';
+    const buttonId = context === 'meal' ? 'add-more-meal-items' : 'add-more-foodlog-items';
+    const mealIdAttr = mealId ? ` data-meal-id="${mealId}"` : '';
+    
+    if (isDarkTheme) {
+      return `
+<div style="display: flex; justify-content: center; margin: 20px 0;">
+  <button id="${buttonId}" class="nutrition-add-cta-btn" data-context="${context}"${mealIdAttr} style="background: linear-gradient(135deg, rgba(59, 130, 246, 0.3), rgba(37, 99, 235, 0.2)); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 2px solid rgba(59, 130, 246, 0.4); border-radius: 12px; padding: 12px 24px; color: #93c5fd; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 16px rgba(59, 130, 246, 0.2); display: flex; align-items: center; gap: 8px;" onmouseover="this.style.background='linear-gradient(135deg, rgba(59, 130, 246, 0.4), rgba(37, 99, 235, 0.3))'; this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(59, 130, 246, 0.3)';" onmouseout="this.style.background='linear-gradient(135deg, rgba(59, 130, 246, 0.3), rgba(37, 99, 235, 0.2))'; this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 16px rgba(59, 130, 246, 0.2)';" onclick="this.style.transform='scale(0.95)'; setTimeout(() => this.style.transform='translateY(-2px)', 150);">
+    ${buttonText}
+  </button>
+</div>
+`;
+    } else {
+      return `
+<div style="display: flex; justify-content: center; margin: 20px 0;">
+  <button id="${buttonId}" class="nutrition-add-cta-btn" data-context="${context}"${mealIdAttr} style="background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(37, 99, 235, 0.05)); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 2px solid rgba(59, 130, 246, 0.3); border-radius: 12px; padding: 12px 24px; color: #3b82f6; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 16px rgba(59, 130, 246, 0.1); display: flex; align-items: center; gap: 8px;" onmouseover="this.style.background='linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(37, 99, 235, 0.1))'; this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(59, 130, 246, 0.2)';" onmouseout="this.style.background='linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(37, 99, 235, 0.05))'; this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 16px rgba(59, 130, 246, 0.1)';" onclick="this.style.transform='scale(0.95)'; setTimeout(() => this.style.transform='translateY(-2px)', 150);">
+    ${buttonText}
+  </button>
+</div>
+`;
+    }
   }
 
   async generateDailySummary(totals: NutritionData): Promise<string> {

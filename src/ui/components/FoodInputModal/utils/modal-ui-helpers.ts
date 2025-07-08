@@ -1,10 +1,12 @@
 import { Setting } from 'obsidian';
 import { Meal, FoodItem } from '../../../../types/nutrition';
 
-export function createModalTitle(contentEl: HTMLElement, initialData: any, editingContext: 'meal' | 'foodlog') {
+export function createModalTitle(contentEl: HTMLElement, initialData: any, editingContext: 'meal' | 'foodlog', targetMealId?: string) {
   let title = 'Add Food Entry';
   if (initialData) {
     title = editingContext === 'meal' ? 'Edit Meal Item' : 'Edit Food Entry';
+  } else if (targetMealId) {
+    title = '➕ Add Items to Meal';
   }
   contentEl.createEl('h2', { text: title });
 }

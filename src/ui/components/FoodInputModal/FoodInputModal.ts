@@ -25,6 +25,7 @@ export class FoodInputModal extends Modal {
   private processingIndicator: HTMLElement | null = null;
   private initialData: any = null;
   private editingContext: 'meal' | 'foodlog' = 'foodlog';
+  private targetMealId: string | null = null;
 
   private mealManager: MealManager;
   private imageManager: ImageManager;
@@ -56,6 +57,11 @@ export class FoodInputModal extends Modal {
     this.editingContext = context;
   }
 
+  setTargetMealId(mealId: string) {
+    this.targetMealId = mealId;
+    this.editingContext = 'meal';
+  }
+
   async onOpen() {
     const { contentEl } = this;
     contentEl.empty();
@@ -63,8 +69,13 @@ export class FoodInputModal extends Modal {
     // Load meals
     await this.mealManager.loadMeals();
 
+    // If we have a target meal ID, pre-select it
+    if (this.targetMealId) {
+      await this.mealManager.addMeal(this.targetMealId);
+    }
+
     // Create UI components
-    createModalTitle(contentEl, this.initialData, this.editingContext);
+    createModalTitle(contentEl, this.initialData, this.editingContext, this.targetMealId);
     createEditingNotice(contentEl, this.initialData, this.editingContext);
     
     createMealSelectionDropdown(
@@ -159,7 +170,8 @@ export class FoodInputModal extends Modal {
       this.saveAsMeal,
       this.mealName,
       this.initialData,
-      this.editingContext
+      this.editingContext,
+      this.targetMealId
     );
 
     if (result.success) {

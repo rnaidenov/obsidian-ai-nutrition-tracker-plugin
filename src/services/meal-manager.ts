@@ -262,7 +262,7 @@ export class MealManager {
     content += '## 🥗 Meal Items\n\n';
     
     // Generate food items using the same card layout as food logs but with meal context
-    content += this.layoutGenerator.generateCardLayout(meal.items, 'meal');
+    content += this.layoutGenerator.generateCardLayout(meal.items, 'meal', meal.id);
     
     // Add beautiful progress summary with hidden meal ID
     content += await this.layoutGenerator.generateMealProgressSummaryWithId(totals, meal.id);
@@ -398,6 +398,92 @@ export class MealManager {
     } catch (error) {
       console.error('Error updating meal item:', error);
       new Notice(`❌ Failed to update meal item: ${error.message}`);
+      throw error;
+    }
+  }
+
+  // Method to delete a specific item from a meal template
+  async deleteMealItem(itemToDelete: { food: string, quantity: string, calories: number, protein: number, carbs: number, fat: number }): Promise<void> {
+    try {
+      console.log('🗑️ Deleting meal item:', itemToDelete.food);
+      
+      const meals = await this.getMeals();
+      let mealFound = false;
+      
+      // Find the meal that contains this item
+      for (const meal of meals) {
+        const itemIndex = meal.items.findIndex(item => 
+          item.food === itemToDelete.food &&
+          item.quantity === itemToDelete.quantity &&
+          item.calories === itemToDelete.calories
+        );
+        
+        if (itemIndex >= 0) {
+          console.log('✅ Found item in meal:', meal.name);
+          
+          // Remove the item from the meal
+          meal.items.splice(itemIndex, 1);
+          meal.updatedAt = new Date().toISOString();
+          
+          // Save updated meals
+          await this.saveMealsToFile(meals);
+          
+          // Regenerate the meal note
+          await this.createMealNote(meal);
+          
+          new Notice(`✅ Meal item deleted: ${itemToDelete.food} from "${meal.name}"`);
+          mealFound = true;
+          break;
+        }
+      }
+      
+      if (!mealFound) {
+        console.warn('⚠️ Could not find meal containing the item to delete');
+        new Notice('⚠️ Could not find the meal containing this item');
+      }
+      
+    } catch (error) {
+      console.error('Error deleting meal item:', error);
+      new Notice(`❌ Failed to delete meal item: ${error.message}`);
+      throw error;
+    }
+  }
+
+  // Method to add new items to a specific meal template
+  async addItemsToMeal(mealId: string, items: FoodItem[]): Promise<void> {
+    try {
+      console.log('➕ Adding items to meal:', mealId, items.length, 'items');
+      
+      const meals = await this.getMeals();
+      const mealIndex = meals.findIndex(m => m.id === mealId);
+      
+      if (mealIndex === -1) {
+        throw new Error(`Meal with ID ${mealId} not found`);
+      }
+      
+      const meal = meals[mealIndex];
+      
+      // Clean items to remove any meal-specific data
+      const cleanItems = items.map(item => {
+        const { mealId: itemMealId, timestamp, ...cleanItem } = item;
+        return cleanItem;
+      });
+      
+      // Add the new items to the meal
+      meal.items.push(...cleanItems);
+      meal.updatedAt = new Date().toISOString();
+      
+      // Save updated meals
+      await this.saveMealsToFile(meals);
+      
+      // Regenerate the meal note
+      await this.createMealNote(meal);
+      
+      new Notice(`✅ ${items.length} item(s) added to meal "${meal.name}"`);
+      
+    } catch (error) {
+      console.error('Error adding items to meal:', error);
+      new Notice(`❌ Failed to add items to meal: ${error.message}`);
       throw error;
     }
   }

@@ -18,7 +18,8 @@ export class FoodProcessor {
     saveAsMeal: boolean,
     mealName: string,
     initialData?: any,
-    editingContext?: 'meal' | 'foodlog'
+    editingContext?: 'meal' | 'foodlog',
+    targetMealId?: string
   ): Promise<{ success: boolean; message?: string }> {
     try {
       // Validate inputs
@@ -98,6 +99,15 @@ export class FoodProcessor {
           // Update food log entry
           await this.fileService.createOrUpdateFoodLog(allFoodItems, initialData);
           return { success: true, message: `✅ Food log updated` };
+        }
+      } else if (targetMealId) {
+        // Add items to specific meal
+        try {
+          await this.fileService.addItemsToMeal(targetMealId, allFoodItems);
+          return { success: true, message: `✅ Items added to meal successfully` };
+        } catch (error) {
+          console.error('Error adding items to meal:', error);
+          return { success: false, message: `Failed to add items to meal: ${error.message}` };
         }
       } else {
         // Create new entry

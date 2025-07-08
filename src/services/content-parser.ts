@@ -274,4 +274,51 @@ export class ContentParser {
     
     return { success: true, content: updatedContent };
   }
+
+  deleteCardFromContent(content: string, itemToDelete: { food: string, quantity: string, calories: number, protein: number, carbs: number, fat: number }): { success: boolean, content: string } {
+    // Find the card to delete using the same logic as findAndReplaceCompleteCard
+    const escapedFood = itemToDelete.food.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/"/g, '&quot;');
+    const escapedQuantity = itemToDelete.quantity.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/"/g, '&quot;');
+    
+    // Try card layout attributes first (data-ntr-*) - new format with complete nutrition data
+    const cardPattern = new RegExp(
+      `<div[^>]*data-ntr-food="${escapedFood}"[^>]*data-ntr-quantity="${escapedQuantity}"[^>]*data-ntr-calories="${itemToDelete.calories}"[^>]*data-ntr-protein="${itemToDelete.protein}"[^>]*data-ntr-carbs="${itemToDelete.carbs}"[^>]*data-ntr-fat="${itemToDelete.fat}"[^>]*>`,
+      'gi'
+    );
+    
+    let startMatch = cardPattern.exec(content);
+    if (!startMatch) {
+      // Try legacy card pattern without complete nutrition data
+      const legacyCardPattern = new RegExp(
+        `<div[^>]*data-ntr-food="${escapedFood}"[^>]*data-ntr-quantity="${escapedQuantity}"[^>]*data-ntr-calories="${itemToDelete.calories}"[^>]*>`,
+        'gi'
+      );
+      startMatch = legacyCardPattern.exec(content);
+    }
+    
+    if (!startMatch) {
+      // Try simple layout attributes (data-*)
+      const simplePattern = new RegExp(
+        `<div[^>]*data-food="${escapedFood}"[^>]*data-quantity="${escapedQuantity}"[^>]*data-calories="${itemToDelete.calories}"[^>]*>`,
+        'gi'
+      );
+      startMatch = simplePattern.exec(content);
+      
+      if (!startMatch) {
+        // Try alternative simple attribute order
+        const simplePattern2 = new RegExp(
+          `<div[^>]*data-calories="${itemToDelete.calories}"[^>]*data-food="${escapedFood}"[^>]*data-quantity="${escapedQuantity}"[^>]*>`,
+          'gi'
+        );
+        startMatch = simplePattern2.exec(content);
+      }
+    }
+    
+    if (!startMatch) {
+      return { success: false, content };
+    }
+    
+    // Use the existing extractCompleteCard method which removes the card and returns the cleaned content
+    return this.extractCompleteCard(content, startMatch.index);
+  }
 } 

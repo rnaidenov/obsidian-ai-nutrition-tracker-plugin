@@ -30,6 +30,10 @@ export class FileService {
     return this.foodLogManager.createOrUpdateFoodLog(foodItems, replaceEntry);
   }
 
+  async deleteFoodLogItem(itemToDelete: { food: string, quantity: string, calories: number, protein: number, carbs: number, fat: number }): Promise<void> {
+    return this.foodLogManager.deleteFoodLogItem(itemToDelete);
+  }
+
   // Meal Operations - delegate to MealManager
   async saveMeal(name: string, foodItems: FoodItem[], description?: string, images?: string[]): Promise<Meal> {
     return this.mealManager.saveMeal(name, foodItems, description, images);
@@ -45,6 +49,14 @@ export class FileService {
 
   async deleteMeal(mealId: string): Promise<void> {
     return this.mealManager.deleteMeal(mealId);
+  }
+
+  async deleteMealItem(itemToDelete: { food: string, quantity: string, calories: number, protein: number, carbs: number, fat: number }): Promise<void> {
+    return this.mealManager.deleteMealItem(itemToDelete);
+  }
+
+  async addItemsToMeal(mealId: string, items: FoodItem[]): Promise<void> {
+    return this.mealManager.addItemsToMeal(mealId, items);
   }
 
   async getMealById(mealId: string): Promise<Meal | null> {

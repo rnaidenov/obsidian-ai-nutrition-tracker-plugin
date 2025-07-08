@@ -10,6 +10,8 @@ export default class NutritionTrackerPlugin extends Plugin {
   llmService: LLMService;
   fileService: FileService;
   private editButtonHandler: (event: Event) => void;
+  private deleteButtonHandler: (event: Event) => void;
+  private ctaButtonHandler: (event: Event) => void;
   private mealSyncTimeouts: Map<string, NodeJS.Timeout> = new Map();
 
   async onload() {
@@ -111,6 +113,12 @@ export default class NutritionTrackerPlugin extends Plugin {
     if (this.editButtonHandler) {
       document.removeEventListener('click', this.editButtonHandler);
     }
+    if (this.deleteButtonHandler) {
+      document.removeEventListener('click', this.deleteButtonHandler);
+    }
+    if (this.ctaButtonHandler) {
+      document.removeEventListener('click', this.ctaButtonHandler);
+    }
     
     // Clear all meal sync timeouts
     this.mealSyncTimeouts.forEach(timeout => clearTimeout(timeout));
@@ -124,6 +132,18 @@ export default class NutritionTrackerPlugin extends Plugin {
       this.llmService, 
       this.fileService
     ).open();
+  }
+
+  private openFoodInputModalForMeal(mealId: string) {
+    const modal = new FoodInputModal(
+      this.app, 
+      this.settings, 
+      this.llmService, 
+      this.fileService
+    );
+    
+    modal.setTargetMealId(mealId);
+    modal.open();
   }
 
   private editFoodEntry(food: string, quantity: string, calories: number, protein: number, carbs: number, fat: number, context?: 'meal' | 'foodlog') {
@@ -152,7 +172,40 @@ export default class NutritionTrackerPlugin extends Plugin {
     modal.open();
   }
 
-
+  private async deleteFoodEntry(food: string, quantity: string, calories: number, protein: number, carbs: number, fat: number, context: 'meal' | 'foodlog', entryId: string) {
+    console.log('🗑️ Delete context:', context);
+    console.log('Entry to delete:', { food, quantity, calories, protein, carbs, fat, entryId });
+    
+    // Create the entry object that matches the one being deleted
+    const entryToDelete = {
+      food,
+      quantity,
+      calories,
+      protein,
+      carbs,
+      fat
+    };
+    
+    try {
+      if (context === 'meal') {
+        await this.fileService.deleteMealItem(entryToDelete);
+        new Notice(`🍽️ Deleted from meal: ${food} (${quantity})`);
+      } else {
+        await this.fileService.deleteFoodLogItem(entryToDelete);
+        new Notice(`📝 Deleted from food log: ${food} (${quantity})`);
+      }
+      
+      // Remove the card from the UI immediately
+      const cardElement = document.getElementById(entryId);
+      if (cardElement) {
+        cardElement.remove();
+      }
+      
+    } catch (error) {
+      console.error('Error deleting food entry:', error);
+      new Notice(`❌ Failed to delete ${food}: ${error.message}`);
+    }
+  }
 
   private setupEditButtonEventHandling() {
     // Use event delegation to handle clicks on edit buttons
@@ -185,7 +238,60 @@ export default class NutritionTrackerPlugin extends Plugin {
       }
     };
     
+    // Use event delegation to handle clicks on delete buttons
+    this.deleteButtonHandler = (event: Event) => {
+      const target = event.target as HTMLElement;
+      
+      if (target && target.classList.contains('nutrition-delete-btn')) {
+        event.preventDefault();
+        
+        // Extract data from button attributes
+        const food = target.getAttribute('data-food') || '';
+        const quantity = target.getAttribute('data-quantity') || '';
+        const calories = parseFloat(target.getAttribute('data-calories') || '0');
+        const protein = parseFloat(target.getAttribute('data-protein') || '0');
+        const carbs = parseFloat(target.getAttribute('data-carbs') || '0');
+        const fat = parseFloat(target.getAttribute('data-fat') || '0');
+        const context = target.getAttribute('data-edit-context') as 'meal' | 'foodlog' || 'foodlog';
+        const entryId = target.getAttribute('data-entry-id') || '';
+        
+        console.log('Delete button clicked via event delegation:', { 
+          food, quantity, calories, protein, carbs, fat, context, entryId 
+        });
+        
+        // Show confirmation dialog
+        const confirmDelete = confirm(`Are you sure you want to delete "${food} (${quantity})"?`);
+        if (confirmDelete) {
+          this.deleteFoodEntry(food, quantity, calories, protein, carbs, fat, context, entryId);
+        }
+      }
+    };
+
+    // Use event delegation to handle clicks on CTA buttons
+    this.ctaButtonHandler = (event: Event) => {
+      const target = event.target as HTMLElement;
+      
+      if (target && target.classList.contains('nutrition-add-cta-btn')) {
+        event.preventDefault();
+        
+        const context = target.getAttribute('data-context') as 'meal' | 'foodlog';
+        const mealId = target.getAttribute('data-meal-id');
+        
+        console.log('🎯 CTA button clicked:', context, mealId ? `(meal ID: ${mealId})` : '(no meal ID)');
+        
+        if (context === 'meal' && mealId) {
+          // Open modal to add items to specific meal
+          this.openFoodInputModalForMeal(mealId);
+        } else {
+          // Open modal to add items to food log
+          this.openFoodInputModal();
+        }
+      }
+    };
+    
     document.addEventListener('click', this.editButtonHandler);
+    document.addEventListener('click', this.deleteButtonHandler);
+    document.addEventListener('click', this.ctaButtonHandler);
   }
 
   private setupMealNoteSyncHandler() {
