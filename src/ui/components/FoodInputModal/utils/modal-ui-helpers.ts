@@ -37,9 +37,9 @@ export function createEditingNotice(contentEl: HTMLElement, initialData: any, ed
   });
   
   if (isDarkTheme) {
-    notice.style.cssText = 'background: linear-gradient(135deg, #1e3a8a, #3730a3); padding: 12px; border-radius: 8px; border-left: 3px solid #60a5fa; margin-bottom: 16px; font-size: 11px; color: #dbeafe; border: 1px solid rgba(96, 165, 250, 0.2);';
+    notice.style.cssText = 'background: linear-gradient(135deg, rgba(30, 58, 138, 0.4), rgba(55, 48, 163, 0.5), rgba(29, 78, 216, 0.3)); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); padding: 14px 16px; border-radius: 12px; border: 1px solid rgba(96, 165, 250, 0.3); margin-bottom: 16px; font-size: 12px; color: #dbeafe; box-shadow: 0 8px 32px rgba(30, 58, 138, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.1), inset 0 -1px 0 rgba(0, 0, 0, 0.1); position: relative; overflow: hidden; letter-spacing: 0.01em; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);';
   } else {
-    notice.style.cssText = 'background: linear-gradient(135deg, #dbeafe, #e0f2fe); padding: 12px; border-radius: 8px; border-left: 3px solid #3b82f6; margin-bottom: 16px; font-size: 11px; color: #1e40af; border: 1px solid rgba(59, 130, 246, 0.2);';
+    notice.style.cssText = 'background: linear-gradient(135deg, rgba(219, 234, 254, 0.8), rgba(224, 242, 254, 0.7), rgba(191, 219, 254, 0.6)); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); padding: 14px 16px; border-radius: 12px; border: 1px solid rgba(59, 130, 246, 0.3); margin-bottom: 16px; font-size: 12px; color: #1e40af; box-shadow: 0 8px 32px rgba(59, 130, 246, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.8), inset 0 -1px 0 rgba(0, 0, 0, 0.02); position: relative; overflow: hidden; letter-spacing: 0.01em;';
   }
 }
 
