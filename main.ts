@@ -1,4 +1,4 @@
-import { Plugin, TFile, Notice } from 'obsidian';
+import { Plugin, TFile, Notice, TFolder, TAbstractFile } from 'obsidian';
 import { FoodInputModal } from './src/ui/components/FoodInputModal/FoodInputModal';
 import { SettingsTab } from './src/ui/settings/SettingsTab';
 import { PluginSettings, DEFAULT_SETTINGS } from './src/types/settings';
@@ -13,6 +13,8 @@ export default class NutritionTrackerPlugin extends Plugin {
   private deleteButtonHandler: (event: Event) => void;
   private ctaButtonHandler: (event: Event) => void;
   private mealSyncTimeouts: Map<string, NodeJS.Timeout> = new Map();
+  private isDeleteInProgress: boolean = false;
+  private currentModal: FoodInputModal | null = null; 
 
   async onload() {
     console.log('Loading Nutrition Tracker Plugin');
@@ -82,6 +84,24 @@ export default class NutritionTrackerPlugin extends Plugin {
       }
     });
 
+    // Add debug command to regenerate meal notes
+    this.addCommand({
+      id: 'regenerate-meal-notes',
+      name: 'Regenerate All Meal Notes (Fix HTML Rendering)',
+      callback: async () => {
+        await this.regenerateMealNotes();
+      }
+    });
+
+    // Add debug command to check event listeners
+    this.addCommand({
+      id: 'debug-event-listeners',
+      name: 'Debug: Check Event Listeners',
+      callback: () => {
+        this.debugEventListeners();
+      }
+    });
+
     // Add settings tab
     this.addSettingTab(new SettingsTab(this.app, this));
 
@@ -111,67 +131,114 @@ export default class NutritionTrackerPlugin extends Plugin {
   async onunload() {
     console.log('Unloading Nutrition Tracker Plugin');
     
-    // Clean up event listener
-    if (this.editButtonHandler) {
-      document.removeEventListener('click', this.editButtonHandler);
-    }
-    if (this.deleteButtonHandler) {
-      document.removeEventListener('click', this.deleteButtonHandler);
-    }
-    if (this.ctaButtonHandler) {
-      document.removeEventListener('click', this.ctaButtonHandler);
-    }
-    
     // Clear all meal sync timeouts
     this.mealSyncTimeouts.forEach(timeout => clearTimeout(timeout));
     this.mealSyncTimeouts.clear();
+    
+    // Reset global delete flag
+    this.isDeleteInProgress = false;
+    
+    // Close any open modal
+    if (this.currentModal) {
+      this.currentModal.close();
+      this.currentModal = null;
+    }
+  }
+
+  private ensureModalClosed() {
+    if (this.currentModal) {
+      console.log('🔄 Closing existing modal before creating new one');
+      this.currentModal.close();
+      this.currentModal = null;
+    }
+    
+    // Clean up any lingering modal containers from DOM
+    // Target both the modal containers and the modal content
+    const existingModalContainers = document.querySelectorAll('.modal-container.mod-dim');
+    const existingModalContent = document.querySelectorAll('.nutrition-tracker-modal');
+    
+    let removedCount = 0;
+    existingModalContainers.forEach(modal => {
+      // Check if this container contains our modal content
+      if (modal.querySelector('.nutrition-tracker-modal')) {
+        modal.remove();
+        removedCount++;
+      }
+    });
+    
+    existingModalContent.forEach(modal => {
+      // Remove any orphaned modal content
+      const container = modal.closest('.modal-container');
+      if (container) {
+        container.remove();
+        removedCount++;
+      } else {
+        modal.remove();
+        removedCount++;
+      }
+    });
+    
+    if (removedCount > 0) {
+      console.log(`🧹 Cleaned up ${removedCount} lingering modal containers`);
+    }
+  }
+
+  private createAndOpenModal(setupFn?: (modal: FoodInputModal) => void) {
+    console.log('🚀 Creating new modal...');
+    
+    // Close any existing modal first
+    this.ensureModalClosed();
+    
+    // Create new modal with cleanup callback
+    this.currentModal = new FoodInputModal(
+      this.app, 
+      this.settings, 
+      this.llmService, 
+      this.fileService,
+      () => {
+        // Cleanup callback - called when modal closes
+        console.log('✅ Modal closed, cleaning up reference');
+        this.currentModal = null;
+      }
+    );
+    
+    // Apply setup function if provided
+    if (setupFn) {
+      setupFn(this.currentModal);
+    }
+    
+    // Open the modal
+    this.currentModal.open();
+    console.log('🎉 Modal opened successfully');
   }
 
   private openFoodInputModal() {
-    new FoodInputModal(
-      this.app, 
-      this.settings, 
-      this.llmService, 
-      this.fileService
-    ).open();
+    this.createAndOpenModal();
   }
 
   private openFoodInputModalForMeal(mealId: string) {
-    const modal = new FoodInputModal(
-      this.app, 
-      this.settings, 
-      this.llmService, 
-      this.fileService
-    );
-    
-    modal.setTargetMealId(mealId);
-    modal.open();
+    this.createAndOpenModal(modal => {
+      modal.setTargetMealId(mealId);
+    });
   }
 
   private editFoodEntry(food: string, quantity: string, calories: number, protein: number, carbs: number, fat: number, context?: 'meal' | 'foodlog') {
     console.log('🔧 Edit context:', context || 'foodlog');
     
-    const modal = new FoodInputModal(
-      this.app, 
-      this.settings, 
-      this.llmService, 
-      this.fileService
-    );
-    
-    // Pre-fill the modal with existing data and context
-    modal.setInitialData({
-      food,
-      quantity,
-      calories,
-      protein,
-      carbs,
-      fat
+    this.createAndOpenModal(modal => {
+      // Pre-fill the modal with existing data and context
+      modal.setInitialData({
+        food,
+        quantity,
+        calories,
+        protein,
+        carbs,
+        fat
+      });
+      
+      // Set the editing context so modal knows how to save
+      modal.setEditingContext(context || 'foodlog');
     });
-    
-    // Set the editing context so modal knows how to save
-    modal.setEditingContext(context || 'foodlog');
-    
-    modal.open();
   }
 
   private async deleteFoodEntry(food: string, quantity: string, calories: number, protein: number, carbs: number, fat: number, context: 'meal' | 'foodlog', entryId: string) {
@@ -216,6 +283,7 @@ export default class NutritionTrackerPlugin extends Plugin {
       
       if (target && target.classList.contains('nutrition-edit-btn')) {
         event.preventDefault();
+        event.stopPropagation();
         
         // Extract data from button attributes
         const food = target.getAttribute('data-food') || '';
@@ -246,25 +314,65 @@ export default class NutritionTrackerPlugin extends Plugin {
       
       if (target && target.classList.contains('nutrition-delete-btn')) {
         event.preventDefault();
+        event.stopPropagation();
+        event.stopImmediatePropagation();
         
-        // Extract data from button attributes
-        const food = target.getAttribute('data-food') || '';
-        const quantity = target.getAttribute('data-quantity') || '';
-        const calories = parseFloat(target.getAttribute('data-calories') || '0');
-        const protein = parseFloat(target.getAttribute('data-protein') || '0');
-        const carbs = parseFloat(target.getAttribute('data-carbs') || '0');
-        const fat = parseFloat(target.getAttribute('data-fat') || '0');
-        const context = target.getAttribute('data-edit-context') as 'meal' | 'foodlog' || 'foodlog';
-        const entryId = target.getAttribute('data-entry-id') || '';
+        console.log('🗑️ Delete button clicked - Global delete in progress:', this.isDeleteInProgress);
         
-        console.log('Delete button clicked via event delegation:', { 
-          food, quantity, calories, protein, carbs, fat, context, entryId 
-        });
+        // Global protection - only allow one delete operation at a time across the entire plugin
+        if (this.isDeleteInProgress) {
+          console.log('❌ Global delete operation already in progress, ignoring click');
+          return;
+        }
         
-        // Show confirmation dialog
-        const confirmDelete = confirm(`Are you sure you want to delete "${food} (${quantity})"?`);
-        if (confirmDelete) {
-          this.deleteFoodEntry(food, quantity, calories, protein, carbs, fat, context, entryId);
+        // Additional per-button protection
+        if (target.hasAttribute('data-processing') || (target as HTMLButtonElement).disabled) {
+          console.log('❌ Button-level delete already in progress, ignoring click');
+          return;
+        }
+        
+        // Set global and button-level flags
+        this.isDeleteInProgress = true;
+        target.setAttribute('data-processing', 'true');
+        target.style.opacity = '0.5';
+        target.style.pointerEvents = 'none';
+        
+        console.log('🔒 Delete operation locked globally and per-button');
+        
+        try {
+          // Extract data from button attributes
+          const food = target.getAttribute('data-food') || '';
+          const quantity = target.getAttribute('data-quantity') || '';
+          const calories = parseFloat(target.getAttribute('data-calories') || '0');
+          const protein = parseFloat(target.getAttribute('data-protein') || '0');
+          const carbs = parseFloat(target.getAttribute('data-carbs') || '0');
+          const fat = parseFloat(target.getAttribute('data-fat') || '0');
+          const context = target.getAttribute('data-edit-context') as 'meal' | 'foodlog' || 'foodlog';
+          const entryId = target.getAttribute('data-entry-id') || '';
+          
+          console.log('🗑️ Processing delete for:', { food, quantity, context, entryId });
+          
+          // Show confirmation dialog - this should only appear once now
+          const confirmDelete = confirm(`Are you sure you want to delete "${food} (${quantity})"?`);
+          
+          if (confirmDelete) {
+            console.log('✅ User confirmed delete, proceeding...');
+            this.deleteFoodEntry(food, quantity, calories, protein, carbs, fat, context, entryId);
+          } else {
+            console.log('❌ User cancelled delete operation');
+          }
+          
+        } catch (error) {
+          console.error('💥 Error in delete handler:', error);
+        } finally {
+          // Always clean up both global and button-level flags
+          setTimeout(() => {
+            console.log('🔓 Releasing delete operation locks');
+            this.isDeleteInProgress = false;
+            target.removeAttribute('data-processing');
+            target.style.opacity = '';
+            target.style.pointerEvents = '';
+          }, 100); // Small delay to ensure all handlers have finished
         }
       }
     };
@@ -275,6 +383,7 @@ export default class NutritionTrackerPlugin extends Plugin {
       
       if (target && target.classList.contains('nutrition-add-cta-btn')) {
         event.preventDefault();
+        event.stopPropagation();
         
         const context = target.getAttribute('data-context') as 'meal' | 'foodlog';
         const mealId = target.getAttribute('data-meal-id');
@@ -303,9 +412,10 @@ export default class NutritionTrackerPlugin extends Plugin {
       }
     };
     
-    document.addEventListener('click', this.editButtonHandler);
-    document.addEventListener('click', this.deleteButtonHandler);
-    document.addEventListener('click', this.ctaButtonHandler);
+    // Use Obsidian's registerDomEvent instead of direct addEventListener
+    this.registerDomEvent(document, 'click', this.editButtonHandler);
+    this.registerDomEvent(document, 'click', this.deleteButtonHandler);
+    this.registerDomEvent(document, 'click', this.ctaButtonHandler);
   }
 
   private setupMealNoteSyncHandler() {
@@ -498,55 +608,102 @@ export default class NutritionTrackerPlugin extends Plugin {
 
   private async debugFileDetection() {
     console.log('=== DEBUGGING FILE DETECTION ===');
-    new Notice('🔍 Checking file detection logic...');
+    
+    // List all files in the meal storage path
+    const mealStoragePath = this.settings.mealStoragePath;
+    console.log('Meal storage path:', mealStoragePath);
     
     try {
-      console.log('📋 Settings:');
-      console.log(`- Meal storage path: "${this.settings.mealStoragePath}"`);
-      console.log(`- Log storage path: "${this.settings.logStoragePath}"`);
+      const folder = this.app.vault.getAbstractFileByPath(mealStoragePath);
+      if (folder && folder instanceof TFolder) {
+        console.log('Files in meal storage:');
+        folder.children.forEach((file: TAbstractFile) => {
+          console.log(`  - ${file.name} (${file.path})`);
+        });
+      } else {
+        console.log('Meal storage folder not found or empty');
+      }
+    } catch (error) {
+      console.error('Error accessing meal storage folder:', error);
+    }
+    
+    // Test file detection
+    const testPaths = [
+      'tracker/health/food/meals/meals.json',
+      'tracker/health/food/meals/test-meal.md',
+      'tracker/health/food/meals/protein-breakfast.md'
+    ];
+    
+    for (const testPath of testPaths) {
+      const file = this.app.vault.getAbstractFileByPath(testPath);
+      const isFile = this.fileService.isMealNote(file);
+      console.log(`Path: ${testPath} - Exists: ${!!file} - Is meal note: ${isFile}`);
+    }
+  }
+
+  private async regenerateMealNotes() {
+    console.log('=== REGENERATING MEAL NOTES ===');
+    new Notice('🔄 Regenerating meal notes to fix HTML rendering...');
+    
+    try {
+      // Get all meals
+      const meals = await this.fileService.getMeals();
+      console.log(`Found ${meals.length} meals to regenerate`);
       
-      // Check specific files
-      const today = new Date().toISOString().split('T')[0];
-      const foodLogPath = `${this.settings.logStoragePath}/${today}.md`;
-      const foodLogFile = this.app.vault.getAbstractFileByPath(foodLogPath);
+      let successCount = 0;
+      let errorCount = 0;
       
-      console.log('📄 Food Log File:');
-      console.log(`- Path: "${foodLogPath}"`);
-      console.log(`- Exists: ${!!foodLogFile}`);
-      if (foodLogFile) {
-        console.log(`- Is meal note: ${this.fileService.isMealNote(foodLogFile)}`);
+      // Regenerate each meal note
+      for (const meal of meals) {
+        try {
+          console.log(`Regenerating meal note: ${meal.name}`);
+          await this.fileService.regenerateMealNote(meal.id);
+          successCount++;
+        } catch (error) {
+          console.error(`Error regenerating meal note for ${meal.name}:`, error);
+          errorCount++;
+        }
       }
       
-      // Check meal files
-      const allFiles = this.app.vault.getFiles();
-      const mealFiles = allFiles.filter(file => this.fileService.isMealNote(file));
-      
-      console.log('📄 Detected Meal Files:');
-      mealFiles.forEach((file, index) => {
-        console.log(`${index + 1}. "${file.path}"`);
-        console.log(`   - Name: "${file.name}"`);
-        console.log(`   - Extension: "${file.extension}"`);
-      });
-      
-      // Check for files that might be misclassified
-      const mdFiles = allFiles.filter(f => f.extension === 'md');
-      console.log('📄 All MD Files:');
-      mdFiles.forEach((file, index) => {
-        const isMeal = this.fileService.isMealNote(file);
-        const isInMealPath = file.path.startsWith(this.settings.mealStoragePath);
-        const isInLogPath = file.path.startsWith(this.settings.logStoragePath);
-        
-        console.log(`${index + 1}. "${file.path}"`);
-        console.log(`   - Is meal note: ${isMeal}`);
-        console.log(`   - In meal path: ${isInMealPath}`);
-        console.log(`   - In log path: ${isInLogPath}`);
-      });
-      
-      new Notice(`Found ${mealFiles.length} meal files and ${mdFiles.length} total MD files`);
+      new Notice(`✅ Regenerated ${successCount} meal notes${errorCount > 0 ? ` (${errorCount} errors)` : ''}`);
+      console.log(`Regeneration complete: ${successCount} success, ${errorCount} errors`);
       
     } catch (error) {
-      console.error('Error during file detection debug:', error);
-      new Notice(`❌ Error during file detection: ${error.message}`);
+      console.error('Error regenerating meal notes:', error);
+      new Notice(`❌ Error regenerating meal notes: ${error.message}`);
     }
+  }
+
+  private debugEventListeners() {
+    console.log('=== DEBUGGING EVENT LISTENERS ===');
+    new Notice('🔍 Checking event listeners and delete buttons...');
+    
+    // Check for delete buttons
+    const deleteButtons = document.querySelectorAll('.nutrition-delete-btn');
+    console.log(`Found ${deleteButtons.length} delete buttons`);
+    
+    deleteButtons.forEach((button, index) => {
+      const food = button.getAttribute('data-food');
+      const isProcessing = button.hasAttribute('data-processing');
+      const style = (button as HTMLElement).style.opacity;
+      
+      console.log(`Button ${index + 1}:`, {
+        food,
+        isProcessing,
+        opacity: style,
+        id: button.id,
+        classes: button.className
+      });
+    });
+    
+    // Check global state
+    console.log('Global delete in progress:', this.isDeleteInProgress);
+    console.log('Plugin state:', {
+      hasEditHandler: !!this.editButtonHandler,
+      hasDeleteHandler: !!this.deleteButtonHandler,
+      hasCTAHandler: !!this.ctaButtonHandler
+    });
+    
+    new Notice(`Found ${deleteButtons.length} delete buttons. Check console for details.`);
   }
 } 

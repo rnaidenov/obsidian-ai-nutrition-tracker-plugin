@@ -26,6 +26,7 @@ export class FoodInputModal extends Modal {
   private initialData: any = null;
   private editingContext: 'meal' | 'foodlog' = 'foodlog';
   private targetMealId: string | null = null;
+  private onCloseCallback?: () => void;
 
   private mealManager: MealManager;
   private imageManager: ImageManager;
@@ -36,10 +37,12 @@ export class FoodInputModal extends Modal {
     app: App, 
     private settings: PluginSettings,
     private llmService: LLMService,
-    private fileService: FileService
+    private fileService: FileService,
+    onCloseCallback?: () => void
   ) {
     super(app);
     this.modalEl.addClass('nutrition-tracker-modal');
+    this.onCloseCallback = onCloseCallback;
     
     // Initialize helper classes
     this.mealManager = new MealManager(fileService);
@@ -192,19 +195,31 @@ export class FoodInputModal extends Modal {
     this.isProcessing = true;
     this.updateButtonState();
 
-    const result = await this.foodProcessor.processFood(
-      this.mealManager.getSelectedMeals(),
-      this.description,
-      this.imageManager.getSelectedImages(),
-      this.saveAsMeal,
-      this.mealName,
-      this.initialData,
-      this.editingContext,
-      this.targetMealId
-    );
+    try {
+      const result = await this.foodProcessor.processFood(
+        this.mealManager.getSelectedMeals(),
+        this.description,
+        this.imageManager.getSelectedImages(),
+        this.saveAsMeal,
+        this.mealName,
+        this.initialData,
+        this.editingContext,
+        this.targetMealId
+      );
 
-    if (result.success) {
-      this.close();
+      console.log('🔄 Food processing result:', result);
+
+      if (result.success) {
+        console.log('✅ Processing successful, closing modal');
+        this.close();
+        return; // Exit early on success
+      } else {
+        console.log('❌ Processing failed:', result.message);
+        // Don't close modal on failure so user can retry
+      }
+    } catch (error) {
+      console.error('💥 Error during food processing:', error);
+      // Don't close modal on error so user can retry
     }
 
     this.isProcessing = false;
@@ -231,5 +246,8 @@ export class FoodInputModal extends Modal {
 
   onClose() {
     this.contentEl.empty();
+    if (this.onCloseCallback) {
+      this.onCloseCallback();
+    }
   }
 } 

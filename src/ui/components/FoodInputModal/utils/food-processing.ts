@@ -65,7 +65,9 @@ export class FoodProcessor {
       if (hasSelectedMeals && !targetMealId) {
         console.log('🍽️ Adding selected meals to food items (not targeting specific meal)');
         selectedMeals.forEach(meal => {
-          allFoodItems.push(...meal.items);
+          // Create a consolidated meal entry instead of individual items
+          const consolidatedMealEntry = this.createConsolidatedMealEntry(meal);
+          allFoodItems.push(consolidatedMealEntry);
         });
       } else if (targetMealId) {
         console.log('🎯 Skipping selected meals because we are targeting meal:', targetMealId);
@@ -156,5 +158,37 @@ export class FoodProcessor {
     } else {
       return { success: false, message: `Error processing food: ${error.message}` };
     }
+  }
+
+  private createConsolidatedMealEntry(meal: Meal): FoodItem {
+    // Calculate totals from meal items
+    const totalCalories = meal.items.reduce((sum, item) => sum + item.calories, 0);
+    const totalProtein = meal.items.reduce((sum, item) => sum + item.protein, 0);
+    const totalCarbs = meal.items.reduce((sum, item) => sum + item.carbs, 0);
+    const totalFat = meal.items.reduce((sum, item) => sum + item.fat, 0);
+    
+    // Use the first item's emoji if available, otherwise use a meal emoji
+    const mealEmoji = meal.items.length > 0 && meal.items[0].emoji ? meal.items[0].emoji : '🍽️';
+    
+    // Create a brief description of the meal items
+    const itemCount = meal.items.length;
+    const itemsDescription = itemCount === 1 ? 
+      `${meal.items[0].food}` : 
+      `${itemCount} items: ${meal.items.slice(0, 3).map(item => item.food).join(', ')}${itemCount > 3 ? '...' : ''}`;
+    
+    const consolidatedItem: FoodItem = {
+      food: `${meal.name} (${itemsDescription})`,
+      quantity: "1 serving",
+      calories: totalCalories,
+      protein: totalProtein,
+      carbs: totalCarbs,
+      fat: totalFat,
+      emoji: mealEmoji,
+      timestamp: new Date().toISOString(),
+      mealId: meal.id // Link to the original meal
+    };
+    
+    console.log('🍽️ Created consolidated meal entry:', consolidatedItem);
+    return consolidatedItem;
   }
 } 

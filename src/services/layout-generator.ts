@@ -145,17 +145,12 @@ export class LayoutGenerator {
       willHaveMealId: !!mealId
     });
     
-    const buttonContent = context === 'meal' ? 
-      `<span>➕ Add More Items to Meal</span>` :
-      `<span>➕ Add More Items to Food Log</span>`;
+    const buttonText = context === 'meal' ? 
+      `➕ Add More Items to Meal` :
+      `➕ Add More Items to Food Log`;
     
-    const buttonHtml = `
-      <div style="text-align: center; margin-top: 20px;">
-        <button id="${buttonId}" class="nutrition-add-cta-btn" data-context="${context}"${mealIdAttr} style="background: linear-gradient(135deg, rgba(59, 130, 246, 0.3), rgba(37, 99, 235, 0.2)); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 12px; padding: 12px 24px; color: var(--text-normal); font-weight: 600; cursor: pointer; transition: all 0.3s ease; font-size: 14px; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);">
-          ${buttonContent}
-        </button>
-      </div>
-    `;
+    // Use single-line HTML format like food item cards for better Obsidian compatibility
+    const buttonHtml = `<div style="text-align: center; margin-top: 20px;"><button id="${buttonId}" class="nutrition-add-cta-btn" data-context="${context}"${mealIdAttr} style="background: linear-gradient(135deg, rgba(59, 130, 246, 0.3), rgba(37, 99, 235, 0.2)); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 12px; padding: 12px 24px; color: var(--text-normal); font-weight: 600; cursor: pointer; transition: all 0.3s ease; font-size: 14px; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);">${buttonText}</button></div>`;
     
     console.log('🎯 Generated CTA button HTML:', buttonHtml);
     return buttonHtml;
