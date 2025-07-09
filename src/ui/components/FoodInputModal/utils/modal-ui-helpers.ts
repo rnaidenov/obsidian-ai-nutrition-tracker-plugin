@@ -186,10 +186,15 @@ export function createProcessButton(
   // Add processing indicator
   const processingIndicator = contentEl.createDiv('nutrition-tracker-processing-indicator');
   processingIndicator.style.display = isProcessing ? 'block' : 'none';
+  
+  const isDarkTheme = document.body.classList.contains('theme-dark');
+  const spinnerColor = isDarkTheme ? '#cbd5e1' : '#475569';
+  const textColor = isDarkTheme ? '#cbd5e1' : '#475569';
+  
   processingIndicator.innerHTML = `
     <div style="text-align: center; margin-top: 10px;">
-      <div style="display: inline-block; width: 20px; height: 20px; border: 3px solid #f3f3f3; border-top: 3px solid #3498db; border-radius: 50%; animation: spin 1s linear infinite;"></div>
-      <p style="margin-top: 8px; font-size: 14px; color: #666;">Processing food data...</p>
+      <div style="display: inline-block; width: 20px; height: 20px; border: 3px solid rgba(${isDarkTheme ? '203, 213, 225' : '71, 85, 105'}, 0.3); border-top: 3px solid ${spinnerColor}; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+      <p style="margin-top: 8px; font-size: 14px; color: ${textColor}; font-weight: 500;">Processing food data...</p>
     </div>
   `;
   

@@ -7,6 +7,18 @@
 
 .nutrition-tracker-modal .modal-content {
   padding: 20px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(248, 250, 252, 0.95));
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+.theme-dark .nutrition-tracker-modal .modal-content {
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.95), rgba(51, 65, 85, 0.95));
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
 .nutrition-tracker-modal .setting-item {
@@ -34,6 +46,29 @@
   font-family: var(--font-interface);
   resize: vertical;
   box-sizing: border-box;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.8), rgba(248, 250, 252, 0.6)) !important;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.6) !important;
+  border-radius: 12px !important;
+  padding: 12px 16px !important;
+  color: #475569 !important;
+  font-size: 14px !important;
+  line-height: 1.5 !important;
+  transition: all 0.3s ease !important;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.8) !important;
+}
+
+.nutrition-tracker-modal textarea:focus {
+  outline: none !important;
+  border-color: rgba(59, 130, 246, 0.6) !important;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(248, 250, 252, 0.8)) !important;
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.9) !important;
+}
+
+.nutrition-tracker-modal textarea::placeholder {
+  color: #94a3b8 !important;
+  opacity: 0.8 !important;
 }
 
 /* Direct targeting approach */
@@ -46,6 +81,66 @@
   resize: vertical !important;
   box-sizing: border-box !important;
   margin-left: 0 !important;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.8), rgba(248, 250, 252, 0.6)) !important;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.6) !important;
+  border-radius: 12px !important;
+  padding: 12px 16px !important;
+  color: #475569 !important;
+  font-size: 14px !important;
+  line-height: 1.5 !important;
+  transition: all 0.3s ease !important;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.8) !important;
+}
+
+.nutrition-tracker-food-input:focus {
+  outline: none !important;
+  border-color: rgba(59, 130, 246, 0.6) !important;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(248, 250, 252, 0.8)) !important;
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.9) !important;
+}
+
+.nutrition-tracker-food-input::placeholder {
+  color: #94a3b8 !important;
+  opacity: 0.8 !important;
+}
+
+/* Dark theme textarea styling */
+.theme-dark .nutrition-tracker-modal textarea {
+  background: linear-gradient(135deg, rgba(148, 163, 184, 0.12), rgba(100, 116, 139, 0.08)) !important;
+  border: 1px solid rgba(148, 163, 184, 0.25) !important;
+  color: #cbd5e1 !important;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+}
+
+.theme-dark .nutrition-tracker-modal textarea:focus {
+  border-color: rgba(59, 130, 246, 0.5) !important;
+  background: linear-gradient(135deg, rgba(148, 163, 184, 0.2), rgba(100, 116, 139, 0.15)) !important;
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+}
+
+.theme-dark .nutrition-tracker-modal textarea::placeholder {
+  color: #64748b !important;
+  opacity: 0.8 !important;
+}
+
+.theme-dark .nutrition-tracker-food-input {
+  background: linear-gradient(135deg, rgba(148, 163, 184, 0.12), rgba(100, 116, 139, 0.08)) !important;
+  border: 1px solid rgba(148, 163, 184, 0.25) !important;
+  color: #cbd5e1 !important;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+}
+
+.theme-dark .nutrition-tracker-food-input:focus {
+  border-color: rgba(59, 130, 246, 0.5) !important;
+  background: linear-gradient(135deg, rgba(148, 163, 184, 0.2), rgba(100, 116, 139, 0.15)) !important;
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+}
+
+.theme-dark .nutrition-tracker-food-input::placeholder {
+  color: #64748b !important;
+  opacity: 0.8 !important;
 }
 
 /* Layout for the food description setting */
@@ -248,23 +343,29 @@
 /* Meal name input styling */
 .nutrition-tracker-meal-name-input {
   width: 100% !important;
-  padding: 8px 12px;
-  border: 1px solid var(--background-modifier-border);
-  border-radius: 4px;
-  background: var(--background-primary);
-  color: var(--text-normal);
-  font-size: 0.9em;
-  transition: border-color 0.2s ease;
+  padding: 12px 16px !important;
+  border: 1px solid rgba(255, 255, 255, 0.6) !important;
+  border-radius: 12px !important;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.8), rgba(248, 250, 252, 0.6)) !important;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: #475569 !important;
+  font-size: 14px !important;
+  font-family: var(--font-interface) !important;
+  transition: all 0.3s ease !important;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.8) !important;
 }
 
 .nutrition-tracker-meal-name-input:focus {
-  outline: none;
-  border-color: var(--color-accent);
-  box-shadow: 0 0 0 2px rgba(var(--color-accent), 0.2);
+  outline: none !important;
+  border-color: rgba(59, 130, 246, 0.6) !important;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(248, 250, 252, 0.8)) !important;
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.9) !important;
 }
 
 .nutrition-tracker-meal-name-input::placeholder {
-  color: var(--text-muted);
+  color: #94a3b8 !important;
+  opacity: 0.8 !important;
 }
 
 .nutrition-tracker-save-meal-setting {
@@ -317,25 +418,21 @@
 
 /* Theme specific improvements */
 .theme-dark .nutrition-tracker-meal-name-input {
-  background: var(--background-primary);
-  border-color: var(--background-modifier-border);
-  color: var(--text-normal);
+  background: linear-gradient(135deg, rgba(148, 163, 184, 0.12), rgba(100, 116, 139, 0.08)) !important;
+  border: 1px solid rgba(148, 163, 184, 0.25) !important;
+  color: #cbd5e1 !important;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
 }
 
 .theme-dark .nutrition-tracker-meal-name-input:focus {
-  border-color: var(--color-accent);
-  box-shadow: 0 0 0 2px rgba(138, 180, 248, 0.2);
+  border-color: rgba(59, 130, 246, 0.5) !important;
+  background: linear-gradient(135deg, rgba(148, 163, 184, 0.2), rgba(100, 116, 139, 0.15)) !important;
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
 }
 
-.theme-light .nutrition-tracker-meal-name-input {
-  background: #ffffff;
-  border-color: #dee2e6;
-  color: #333333;
-}
-
-.theme-light .nutrition-tracker-meal-name-input:focus {
-  border-color: #007acc;
-  box-shadow: 0 0 0 2px rgba(0, 122, 204, 0.2);
+.theme-dark .nutrition-tracker-meal-name-input::placeholder {
+  color: #64748b !important;
+  opacity: 0.8 !important;
 }
 
 /* Improved meal selection styles */
@@ -347,64 +444,75 @@
 }
 
 .nutrition-tracker-meal-selection select {
-  padding: 8px 12px;
-  font-size: 0.9em;
-  border-radius: 6px;
-  border: 1px solid var(--background-modifier-border);
-  background: var(--background-primary);
-  color: var(--text-normal);
+  padding: 12px 16px;
+  padding-right: 40px;
+  font-size: 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.8), rgba(248, 250, 252, 0.6));
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: #475569;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
   font-family: var(--font-interface);
+  font-weight: 500;
   -webkit-appearance: none;
   -moz-appearance: none;
   appearance: none;
-  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23475569' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
   background-repeat: no-repeat;
-  background-position: right 8px center;
+  background-position: right 12px center;
   background-size: 16px;
-  padding-right: 32px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.8);
 }
 
 .nutrition-tracker-meal-selection select:hover {
-  border-color: var(--background-modifier-border-hover);
-  background-color: var(--background-modifier-hover);
+  border-color: rgba(255, 255, 255, 0.8);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(248, 250, 252, 0.7));
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.9);
 }
 
 .nutrition-tracker-meal-selection select:focus {
   outline: none;
-  border-color: var(--color-accent);
-  box-shadow: 0 0 0 2px rgba(var(--color-accent), 0.2);
+  border-color: rgba(59, 130, 246, 0.6);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(248, 250, 252, 0.8));
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.9);
 }
 
 .nutrition-tracker-meal-selection select option {
-  background: var(--background-primary);
-  color: var(--text-normal);
-  padding: 8px 12px;
+  background: #ffffff;
+  color: #475569;
+  padding: 12px 16px;
   font-family: var(--font-interface);
+  font-weight: 500;
 }
 
 /* Theme-specific dropdown styling */
 .theme-dark .nutrition-tracker-meal-selection select {
-  background-color: var(--background-primary);
-  border-color: var(--background-modifier-border);
-  color: var(--text-normal);
+  background: linear-gradient(135deg, rgba(148, 163, 184, 0.12), rgba(100, 116, 139, 0.08));
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  color: #cbd5e1;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23cbd5e1' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
 }
 
 .theme-dark .nutrition-tracker-meal-selection select:hover {
-  background-color: var(--background-modifier-hover);
-  border-color: var(--background-modifier-border-hover);
+  background: linear-gradient(135deg, rgba(148, 163, 184, 0.2), rgba(100, 116, 139, 0.15));
+  border-color: rgba(148, 163, 184, 0.4);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2);
 }
 
-.theme-light .nutrition-tracker-meal-selection select {
-  background-color: #ffffff;
-  border-color: #d1d5db;
-  color: #374151;
+.theme-dark .nutrition-tracker-meal-selection select:focus {
+  border-color: rgba(59, 130, 246, 0.5);
+  background: linear-gradient(135deg, rgba(148, 163, 184, 0.2), rgba(100, 116, 139, 0.15));
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.2);
 }
 
-.theme-light .nutrition-tracker-meal-selection select:hover {
-  background-color: #f9fafb;
-  border-color: #9ca3af;
+.theme-dark .nutrition-tracker-meal-selection select option {
+  background: #1e293b;
+  color: #cbd5e1;
 }
 
 /* Empty state styling */
@@ -694,12 +802,21 @@ textarea[placeholder*="Enter food description"] {
 }
 
 .nutrition-tracker-image-preview {
-  background: var(--background-secondary);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.8), rgba(248, 250, 252, 0.6));
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   padding: 12px;
-  border-radius: 6px;
-  border: 1px solid var(--background-modifier-border);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.6);
   width: 100%;
   box-sizing: border-box;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+.theme-dark .nutrition-tracker-image-preview {
+  background: linear-gradient(135deg, rgba(148, 163, 184, 0.12), rgba(100, 116, 139, 0.08));
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
 .nutrition-tracker-preview-image {
@@ -803,14 +920,24 @@ textarea[placeholder*="Enter food description"] {
 }
 
 .nutrition-tracker-processing {
-  background: var(--background-secondary);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.8), rgba(248, 250, 252, 0.6));
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   padding: 15px;
-  border-radius: 8px;
+  border-radius: 12px;
   margin: 15px 0;
   text-align: center;
-  color: var(--text-accent);
-  font-weight: 500;
-  border: 1px solid var(--background-modifier-border);
+  color: #475569;
+  font-weight: 600;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+.theme-dark .nutrition-tracker-processing {
+  background: linear-gradient(135deg, rgba(148, 163, 184, 0.12), rgba(100, 116, 139, 0.08));
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  color: #cbd5e1;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
 .nutrition-tracker-button-container {
@@ -821,34 +948,76 @@ textarea[placeholder*="Enter food description"] {
 }
 
 .nutrition-tracker-button-container button {
-  padding: 10px 20px;
-  border: 1px solid var(--background-modifier-border);
-  border-radius: 6px;
-  background: var(--background-primary);
-  color: var(--text-normal);
+  padding: 12px 24px;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.7), rgba(248, 250, 252, 0.5));
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: #475569;
   cursor: pointer;
   font-size: 14px;
-  font-weight: 500;
-  transition: all 0.2s;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  position: relative;
+  overflow: hidden;
 }
 
 .nutrition-tracker-button-container button:hover:not(:disabled) {
-  background: var(--background-secondary);
-  border-color: var(--background-modifier-border-hover);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(248, 250, 252, 0.7));
+  border-color: rgba(255, 255, 255, 0.8);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.9);
 }
 
 .nutrition-tracker-button-container button.mod-cta {
-  background: var(--interactive-accent);
-  color: var(--text-on-accent);
-  border-color: var(--interactive-accent);
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.8), rgba(37, 99, 235, 0.6));
+  color: #ffffff;
+  border-color: rgba(59, 130, 246, 0.6);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 .nutrition-tracker-button-container button.mod-cta:hover:not(:disabled) {
-  background: var(--interactive-accent-hover);
-  border-color: var(--interactive-accent-hover);
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.9), rgba(37, 99, 235, 0.8));
+  border-color: rgba(59, 130, 246, 0.8);
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.2);
 }
 
 .nutrition-tracker-button-container button:disabled {
-  opacity: 0.6;
+  opacity: 0.4;
   cursor: not-allowed;
+  transform: none;
+}
+
+/* Dark theme button styling */
+.theme-dark .nutrition-tracker-button-container button {
+  background: linear-gradient(135deg, rgba(148, 163, 184, 0.12), rgba(100, 116, 139, 0.08));
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  color: #cbd5e1;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.theme-dark .nutrition-tracker-button-container button:hover:not(:disabled) {
+  background: linear-gradient(135deg, rgba(148, 163, 184, 0.2), rgba(100, 116, 139, 0.15));
+  border-color: rgba(148, 163, 184, 0.4);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.theme-dark .nutrition-tracker-button-container button.mod-cta {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.7), rgba(37, 99, 235, 0.5));
+  color: #ffffff;
+  border-color: rgba(59, 130, 246, 0.5);
+}
+
+.theme-dark .nutrition-tracker-button-container button.mod-cta:hover:not(:disabled) {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.8), rgba(37, 99, 235, 0.7));
+  border-color: rgba(59, 130, 246, 0.7);
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+/* Keyframes for spinner animation */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 } 

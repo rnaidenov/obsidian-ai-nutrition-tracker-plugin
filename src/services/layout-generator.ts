@@ -150,7 +150,12 @@ export class LayoutGenerator {
       `➕ Add More Items to Food Log`;
     
     // Use single-line HTML format like food item cards for better Obsidian compatibility
-    const buttonHtml = `<div style="text-align: center; margin-top: 20px;"><button id="${buttonId}" class="nutrition-add-cta-btn" data-context="${context}"${mealIdAttr} style="background: linear-gradient(135deg, rgba(59, 130, 246, 0.3), rgba(37, 99, 235, 0.2)); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 12px; padding: 12px 24px; color: var(--text-normal); font-weight: 600; cursor: pointer; transition: all 0.3s ease; font-size: 14px; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);">${buttonText}</button></div>`;
+    const isDarkTheme = document.body.classList.contains('theme-dark');
+    const buttonStyle = isDarkTheme ? 
+      'background: linear-gradient(135deg, rgba(59, 130, 246, 0.7), rgba(37, 99, 235, 0.5)); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(59, 130, 246, 0.5); border-radius: 12px; padding: 12px 24px; color: #ffffff; font-weight: 600; cursor: pointer; transition: all 0.3s ease; font-size: 14px; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1); text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);' :
+      'background: linear-gradient(135deg, rgba(59, 130, 246, 0.8), rgba(37, 99, 235, 0.6)); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(59, 130, 246, 0.6); border-radius: 12px; padding: 12px 24px; color: #ffffff; font-weight: 600; cursor: pointer; transition: all 0.3s ease; font-size: 14px; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.8); text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);';
+    
+    const buttonHtml = `<div style="text-align: center; margin-top: 20px;"><button id="${buttonId}" class="nutrition-add-cta-btn" data-context="${context}"${mealIdAttr} style="${buttonStyle}" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(59, 130, 246, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.2)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='${isDarkTheme ? '0 4px 15px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1)' : '0 4px 15px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.8)'}'">${buttonText}</button></div>`;
     
     console.log('🎯 Generated CTA button HTML:', buttonHtml);
     return buttonHtml;
