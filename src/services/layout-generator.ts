@@ -161,7 +161,7 @@ export class LayoutGenerator {
     const resetStyleDark = 'this.style.transform="translateY(0)"; this.style.background="linear-gradient(135deg, rgba(10, 10, 20, 0.2), rgba(15, 15, 30, 0.3), rgba(5, 5, 15, 0.1))"; this.style.boxShadow="0 12px 48px rgba(0, 0, 0, 0.2), 0 6px 24px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.02)"; this.style.borderColor="rgba(120, 120, 140, 0.3)"; this.style.color="#e2e8f0"; this.style.padding="24px 48px"; this.style.letterSpacing="0.05em";';
     const resetStyleLight = 'this.style.transform="translateY(0)"; this.style.background="linear-gradient(135deg, rgba(255, 255, 255, 0.8), rgba(248, 250, 252, 0.7), rgba(241, 245, 249, 0.6))"; this.style.boxShadow="0 8px 32px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.8), inset 0 -1px 0 rgba(0, 0, 0, 0.03)"; this.style.borderColor="rgba(100, 116, 139, 0.4)"; this.style.padding="24px 48px"; this.style.letterSpacing="0.05em";';
     
-    const buttonHtml = `<div style="text-align: center; margin: 24px 0; padding: 0px 0;"><button id="${buttonId}" class="nutrition-add-cta-btn" data-context="${context}"${mealIdAttr} style="${buttonStyle}" onmouseover="${isDarkTheme ? hoverStyleDark : hoverStyleLight}" onmouseout="${isDarkTheme ? resetStyleDark : resetStyleLight}">${buttonText}</button></div>`;
+    const buttonHtml = `<div style="text-align: center; margin: 24px 0 60px; padding: 0px 0;"><button id="${buttonId}" class="nutrition-add-cta-btn" data-context="${context}"${mealIdAttr} style="${buttonStyle}" onmouseover="${isDarkTheme ? hoverStyleDark : hoverStyleLight}" onmouseout="${isDarkTheme ? resetStyleDark : resetStyleLight}">${buttonText}</button></div>`;
     
     console.log('🎯 Generated CTA button HTML:', buttonHtml);
     return buttonHtml;
