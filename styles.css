@@ -274,27 +274,35 @@
 }
 
 .nutrition-tracker-meal-calories {
-  color: var(--text-accent);
+  color: #6366f1;
   font-size: 0.8em;
   font-weight: 500;
-  background: var(--background-modifier-border);
-  padding: 2px 6px;
-  border-radius: 3px;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.08), rgba(79, 70, 229, 0.06));
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(99, 102, 241, 0.2);
+  padding: 4px 8px;
+  border-radius: 8px;
   display: inline-block;
   margin-top: 2px;
   width: fit-content;
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  transition: all 0.2s ease;
+  letter-spacing: 0.01em;
 }
 
 .nutrition-tracker-remove-meal {
-  background: var(--background-modifier-error);
-  color: var(--text-on-accent);
-  border: 1px solid var(--background-modifier-error);
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.08), rgba(220, 38, 38, 0.06));
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.2);
   padding: 6px 10px;
-  border-radius: 4px;
+  border-radius: 8px;
   cursor: pointer;
   font-size: 0.8em;
   font-weight: 500;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
   flex-shrink: 0;
   min-width: 28px;
   height: 28px;
@@ -305,14 +313,17 @@
   position: absolute;
   right: 8px;
   top: 8px;
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  letter-spacing: 0.01em;
 }
 
 .nutrition-tracker-remove-meal:hover {
-  background: var(--background-modifier-error-hover);
-  color: var(--text-on-accent);
-  border-color: var(--background-modifier-error-hover);
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.12), rgba(220, 38, 38, 0.08));
+  color: #dc2626;
+  border-color: rgba(239, 68, 68, 0.3);
   opacity: 1;
   transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.15);
 }
 
 .nutrition-tracker-remove-meal:active {
@@ -601,19 +612,24 @@
 }
 
 .theme-dark .nutrition-tracker-meal-calories {
-  background: var(--background-modifier-border);
-  color: var(--text-accent);
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.12), rgba(79, 70, 229, 0.08));
+  color: #a5b4fc;
+  border: 1px solid rgba(99, 102, 241, 0.25);
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
 .theme-dark .nutrition-tracker-remove-meal {
-  background: #8b2635;
-  color: #ffffff;
-  border-color: #8b2635;
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.12), rgba(220, 38, 38, 0.08));
+  color: #fca5a5;
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
 .theme-dark .nutrition-tracker-remove-meal:hover {
-  background: #a12d3d;
-  border-color: #a12d3d;
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.18), rgba(220, 38, 38, 0.12));
+  color: #f87171;
+  border-color: rgba(239, 68, 68, 0.35);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
 /* Light theme specific styles */
@@ -635,19 +651,24 @@
 }
 
 .theme-light .nutrition-tracker-meal-calories {
-  background: #e9ecef;
-  color: var(--text-accent);
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.06), rgba(79, 70, 229, 0.04));
+  color: #4f46e5;
+  border: 1px solid rgba(99, 102, 241, 0.15);
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.7);
 }
 
 .theme-light .nutrition-tracker-remove-meal {
-  background: #dc3545;
-  color: #ffffff;
-  border-color: #dc3545;
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.06), rgba(220, 38, 38, 0.04));
+  color: #dc2626;
+  border: 1px solid rgba(239, 68, 68, 0.15);
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.7);
 }
 
 .theme-light .nutrition-tracker-remove-meal:hover {
-  background: #c82333;
-  border-color: #bd2130;
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(220, 38, 38, 0.06));
+  color: #b91c1c;
+  border-color: rgba(239, 68, 68, 0.25);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.8);
 }
 
 /* Meal setting overrides */
@@ -824,14 +845,20 @@ textarea[placeholder*="Enter food description"] {
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.03);
 }
 
-.nutrition-tracker-preview-image {
+.nutrition-tracker-image-container {
+  position: relative;
+  display: inline-block;
+  margin-bottom: 8px;
   width: 100%;
   max-width: 200px;
+}
+
+.nutrition-tracker-preview-image {
+  width: 100%;
   height: auto;
   max-height: 120px;
   object-fit: cover;
-  border-radius: 4px;
-  margin-bottom: 8px;
+  border-radius: 8px;
   border: 1px solid var(--background-modifier-border-hover);
   display: block;
 }
@@ -841,6 +868,7 @@ textarea[placeholder*="Enter food description"] {
   align-items: center;
   justify-content: space-between;
   gap: 12px;
+  margin-top: 8px;
 }
 
 .nutrition-tracker-image-details {
@@ -865,27 +893,67 @@ textarea[placeholder*="Enter food description"] {
 }
 
 .nutrition-tracker-remove-image {
-  background: transparent;
-  color: var(--text-muted);
-  border: 1px solid var(--background-modifier-border);
-  padding: 4px 8px;
-  border-radius: 4px;
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.08), rgba(220, 38, 38, 0.06));
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  padding: 6px 10px;
+  border-radius: 8px;
   cursor: pointer;
-  font-size: 0.75em;
-  transition: all 0.2s;
-  white-space: nowrap;
+  font-size: 0.8em;
+  font-weight: 500;
+  transition: all 0.3s ease;
   flex-shrink: 0;
-  min-width: 24px;
-  height: 24px;
+  min-width: 28px;
+  height: 28px;
   display: flex;
   align-items: center;
   justify-content: center;
+  opacity: 0.8;
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  letter-spacing: 0.01em;
 }
 
 .nutrition-tracker-remove-image:hover {
-  background: var(--background-modifier-hover);
-  color: var(--text-normal);
-  border-color: var(--background-modifier-border-hover);
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.12), rgba(220, 38, 38, 0.08));
+  color: #dc2626;
+  border-color: rgba(239, 68, 68, 0.3);
+  opacity: 1;
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+.nutrition-tracker-remove-image:active {
+  transform: scale(0.95);
+}
+
+.theme-dark .nutrition-tracker-remove-image {
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.12), rgba(220, 38, 38, 0.08));
+  color: #fca5a5;
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.theme-dark .nutrition-tracker-remove-image:hover {
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.18), rgba(220, 38, 38, 0.12));
+  color: #f87171;
+  border-color: rgba(239, 68, 68, 0.35);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.theme-light .nutrition-tracker-remove-image {
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.06), rgba(220, 38, 38, 0.04));
+  color: #dc2626;
+  border: 1px solid rgba(239, 68, 68, 0.15);
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+
+.theme-light .nutrition-tracker-remove-image:hover {
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(220, 38, 38, 0.06));
+  color: #b91c1c;
+  border-color: rgba(239, 68, 68, 0.25);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.8);
 }
 
 .nutrition-tracker-clear-all-images {

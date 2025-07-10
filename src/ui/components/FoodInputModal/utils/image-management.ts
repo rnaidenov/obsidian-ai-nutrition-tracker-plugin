@@ -55,7 +55,10 @@ export class ImageManager {
     this.selectedImages.forEach((image, index) => {
       const imagePreview = imagesContainer.createDiv('nutrition-tracker-image-preview');
       
-      const img = imagePreview.createEl('img', { 
+      // Create image container with relative positioning for the remove button
+      const imageContainer = imagePreview.createDiv('nutrition-tracker-image-container');
+      
+      const img = imageContainer.createEl('img', { 
         cls: 'nutrition-tracker-preview-image' 
       });
       
@@ -73,6 +76,7 @@ export class ImageManager {
         cls: 'nutrition-tracker-image-size'
       });
       
+      // Position remove button in image info section
       const removeBtn = imageInfo.createEl('button', { 
         text: '✕',
         cls: 'nutrition-tracker-remove-image'
