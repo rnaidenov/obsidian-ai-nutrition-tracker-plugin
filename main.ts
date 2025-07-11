@@ -102,6 +102,15 @@ export default class NutritionTrackerPlugin extends Plugin {
       }
     });
 
+    // Add debug command to test meal sync mechanism
+    this.addCommand({
+      id: 'test-meal-sync',
+      name: 'Debug: Test Meal Sync (Force sync all meal files)',
+      callback: async () => {
+        await this.testMealSync();
+      }
+    });
+
     // Add settings tab
     this.addSettingTab(new SettingsTab(this.app, this));
 
@@ -422,26 +431,56 @@ export default class NutritionTrackerPlugin extends Plugin {
     // Listen for file modifications to sync meal notes back to JSON
     this.registerEvent(
       this.app.vault.on('modify', async (file) => {
-        if (this.fileService.isMealNote(file) && file instanceof TFile) {
+        // More detailed file detection with debugging
+        console.log('📄 File modified:', file.path);
+        
+        const isMealNote = this.fileService.isMealNote(file);
+        console.log('🔍 Is meal note?', isMealNote);
+        
+        if (isMealNote && file instanceof TFile) {
+          console.log('✅ Meal note detected, setting up sync for:', file.path);
+          
           // Debounce the sync to prevent excessive calls during active editing
           const filePath = file.path;
           
           // Clear existing timeout for this file
           if (this.mealSyncTimeouts.has(filePath)) {
             clearTimeout(this.mealSyncTimeouts.get(filePath)!);
+            console.log('🔄 Cleared existing sync timeout for:', filePath);
           }
           
-          // Set a new timeout to sync after 2 seconds of inactivity
+          // Set a new timeout to sync after 1 second of inactivity (reduced from 2 seconds for more responsive sync)
           const timeout = setTimeout(async () => {
-            console.log('Meal note modified, syncing to JSON:', filePath);
-            await this.fileService.syncMealNoteToJSON(file);
-            this.mealSyncTimeouts.delete(filePath);
-          }, 2000);
+            try {
+              console.log('🚀 Starting automatic meal sync for:', filePath);
+              await this.fileService.syncMealNoteToJSON(file);
+              console.log('✅ Automatic meal sync completed for:', filePath);
+              
+              // Also refresh the dropdown by re-loading meals
+              try {
+                const updatedMeals = await this.fileService.getMeals();
+                console.log('📊 Refreshed meal dropdown:', updatedMeals.length, 'meals available');
+              } catch (refreshError) {
+                console.warn('⚠️ Could not refresh meal dropdown:', refreshError);
+              }
+              
+            } catch (syncError) {
+              console.error('❌ Automatic meal sync failed for:', filePath, syncError);
+              new Notice(`⚠️ Could not sync meal changes: ${syncError.message}`);
+            } finally {
+              this.mealSyncTimeouts.delete(filePath);
+            }
+          }, 1000); // Reduced debounce time for more responsive sync
           
           this.mealSyncTimeouts.set(filePath, timeout);
+          console.log('⏰ Scheduled automatic sync for:', filePath, 'in 1 second');
+        } else {
+          console.log('⏭️ Skipping non-meal file:', file.path);
         }
       })
     );
+    
+    console.log('🎧 Meal note sync handler set up successfully');
   }
 
   async loadSettings() {
@@ -671,6 +710,50 @@ export default class NutritionTrackerPlugin extends Plugin {
     } catch (error) {
       console.error('Error regenerating meal notes:', error);
       new Notice(`❌ Error regenerating meal notes: ${error.message}`);
+    }
+  }
+
+  private async testMealSync() {
+    console.log('=== TESTING MEAL SYNC ===');
+    new Notice('Testing meal sync functionality...');
+
+    try {
+      // Get all meal files
+      const mealFiles = await this.fileService.getMealFiles();
+      console.log(`Found ${mealFiles.length} meal files to sync.`);
+
+      if (mealFiles.length === 0) {
+        new Notice('No meal files found to sync. Please create a meal first.');
+        return;
+      }
+
+      let successCount = 0;
+      let errorCount = 0;
+
+      // Process each meal file
+      for (const mealFile of mealFiles) {
+        try {
+          console.log(`Testing sync for meal file: ${mealFile.name}`);
+          await this.fileService.syncMealNoteToJSON(mealFile);
+          successCount++;
+          console.log(`✅ Successfully synced: ${mealFile.name}`);
+        } catch (error) {
+          errorCount++;
+          console.error(`❌ Failed to sync ${mealFile.name}:`, error);
+        }
+      }
+
+      const message = `✅ Sync test complete: ${successCount} successful, ${errorCount} failed`;
+      console.log(message);
+      new Notice(message);
+
+      // Also verify the JSON is updated
+      const meals = await this.fileService.getMeals();
+      console.log(`📊 JSON contains ${meals.length} meals after sync`);
+
+    } catch (error) {
+      console.error('Error during meal sync test:', error);
+      new Notice(`❌ Error during meal sync test: ${error.message}`);
     }
   }
 

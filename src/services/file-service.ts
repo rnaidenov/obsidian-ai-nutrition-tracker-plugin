@@ -1,4 +1,4 @@
-import { TFile, Vault, TAbstractFile } from 'obsidian';
+import { TFile, Vault, TAbstractFile, TFolder } from 'obsidian';
 import { FoodItem, Meal } from '../types/nutrition';
 import { PluginSettings } from '../types/settings';
 import { FileUtils } from './file-utils';
@@ -73,6 +73,36 @@ export class FileService {
 
   async regenerateMealNote(mealId: string): Promise<void> {
     return this.mealManager.regenerateMealNote(mealId);
+  }
+
+  // Get all meal files from the meal storage directory
+  async getMealFiles(): Promise<TFile[]> {
+    try {
+      const mealStoragePath = this.settings.mealStoragePath;
+      const folder = this.vault.getAbstractFileByPath(mealStoragePath);
+      
+      if (!folder || !(folder instanceof TFolder)) {
+        console.log('Meal storage folder not found:', mealStoragePath);
+        return [];
+      }
+      
+      // Get all .md files in the meal folder that are actual meal notes
+      const mealFiles = folder.children.filter((file: TAbstractFile) => {
+        if (!(file instanceof TFile)) return false;
+        if (file.extension !== 'md') return false;
+        if (file.name === 'meals.json') return false;
+        
+        // Use the isMealNote method to verify it's actually a meal file
+        return this.mealManager.isMealNote(file);
+      }) as TFile[];
+      
+      console.log(`Found ${mealFiles.length} meal files in ${mealStoragePath}`);
+      return mealFiles;
+      
+    } catch (error) {
+      console.error('Error getting meal files:', error);
+      return [];
+    }
   }
 
   async updateMealItem(originalItem: { food: string, quantity: string, calories: number, protein: number, carbs: number, fat: number }, newItem: FoodItem): Promise<void> {
