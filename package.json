@@ -1,6 +1,6 @@
 {
   "name": "ai-nutrition-tracker",
-  "version": "1.0.0",
+  "version": "1.0.3",
   "description": "AI-powered nutrition tracking for Obsidian",
   "main": "main.js",
   "scripts": {
