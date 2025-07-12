@@ -21,13 +21,28 @@ export class SettingsTab extends PluginSettingTab {
     new Setting(containerEl)
       .setName('OpenRouter API Key')
       .setDesc('Your OpenRouter API key for LLM processing. Get one at openrouter.ai')
-      .addText(text => text
-        .setPlaceholder('Enter your API key')
-        .setValue(this.plugin.settings.openRouterApiKey)
-        .onChange(async (value) => {
-          this.plugin.settings.openRouterApiKey = value;
-          await this.plugin.saveSettings();
-        }));
+      .addText(text => {
+        text
+          .setPlaceholder('Enter your API key')
+          .setValue(this.plugin.settings.openRouterApiKey)
+          .onChange(async (value) => {
+            this.plugin.settings.openRouterApiKey = value;
+            await this.plugin.saveSettings();
+          });
+        
+        // Start as password field
+        text.inputEl.type = 'password';
+        
+        // Show value when focused
+        text.inputEl.addEventListener('focus', () => {
+          text.inputEl.type = 'text';
+        });
+        
+        // Hide value when unfocused
+        text.inputEl.addEventListener('blur', () => {
+          text.inputEl.type = 'password';
+        });
+      });
 
     new Setting(containerEl)
       .setName('LLM Model')
@@ -164,7 +179,7 @@ export class SettingsTab extends PluginSettingTab {
 
 
     // Display Settings Section
-    containerEl.createEl('h3', { text: '🎨 Display Settings' });
+    containerEl.createEl('h3', { text: 'Display Settings' });
 
     new Setting(containerEl)
       .setName('Display Theme')
