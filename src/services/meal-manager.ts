@@ -46,7 +46,6 @@ export class MealManager {
       new Notice(`✅ Meal "${name}" saved successfully`);
       return meal;
     } catch (error) {
-      console.error('Error saving meal:', error);
       new Notice(`❌ Failed to save meal: ${error.message}`);
       throw new Error(`Failed to save meal: ${error.message}`);
     }
@@ -67,13 +66,11 @@ export class MealManager {
       
       // Validate meals format
       if (!Array.isArray(meals)) {
-        console.warn('Invalid meals file format, returning empty array');
         return [];
       }
 
       return meals;
     } catch (error) {
-      console.error('Error loading meals:', error);
       return [];
     }
   }
@@ -103,7 +100,6 @@ export class MealManager {
       
       new Notice(`✅ Meal "${updatedMeal.name}" updated successfully`);
     } catch (error) {
-      console.error('Error updating meal:', error);
       throw new Error(`Failed to update meal: ${error.message}`);
     }
   }
@@ -127,7 +123,6 @@ export class MealManager {
       
       new Notice(`✅ Meal "${mealToDelete.name}" deleted successfully`);
     } catch (error) {
-      console.error('Error deleting meal:', error);
       throw new Error(`Failed to delete meal: ${error.message}`);
     }
   }
@@ -137,7 +132,6 @@ export class MealManager {
       const meals = await this.getMeals();
       return meals.find(m => m.id === mealId) || null;
     } catch (error) {
-      console.error('Error getting meal by ID:', error);
       return null;
     }
   }
@@ -145,37 +139,24 @@ export class MealManager {
   private async saveMealsToFile(meals: Meal[]): Promise<void> {
     try {
       const mealsPath = this.getMealsFilePath();
-      console.log('Saving meals to file path:', mealsPath);
       
       // Ensure directory exists
-      console.log('Ensuring directory exists for:', this.settings.mealStoragePath);
       await this.fileUtils.ensureDirectoryExists(this.settings.mealStoragePath);
       
       const content = JSON.stringify(meals, null, 2);
-      console.log('Meals content to save:', content);
       
       const existingFile = this.vault.getAbstractFileByPath(mealsPath);
-      console.log('Existing file found:', !!existingFile);
       
       if (existingFile instanceof TFile) {
-        console.log('Modifying existing file...');
         await this.vault.modify(existingFile, content);
-        console.log('Successfully modified existing file');
       } else {
-        console.log('Creating new file...');
         await this.vault.create(mealsPath, content);
-        console.log('Successfully created new file');
       }
       
       // Verify file was created/updated
       const verifyFile = this.vault.getAbstractFileByPath(mealsPath);
-      console.log('Verification: File exists after save:', !!verifyFile);
       
     } catch (error) {
-      console.error('Error saving meals to file:', error);
-      console.error('Meals path:', this.getMealsFilePath());
-      console.error('Storage path:', this.settings.mealStoragePath);
-      console.error('Full error:', error);
       throw error;
     }
   }
