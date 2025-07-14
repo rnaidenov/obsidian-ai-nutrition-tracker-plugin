@@ -1,5 +1,6 @@
 import { FoodItem } from '../types/nutrition';
 import { PluginSettings } from '../types/settings';
+import { requestUrl } from 'obsidian';
 
 export interface LLMResponse {
   items: FoodItem[];
@@ -29,7 +30,8 @@ export class LLMService {
       const messages = await this.buildMessages(prompt, images);
       const effectiveModel = this.getEffectiveModel();
 
-      const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+      const response = await requestUrl({
+        url: 'https://openrouter.ai/api/v1/chat/completions',
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${this.settings.openRouterApiKey}`,
@@ -46,12 +48,11 @@ export class LLMService {
         })
       });
 
-      if (!response.ok) {
-        const errorData = await response.text();
-        throw new Error(`OpenRouter API error: ${response.status} - ${errorData}`);
+      if (response.status !== 200) {
+        throw new Error(`OpenRouter API error: ${response.status} - ${response.text}`);
       }
 
-      const data = await response.json();
+      const data = response.json;
       
       if (!data.choices || !data.choices[0] || !data.choices[0].message) {
         throw new Error('Invalid response format from OpenRouter API');
