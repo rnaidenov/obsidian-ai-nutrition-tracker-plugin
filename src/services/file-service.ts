@@ -82,15 +82,15 @@ export class FileService {
         return [];
       }
       
-      // Get all .md files in the meal folder that are actual meal notes
-      const mealFiles = folder.children.filter((file: TAbstractFile) => {
+      const isMealNoteFile = (file: TAbstractFile): file is TFile => {
         if (!(file instanceof TFile)) return false;
         if (file.extension !== 'md') return false;
         if (file.name === 'meals.json') return false;
         
-        // Use the isMealNote method to verify it's actually a meal file
         return this.mealManager.isMealNote(file);
-      }) as TFile[];
+      };
+      
+      const mealFiles = folder.children.filter(isMealNoteFile);
       
       return mealFiles;
       

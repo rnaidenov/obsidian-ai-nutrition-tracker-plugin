@@ -168,27 +168,21 @@ export class MealManager {
       const filename = `${sanitizedName}.md`;
       const notePath = `${this.settings.mealStoragePath}/${filename}`;
       
-      // Generate meal note content
       const content = await this.generateMealNoteContent(meal);
       
-      // Check if file already exists
       const existingFile = this.vault.getAbstractFileByPath(notePath);
-      if (existingFile) {
-        // File exists, modify it
-        await this.vault.modify(existingFile as TFile, content);
+      if (existingFile && existingFile instanceof TFile) {
+        await this.vault.modify(existingFile, content);
       } else {
-        // Create new file
         await this.vault.create(notePath, content);
       }
     } catch (error) {
-      // Don't throw here - we don't want to fail the whole meal save if note creation fails
       new Notice(`Warning: Failed to create meal note: ${error.message}`);
     }
   }
 
   private async updateMealNote(oldMeal: Meal, newMeal: Meal): Promise<void> {
     try {
-      // Delete old note if name changed
       if (oldMeal.name !== newMeal.name) {
         await this.deleteMealNote(oldMeal);
       }
