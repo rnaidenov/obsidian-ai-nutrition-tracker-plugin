@@ -20,9 +20,6 @@ export class FileService {
     this.layoutGenerator = new LayoutGenerator(settings);
     this.foodLogManager = new FoodLogManager(vault, settings);
     this.mealManager = new MealManager(vault, settings);
-    
-    console.log('FileService initialized with settings:', settings);
-    console.log('Meal storage path:', settings.mealStoragePath);
   }
 
   // Food Log Operations - delegate to FoodLogManager
@@ -82,7 +79,6 @@ export class FileService {
       const folder = this.vault.getAbstractFileByPath(mealStoragePath);
       
       if (!folder || !(folder instanceof TFolder)) {
-        console.log('Meal storage folder not found:', mealStoragePath);
         return [];
       }
       
@@ -96,11 +92,9 @@ export class FileService {
         return this.mealManager.isMealNote(file);
       }) as TFile[];
       
-      console.log(`Found ${mealFiles.length} meal files in ${mealStoragePath}`);
       return mealFiles;
       
     } catch (error) {
-      console.error('Error getting meal files:', error);
       return [];
     }
   }

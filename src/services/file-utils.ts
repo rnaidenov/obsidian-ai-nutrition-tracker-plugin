@@ -4,29 +4,24 @@ export class FileUtils {
   constructor(private vault: Vault) {}
 
   async ensureDirectoryExists(path: string): Promise<void> {
-    console.log('Ensuring directory exists for path:', path);
     const dirs = path.split('/');
     let currentPath = '';
     
     for (const dir of dirs) {
       currentPath = currentPath ? `${currentPath}/${dir}` : dir;
-      console.log('Checking/creating directory:', currentPath);
       
       const exists = this.vault.getAbstractFileByPath(currentPath);
-      if (!exists) {
-        console.log('Directory does not exist, creating:', currentPath);
-        try {
-          await this.vault.createFolder(currentPath);
-          console.log('Successfully created directory:', currentPath);
-        } catch (error) {
-          console.error('Failed to create directory:', currentPath, error);
-          throw new Error(`Failed to create directory ${currentPath}: ${error.message}`);
-        }
-      } else {
-        console.log('Directory already exists:', currentPath);
+
+      if (exists) {
+        return;
+      }
+
+      try {
+        await this.vault.createFolder(currentPath);
+      } catch (error) {
+        throw new Error(`Failed to create directory ${currentPath}: ${error.message}`);
       }
     }
-    console.log('Directory creation completed for path:', path);
   }
 
   async saveImage(imageFile: File, imageStoragePath: string): Promise<string> {
@@ -82,14 +77,7 @@ export class FileUtils {
     // Must not be a food log (food logs typically have format "YYYY-MM-DD.md")
     const isFoodLog = /^\d{4}-\d{2}-\d{2}\.md$/.test(file.name);
     
-    console.log(`🔍 File detection for "${file.path}":`);
-    console.log(`  - In meal path: ${inMealPath}`);
-    console.log(`  - In log path: ${inLogPath}`);
-    console.log(`  - Valid extension: ${validExtension}`);
-    console.log(`  - Is food log pattern: ${isFoodLog}`);
-    
     const isMealNote = inMealPath && !inLogPath && validExtension && !isFoodLog;
-    console.log(`  - RESULT: Is meal note = ${isMealNote}`);
     
     return isMealNote;
   }

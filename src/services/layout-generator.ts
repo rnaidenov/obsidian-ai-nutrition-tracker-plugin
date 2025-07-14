@@ -13,14 +13,6 @@ export class LayoutGenerator {
   }
 
   generateCardLayout(foodItems: FoodItem[], context?: 'meal' | 'foodlog', mealId?: string): string {
-    console.log('🛠️ generateCardLayout called with:', {
-      itemCount: foodItems.length,
-      context,
-      mealId,
-      hasContext: !!context,
-      hasMealId: !!mealId
-    });
-    
     let content = '';
     const isDarkTheme = this.themeUtils.getEffectiveTheme() === 'dark';
     
@@ -126,7 +118,6 @@ export class LayoutGenerator {
     
     // Add CTA buttons at the end
     if (context) {
-      console.log('🛠️ Adding CTA buttons with context:', context, 'and mealId:', mealId);
       content += this.generateCTAButtons(context, mealId);
     }
     
@@ -136,14 +127,6 @@ export class LayoutGenerator {
   generateCTAButtons(context: 'meal' | 'foodlog', mealId?: string): string {
     const buttonId = `nutrition-add-cta-${Date.now()}-${Math.random().toString(36).substring(7)}`;
     const mealIdAttr = mealId ? ` data-meal-id="${mealId}"` : '';
-    
-    console.log('🎯 generateCTAButtons called with:', {
-      context,
-      mealId,
-      buttonId,
-      mealIdAttr,
-      willHaveMealId: !!mealId
-    });
     
     const buttonText = context === 'meal' ? 
       `➕ Add More Items to Meal` :
@@ -163,7 +146,6 @@ export class LayoutGenerator {
     
     const buttonHtml = `<div style="text-align: center; margin: 24px 0 60px; padding: 0px 0;"><button id="${buttonId}" class="nutrition-add-cta-btn" data-context="${context}"${mealIdAttr} style="${buttonStyle}" onmouseover="${isDarkTheme ? hoverStyleDark : hoverStyleLight}" onmouseout="${isDarkTheme ? resetStyleDark : resetStyleLight}">${buttonText}</button></div>`;
     
-    console.log('🎯 Generated CTA button HTML:', buttonHtml);
     return buttonHtml;
   }
 
