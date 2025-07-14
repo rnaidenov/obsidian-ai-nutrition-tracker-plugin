@@ -180,10 +180,7 @@ export class MealManager {
         // Create new file
         await this.vault.create(notePath, content);
       }
-      
-      console.log(`Created meal note: ${notePath}`);
     } catch (error) {
-      console.error('Error creating meal note:', error);
       // Don't throw here - we don't want to fail the whole meal save if note creation fails
       new Notice(`Warning: Failed to create meal note: ${error.message}`);
     }
@@ -196,12 +193,8 @@ export class MealManager {
         await this.deleteMealNote(oldMeal);
       }
       
-      // Create/update new note
       await this.createMealNote(newMeal);
-      
-      console.log(`Updated meal note for: ${newMeal.name}`);
     } catch (error) {
-      console.error('Error updating meal note:', error);
       new Notice(`Warning: Failed to update meal note: ${error.message}`);
     }
   }
@@ -215,17 +208,13 @@ export class MealManager {
       const existingFile = this.vault.getAbstractFileByPath(notePath);
       if (existingFile instanceof TFile) {
         await this.vault.delete(existingFile);
-        console.log(`Deleted meal note: ${notePath}`);
       }
     } catch (error) {
-      console.error('Error deleting meal note:', error);
       new Notice(`Warning: Failed to delete meal note: ${error.message}`);
     }
   }
 
   private async generateMealNoteContent(meal: Meal): Promise<string> {
-    console.log('📝 Generating meal note content for:', meal.name, 'with ID:', meal.id);
-    
     const totalCalories = meal.items.reduce((sum, item) => sum + item.calories, 0);
     const totalProtein = meal.items.reduce((sum, item) => sum + item.protein, 0);
     const totalCarbs = meal.items.reduce((sum, item) => sum + item.carbs, 0);
@@ -244,8 +233,6 @@ export class MealManager {
     // Add meal items section with collapsible heading
     content += '## 🥗 Meal Items\n\n';
     
-    // Generate food items using the same card layout as food logs but with meal context
-    console.log('🛠️ Calling generateCardLayout with meal context and ID:', meal.id);
     content += this.layoutGenerator.generateCardLayout(meal.items, 'meal', meal.id);
     
     // Add beautiful progress summary with hidden meal ID
@@ -261,38 +248,22 @@ export class MealManager {
 
   async syncMealNoteToJSON(file: TFile): Promise<void> {
     try {
-      console.log('🔄 Starting meal sync for:', file.path);
-      console.log('📋 This will update the meal template for future use (won\'t affect past food logs)');
-      
       const content = await this.vault.read(file);
-      console.log('📄 File content length:', content.length, 'characters');
       
       // Double-check that this is actually a meal note by looking for meal ID
       if (!content.includes('data-meal-id="')) {
-        console.warn('❌ File does not contain meal ID - this is NOT a meal note, skipping sync:', file.path);
-        console.warn('📄 File content preview:', content.substring(0, 500) + '...');
         return;
       }
       
-      console.log('✅ Meal ID marker found, parsing meal data...');
       const parsedMeal = this.contentParser.parseMealFromMarkdown(content);
       
       if (!parsedMeal) {
-        console.warn('❌ Could not parse meal from markdown:', file.path);
-        console.warn('📄 File content preview:', content.substring(0, 500) + '...');
         return;
       }
-      
-      console.log('✅ Parsed meal data:', {
-        id: parsedMeal.id,
-        itemCount: parsedMeal.items?.length || 0,
-        hasDescription: !!parsedMeal.description
-      });
-      
+
       // Extract meal name from filename instead of content
       const filename = file.path.split('/').pop()?.replace('.md', '') || '';
       const mealName = this.convertFilenameToMealName(filename);
-      console.log('📝 Meal name from filename:', mealName);
       
       // IMPORTANT: Only update the meal template in JSON storage
       // This will NOT affect any existing food logs that used this meal
@@ -301,7 +272,6 @@ export class MealManager {
       
       if (mealIndex >= 0) {
         const oldMeal = meals[mealIndex];
-        console.log('✅ Found existing meal in JSON storage:', oldMeal.name);
         
         // Check if name changed (file was renamed)
         const nameChanged = oldMeal.name !== mealName;
@@ -317,57 +287,34 @@ export class MealManager {
         
         meals[mealIndex] = updatedMeal;
         await this.saveMealsToFile(meals);
-        
-        if (nameChanged) {
-          // If name changed, we need to handle the old file
-          await this.handleMealNameChange(oldMeal, updatedMeal, file);
-          console.log('✅ Meal name updated from:', oldMeal.name, 'to:', updatedMeal.name);
-          new Notice(`✅ Meal renamed: "${oldMeal.name}" → "${updatedMeal.name}"`);
-        } else {
-          console.log('✅ Meal template updated in JSON storage:', updatedMeal.name);
-          console.log('📊 Updated meal details:', {
-            itemCount: updatedMeal.items.length,
-            totalCalories: updatedMeal.items.reduce((sum, item) => sum + item.calories, 0)
-          });
-        }
-        
-        // Provide user feedback (but not too noisy)
+
         if (!nameChanged) {
-          console.log('🔄 Meal sync completed successfully - dropdown will reflect changes');
+          return;
         }
-        
+
+        await this.handleMealNameChange(oldMeal, updatedMeal, file);
+        new Notice(`✅ Meal updated: "${oldMeal.name}" → "${updatedMeal.name}"`);
       } else {
-        console.warn('❌ Meal not found in JSON storage:', parsedMeal.id);
-        console.warn('📄 Available meal IDs:', meals.map(m => m.id));
         new Notice(`⚠️ Meal not found in storage - this might be an orphaned meal note`);
       }
       
     } catch (error) {
-      console.error('❌ Error syncing meal note to JSON:', error);
-      console.error('📄 File path:', file.path);
       new Notice(`❌ Failed to sync meal changes: ${error.message}`);
-      throw error; // Re-throw to let caller handle it
+      throw error;
     }
   }
 
   // Method to regenerate meal note after sync (to update totals)
   async regenerateMealNote(mealId: string): Promise<void> {
-    try {
-      const meal = await this.getMealById(mealId);
-      if (meal) {
-        await this.createMealNote(meal);
-        console.log('✅ Meal note regenerated:', meal.name);
-      }
-    } catch (error) {
-      console.error('Error regenerating meal note:', error);
+    const meal = await this.getMealById(mealId);
+    if (meal) {
+      await this.createMealNote(meal);
     }
   }
 
   // Method to update a specific item within a meal template
   async updateMealItem(originalItem: { food: string, quantity: string, calories: number, protein: number, carbs: number, fat: number }, newItem: FoodItem): Promise<void> {
     try {
-      console.log('🔄 Updating meal item:', originalItem.food, '→', newItem.food);
-      
       const meals = await this.getMeals();
       let mealFound = false;
       
@@ -380,8 +327,6 @@ export class MealManager {
         );
         
         if (itemIndex >= 0) {
-          console.log('✅ Found item in meal:', meal.name);
-          
           // Update the item in the meal
           const { mealId, timestamp, ...itemWithoutMealData } = newItem;
           meal.items[itemIndex] = itemWithoutMealData;
@@ -398,7 +343,6 @@ export class MealManager {
           const mealFilePath = `${this.settings.mealStoragePath}/${mealFileName}`;
           const mealFile = this.vault.getAbstractFileByPath(mealFilePath);
           if (mealFile instanceof TFile) {
-            console.log('🔄 Force syncing updated meal file back to JSON');
             // Small delay to ensure file write is complete
             setTimeout(async () => {
               await this.syncMealNoteToJSON(mealFile);
@@ -412,12 +356,10 @@ export class MealManager {
       }
       
       if (!mealFound) {
-        console.warn('⚠️ Could not find meal containing the item to update');
         new Notice('⚠️ Could not find the meal containing this item');
       }
       
     } catch (error) {
-      console.error('Error updating meal item:', error);
       new Notice(`❌ Failed to update meal item: ${error.message}`);
       throw error;
     }
@@ -426,8 +368,6 @@ export class MealManager {
   // Method to delete a specific item from a meal template
   async deleteMealItem(itemToDelete: { food: string, quantity: string, calories: number, protein: number, carbs: number, fat: number }): Promise<void> {
     try {
-      console.log('🗑️ Deleting meal item:', itemToDelete.food);
-      
       const meals = await this.getMeals();
       let mealFound = false;
       
@@ -440,8 +380,6 @@ export class MealManager {
         );
         
         if (itemIndex >= 0) {
-          console.log('✅ Found item in meal:', meal.name);
-          
           // Remove the item from the meal
           meal.items.splice(itemIndex, 1);
           meal.updatedAt = new Date().toISOString();
@@ -457,7 +395,6 @@ export class MealManager {
           const mealFilePath = `${this.settings.mealStoragePath}/${mealFileName}`;
           const mealFile = this.vault.getAbstractFileByPath(mealFilePath);
           if (mealFile instanceof TFile) {
-            console.log('🔄 Force syncing updated meal file back to JSON');
             // Small delay to ensure file write is complete
             setTimeout(async () => {
               await this.syncMealNoteToJSON(mealFile);
@@ -471,12 +408,10 @@ export class MealManager {
       }
       
       if (!mealFound) {
-        console.warn('⚠️ Could not find meal containing the item to delete');
         new Notice('⚠️ Could not find the meal containing this item');
       }
       
     } catch (error) {
-      console.error('Error deleting meal item:', error);
       new Notice(`❌ Failed to delete meal item: ${error.message}`);
       throw error;
     }
@@ -485,8 +420,6 @@ export class MealManager {
   // Method to add new items to a specific meal template
   async addItemsToMeal(mealId: string, items: FoodItem[]): Promise<void> {
     try {
-      console.log('➕ Adding items to meal:', mealId, items.length, 'items');
-      
       const meals = await this.getMeals();
       const mealIndex = meals.findIndex(m => m.id === mealId);
       
@@ -517,8 +450,6 @@ export class MealManager {
       const mealFilePath = `${this.settings.mealStoragePath}/${mealFileName}`;
       const mealFile = this.vault.getAbstractFileByPath(mealFilePath);
       if (mealFile instanceof TFile) {
-        console.log('🔄 Force syncing updated meal file back to JSON');
-        // Small delay to ensure file write is complete
         setTimeout(async () => {
           await this.syncMealNoteToJSON(mealFile);
         }, 100);
@@ -527,7 +458,6 @@ export class MealManager {
       new Notice(`✅ ${items.length} item(s) added to meal "${meal.name}"`);
       
     } catch (error) {
-      console.error('Error adding items to meal:', error);
       new Notice(`❌ Failed to add items to meal: ${error.message}`);
       throw error;
     }
@@ -536,8 +466,6 @@ export class MealManager {
   // Handle when a meal's name has changed via file rename
   private async handleMealNameChange(oldMeal: Meal, newMeal: Meal, currentFile: TFile): Promise<void> {
     try {
-      console.log('🔄 Handling meal name change from:', oldMeal.name, 'to:', newMeal.name);
-      
       // Calculate what the old filename should have been
       const oldSanitizedName = this.fileUtils.sanitizeMealName(oldMeal.name);
       const oldFilename = `${oldSanitizedName}.md`;
@@ -550,12 +478,9 @@ export class MealManager {
       
       // If the current file doesn't match the expected new filename, rename it
       if (currentFile.path !== newNotePath) {
-        console.log('📝 Renaming file from:', currentFile.path, 'to:', newNotePath);
-        
         // Check if a file with the new name already exists
         const existingNewFile = this.vault.getAbstractFileByPath(newNotePath);
         if (existingNewFile && existingNewFile !== currentFile) {
-          console.warn('⚠️ File with new name already exists, will overwrite');
           if (existingNewFile instanceof TFile) {
             await this.vault.delete(existingNewFile);
           }
@@ -565,20 +490,17 @@ export class MealManager {
         const newFileBasename = newFilename.replace('.md', '');
         await this.vault.rename(currentFile, newNotePath);
         
-        console.log('✅ File renamed to match new meal name');
       }
       
       // Clean up old file if it exists and is different from current file
       if (oldNotePath !== currentFile.path) {
         const oldFile = this.vault.getAbstractFileByPath(oldNotePath);
         if (oldFile instanceof TFile && oldFile !== currentFile) {
-          console.log('🗑️ Cleaning up old meal file:', oldNotePath);
           await this.vault.delete(oldFile);
         }
       }
       
     } catch (error) {
-      console.error('Error handling meal name change:', error);
       // Don't throw here - the meal data has already been updated successfully
       new Notice(`Warning: Could not rename meal file: ${error.message}`);
     }
@@ -596,24 +518,19 @@ export class MealManager {
         return;
       }
       
-      console.log('🔄 Meal file renamed externally:', oldFilename, '→', newFilename);
-      
       // Read the file to get the meal ID
       const file = this.vault.getAbstractFileByPath(newPath);
       if (!(file instanceof TFile)) {
-        console.warn('Renamed file is not a valid file:', newPath);
         return;
       }
       
       const content = await this.vault.read(file);
       if (!content.includes('data-meal-id="')) {
-        console.log('File does not contain meal ID, skipping:', newPath);
         return;
       }
       
       const parsedMeal = this.contentParser.parseMealFromMarkdown(content);
       if (!parsedMeal || !parsedMeal.id) {
-        console.warn('Could not parse meal from renamed file:', newPath);
         return;
       }
       
@@ -629,11 +546,8 @@ export class MealManager {
         
         // Only proceed if the name actually changed
         if (oldMeal.name === newMealName) {
-          console.log('Meal name unchanged, skipping update');
           return;
         }
-        
-        console.log('🔄 Updating meal name from:', oldMeal.name, 'to:', newMealName);
         
         // Update the meal name in JSON storage
         const updatedMeal = {
@@ -646,14 +560,10 @@ export class MealManager {
         await this.saveMealsToFile(meals);
         
         // Regenerate the entire file content with the new name in the heading
-        console.log('📝 Updating markdown content with new heading');
         await this.createMealNote(updatedMeal);
-      } else {
-        console.warn('Could not find meal in JSON storage for renamed file:', newPath);
       }
       
     } catch (error) {
-      console.error('Error handling meal file rename:', error);
       new Notice(`Warning: Could not sync meal name change: ${error.message}`);
     }
   }

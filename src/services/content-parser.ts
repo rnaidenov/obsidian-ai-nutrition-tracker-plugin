@@ -84,7 +84,6 @@ export class ContentParser {
       // Extract meal ID from HTML data attribute
       const mealIdMatch = content.match(/data-meal-id="([^"]+)"/);
       if (!mealIdMatch) {
-        console.warn('No meal ID found in content');
         return null;
       }
       

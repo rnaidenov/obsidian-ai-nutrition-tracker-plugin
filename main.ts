@@ -310,26 +310,11 @@ export default class NutritionTrackerPlugin extends Plugin {
           }
           
           const timeout = setTimeout(async () => {
-            try {
-              await this.fileService.syncMealNoteToJSON(file);
-              
-              try {
-                const updatedMeals = await this.fileService.getMeals();
-              } catch (refreshError) {
-                console.warn('⚠️ Could not refresh meal dropdown:', refreshError);
-              }
-              
-            } catch (syncError) {
-              console.error('❌ Automatic meal sync failed for:', filePath, syncError);
-              new Notice(`⚠️ Could not sync meal changes: ${syncError.message}`);
-            } finally {
-              this.mealSyncTimeouts.delete(filePath);
-            }
+            await this.fileService.syncMealNoteToJSON(file);
+            this.mealSyncTimeouts.delete(filePath);
           }, 1000);
           
           this.mealSyncTimeouts.set(filePath, timeout);
-        } else {
-          console.log('⏭️ Skipping non-meal file:', file.path);
         }
       })
     );
