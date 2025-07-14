@@ -21,24 +21,12 @@ export class FoodProcessor {
     editingContext?: 'foodlog' | 'meal',
     targetMealId?: string
   ): Promise<{ success: boolean; message?: string }> {
-    console.log('🔄 FoodProcessor.processFood called with:', {
-      selectedMeals: selectedMeals.length,
-      description,
-      images: images.length,
-      saveAsMeal,
-      mealName,
-      hasInitialData: !!initialData,
-      editingContext,
-      targetMealId
-    });
-    
     try {
       // Validate inputs
       const hasSelectedMeals = selectedMeals.length > 0;
       const hasAdditionalInput = description.trim().length > 0 || images.length > 0;
       
       if (targetMealId) {
-        console.log('🎯 Processing for targetMealId:', targetMealId);
         // When adding to a specific meal, we just need additional input
         if (!hasAdditionalInput) {
           return { success: false, message: 'Please add food description or images to add to the meal' };
@@ -63,14 +51,11 @@ export class FoodProcessor {
       
       // Add selected meals (but not when adding to a specific meal to avoid duplication)
       if (hasSelectedMeals && !targetMealId) {
-        console.log('🍽️ Adding selected meals to food items (not targeting specific meal)');
         selectedMeals.forEach(meal => {
           // Create a consolidated meal entry instead of individual items
           const consolidatedMealEntry = this.createConsolidatedMealEntry(meal);
           allFoodItems.push(consolidatedMealEntry);
         });
-      } else if (targetMealId) {
-        console.log('🎯 Skipping selected meals because we are targeting meal:', targetMealId);
       }
       
       // Process additional input via LLM
@@ -127,7 +112,6 @@ export class FoodProcessor {
         }
       } else if (targetMealId) {
         // Add items to specific meal
-        console.log('🎯 Adding items to specific meal:', targetMealId, 'Items:', allFoodItems.length);
         try {
           await this.fileService.addItemsToMeal(targetMealId, allFoodItems);
           return { success: true, message: `✅ Items added to meal successfully` };
@@ -188,7 +172,6 @@ export class FoodProcessor {
       mealId: meal.id // Link to the original meal
     };
     
-    console.log('🍽️ Created consolidated meal entry:', consolidatedItem);
     return consolidatedItem;
   }
 } 

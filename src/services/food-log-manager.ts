@@ -64,12 +64,8 @@ export class FoodLogManager {
       
       const existingContent = await this.vault.read(existingFile);
       
-      // Use the content parser to delete the specific item
       const deleteResult = this.contentParser.deleteCardFromContent(existingContent, itemToDelete);
-      
       if (deleteResult.success) {
-        console.log('Successfully deleted item from food log');
-        // Recalculate totals and update summary
         const finalContent = await this.recalculateTotals(deleteResult.content);
         await this.vault.modify(existingFile, finalContent);
       } else {
@@ -141,13 +137,9 @@ export class FoodLogManager {
     // Find and replace the card in its original position
     const replacement = this.contentParser.replaceCardInPosition(existingContent, originalEntry, newCardContent);
     if (replacement.success) {
-      console.log('Successfully replaced entry in original position');
-      // Recalculate totals and update summary
       const finalContent = await this.recalculateTotals(replacement.content);
       await this.vault.modify(file, finalContent);
     } else {
-      console.warn('Original entry not found for replacement, falling back to append');
-      // Fallback to the old append logic
       await this.appendToExistingLog(file, newFoodItems);
     }
   }

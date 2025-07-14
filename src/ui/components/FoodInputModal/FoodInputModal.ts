@@ -61,21 +61,11 @@ export class FoodInputModal extends Modal {
   }
 
   setTargetMealId(mealId: string) {
-    console.log('🎯 setTargetMealId called with:', mealId);
     this.targetMealId = mealId;
     this.editingContext = 'meal';
-    console.log('🎯 targetMealId set to:', this.targetMealId, 'editingContext:', this.editingContext);
   }
 
   async onOpen() {
-    console.log('🚀 FoodInputModal.onOpen() called');
-    console.log('🎯 Current state:', {
-      targetMealId: this.targetMealId,
-      editingContext: this.editingContext,
-      initialData: this.initialData,
-      hasTargetMealId: !!this.targetMealId
-    });
-    
     const { contentEl } = this;
     contentEl.empty();
 
@@ -91,7 +81,6 @@ export class FoodInputModal extends Modal {
     
     // Only show meal selection dropdown if we're NOT adding to a specific meal
     if (!this.targetMealId) {
-      console.log('🔽 Showing meal selection dropdown (no targetMealId)');
       createMealSelectionDropdown(
         contentEl, 
         this.mealManager.getAvailableMeals(), 
@@ -103,8 +92,6 @@ export class FoodInputModal extends Modal {
         this.mealManager.getSelectedMeals(), 
         this.handleMealRemove.bind(this)
       );
-    } else {
-      console.log('🚫 Hiding meal selection dropdown (targetMealId:', this.targetMealId, ')');
     }
     
     createFoodDescriptionInput(
@@ -123,7 +110,6 @@ export class FoodInputModal extends Modal {
     
     // Only show save as meal toggle if we're NOT adding to a specific meal
     if (!this.targetMealId) {
-      console.log('🔽 Showing save as meal toggle (no targetMealId)');
       createSaveAsMealToggle(
         contentEl, 
         this.saveAsMeal, 
@@ -131,8 +117,6 @@ export class FoodInputModal extends Modal {
         this.handleSaveAsMealChange.bind(this),
         this.handleMealNameChange.bind(this)
       );
-    } else {
-      console.log('🚫 Hiding save as meal toggle (targetMealId:', this.targetMealId, ')');
     }
     
     // Create process button and get references
@@ -183,15 +167,6 @@ export class FoodInputModal extends Modal {
   }
 
   private async handleProcessFood() {
-    console.log('🍽️ handleProcessFood called');
-    console.log('🎯 Processing with state:', {
-      targetMealId: this.targetMealId,
-      selectedMeals: this.mealManager.getSelectedMeals().length,
-      description: this.description,
-      editingContext: this.editingContext,
-      hasInitialData: !!this.initialData
-    });
-    
     this.isProcessing = true;
     this.updateButtonState();
 
@@ -207,19 +182,12 @@ export class FoodInputModal extends Modal {
         this.targetMealId
       );
 
-      console.log('🔄 Food processing result:', result);
-
       if (result.success) {
-        console.log('✅ Processing successful, closing modal');
         this.close();
-        return; // Exit early on success
-      } else {
-        console.log('❌ Processing failed:', result.message);
-        // Don't close modal on failure so user can retry
-      }
+        return;
+      };
     } catch (error) {
-      console.error('💥 Error during food processing:', error);
-      // Don't close modal on error so user can retry
+      console.error('Error during food processing:', error);
     }
 
     this.isProcessing = false;
