@@ -1,4 +1,4 @@
-import { TFile, Vault, Notice, TAbstractFile } from 'obsidian';
+import { TFile, Vault, Notice, TAbstractFile, App } from 'obsidian';
 import { FoodItem, Meal } from '../types/nutrition';
 import { PluginSettings } from '../types/settings';
 import { FileUtils } from './file-utils';
@@ -10,7 +10,7 @@ export class MealManager {
   private layoutGenerator: LayoutGenerator;
   private contentParser: ContentParser;
 
-  constructor(private vault: Vault, private settings: PluginSettings) {
+  constructor(private app: App, private vault: Vault, private settings: PluginSettings) {
     this.fileUtils = new FileUtils(vault);
     this.layoutGenerator = new LayoutGenerator(settings);
     this.contentParser = new ContentParser();
@@ -201,7 +201,7 @@ export class MealManager {
       
       const existingFile = this.vault.getAbstractFileByPath(notePath);
       if (existingFile instanceof TFile) {
-        await this.vault.delete(existingFile);
+        await this.app.fileManager.trashFile(existingFile);
       }
     } catch (error) {
       new Notice(`Warning: Failed to delete meal note: ${error.message}`);
@@ -476,7 +476,7 @@ export class MealManager {
         const existingNewFile = this.vault.getAbstractFileByPath(newNotePath);
         if (existingNewFile && existingNewFile !== currentFile) {
           if (existingNewFile instanceof TFile) {
-            await this.vault.delete(existingNewFile);
+            await this.app.fileManager.trashFile(existingNewFile);
           }
         }
         
@@ -490,7 +490,7 @@ export class MealManager {
       if (oldNotePath !== currentFile.path) {
         const oldFile = this.vault.getAbstractFileByPath(oldNotePath);
         if (oldFile instanceof TFile && oldFile !== currentFile) {
-          await this.vault.delete(oldFile);
+          await this.app.fileManager.trashFile(oldFile);
         }
       }
       

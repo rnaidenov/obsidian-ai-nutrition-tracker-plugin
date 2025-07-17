@@ -21,7 +21,7 @@ export default class NutritionTrackerPlugin extends Plugin {
     
     // Initialize services
     this.llmService = new LLMService(this.settings);
-    this.fileService = new FileService(this.app.vault, this.settings);
+    this.fileService = new FileService(this.app, this.app.vault, this.settings);
     
     // Add ribbon icon
     this.addRibbonIcon('apple', 'Log Food', () => {
@@ -330,7 +330,7 @@ export default class NutritionTrackerPlugin extends Plugin {
     }
 
     if (this.fileService) {
-      this.fileService = new FileService(this.app.vault, this.settings);
+      this.fileService = new FileService(this.app, this.app.vault, this.settings);
     }
   }
 
@@ -338,7 +338,7 @@ export default class NutritionTrackerPlugin extends Plugin {
     await this.saveData(this.settings);
     
     this.llmService = new LLMService(this.settings);
-    this.fileService = new FileService(this.app.vault, this.settings);
+    this.fileService = new FileService(this.app, this.app.vault, this.settings);
   }
 
   private async openTodaysFoodLog() {

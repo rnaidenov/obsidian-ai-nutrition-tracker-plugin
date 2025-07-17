@@ -1,4 +1,4 @@
-import { TFile, Vault, TAbstractFile, TFolder } from 'obsidian';
+import { TFile, Vault, TAbstractFile, TFolder, App } from 'obsidian';
 import { FoodItem, Meal } from '../types/nutrition';
 import { PluginSettings } from '../types/settings';
 import { FileUtils } from './file-utils';
@@ -14,12 +14,12 @@ export class FileService {
   private foodLogManager: FoodLogManager;
   private mealManager: MealManager;
   
-  constructor(private vault: Vault, private settings: PluginSettings) {
+  constructor(private app: App, private vault: Vault, private settings: PluginSettings) {
     this.fileUtils = new FileUtils(vault);
     this.contentParser = new ContentParser();
     this.layoutGenerator = new LayoutGenerator(settings);
     this.foodLogManager = new FoodLogManager(vault, settings);
-    this.mealManager = new MealManager(vault, settings);
+    this.mealManager = new MealManager(app, vault, settings);
   }
 
   // Food Log Operations - delegate to FoodLogManager
