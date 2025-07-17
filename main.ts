@@ -68,8 +68,6 @@ export default class NutritionTrackerPlugin extends Plugin {
         }
       })
     );
- 
-    this.setupEditButtonEventHandling();
   }
 
   async onunload() {
