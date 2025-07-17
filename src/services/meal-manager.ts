@@ -468,11 +468,8 @@ export class MealManager {
     }
   }
 
-  // Handle when a meal file is renamed externally (via Obsidian file rename)
   async handleFileRename(oldPath: string, newPath: string): Promise<void> {
     try {
-      // Extract meal name from filename (remove .md extension and unsanitize)
-      const oldFilename = oldPath.split('/').pop()?.replace('.md', '') || '';
       const newFilename = newPath.split('/').pop()?.replace('.md', '') || '';
       
       // Skip if not in meal storage path

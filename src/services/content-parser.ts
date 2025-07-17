@@ -208,7 +208,6 @@ export class ContentParser {
   }
 
   replaceCardInPosition(content: string, originalEntry: { food: string, quantity: string, calories: number, protein: number, carbs: number, fat: number }, newCardContent: string): { success: boolean, content: string } {
-    // Find the start of the card using data attributes
     const escapedFood = originalEntry.food.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/"/g, '&quot;');
     const escapedQuantity = originalEntry.quantity.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/"/g, '&quot;');
     
