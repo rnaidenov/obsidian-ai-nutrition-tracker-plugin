@@ -29,18 +29,10 @@ export function createEditingNotice(contentEl: HTMLElement, initialData: any, ed
   
   if (!noticeText) return; // No notice needed
   
-  const isDarkTheme = document.body.classList.contains('theme-dark');
-  
   const notice = contentEl.createEl('p', { 
     text: noticeText,
     cls: 'nutrition-tracker-edit-notice'
   });
-  
-  if (isDarkTheme) {
-    notice.style.cssText = 'background: linear-gradient(135deg, rgba(30, 58, 138, 0.4), rgba(55, 48, 163, 0.5), rgba(29, 78, 216, 0.3)); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); padding: 14px 16px; border-radius: 12px; border: 1px solid rgba(96, 165, 250, 0.3); margin-bottom: 16px; font-size: 12px; color: #dbeafe; box-shadow: 0 8px 32px rgba(30, 58, 138, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.1), inset 0 -1px 0 rgba(0, 0, 0, 0.1); position: relative; overflow: hidden; letter-spacing: 0.01em; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);';
-  } else {
-    notice.style.cssText = 'background: linear-gradient(135deg, rgba(219, 234, 254, 0.8), rgba(224, 242, 254, 0.7), rgba(191, 219, 254, 0.6)); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); padding: 14px 16px; border-radius: 12px; border: 1px solid rgba(59, 130, 246, 0.3); margin-bottom: 16px; font-size: 12px; color: #1e40af; box-shadow: 0 8px 32px rgba(59, 130, 246, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.8), inset 0 -1px 0 rgba(0, 0, 0, 0.02); position: relative; overflow: hidden; letter-spacing: 0.01em;';
-  }
 }
 
 export function createMealSelectionDropdown(
@@ -184,18 +176,11 @@ export function createProcessButton(
   const processButton = processButtonSetting.settingEl.querySelector('button') as HTMLButtonElement;
   
   // Add processing indicator
-  const processingIndicator = contentEl.createDiv('nutrition-tracker-processing-indicator');
-  processingIndicator.style.display = isProcessing ? 'block' : 'none';
-  
-  const isDarkTheme = document.body.classList.contains('theme-dark');
-  const spinnerColor = isDarkTheme ? '#e2e8f0' : '#475569';
-  const textColor = isDarkTheme ? '#e2e8f0' : '#475569';
+  const processingIndicator = contentEl.createDiv(`nutrition-tracker-processing-indicator${isProcessing ? ' visible' : ''}`);
   
   processingIndicator.innerHTML = `
-    <div style="text-align: center; margin-top: 10px;">
-      <div style="display: inline-block; width: 20px; height: 20px; border: 3px solid rgba(${isDarkTheme ? '71, 85, 105' : '71, 85, 105'}, 0.2); border-top: 3px solid ${spinnerColor}; border-radius: 50%; animation: spin 1s linear infinite;"></div>
-      <p style="margin-top: 8px; font-size: 14px; color: ${textColor}; font-weight: 500; opacity: 0.9;">Processing food data...</p>
-    </div>
+    <div class="nutrition-tracker-processing-spinner"></div>
+    <p class="nutrition-tracker-processing-text">Processing food data...</p>
   `;
   
   return processButton;

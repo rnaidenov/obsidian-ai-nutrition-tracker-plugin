@@ -233,8 +233,7 @@ export default class NutritionTrackerPlugin extends Plugin {
         
         this.isDeleteInProgress = true;
         target.setAttribute('data-processing', 'true');
-        target.style.opacity = '0.5';
-        target.style.pointerEvents = 'none';
+        target.classList.add('disabled');
         
         
         try {
@@ -259,8 +258,7 @@ export default class NutritionTrackerPlugin extends Plugin {
           setTimeout(() => {
             this.isDeleteInProgress = false;
             target.removeAttribute('data-processing');
-            target.style.opacity = '';
-            target.style.pointerEvents = '';
+            target.classList.remove('disabled');
           }, 100); 
         }
       }

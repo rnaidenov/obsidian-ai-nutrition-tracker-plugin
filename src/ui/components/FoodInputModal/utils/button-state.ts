@@ -45,7 +45,11 @@ export class ButtonStateManager {
     }
     
     if (this.processingIndicator) {
-      this.processingIndicator.style.display = isProcessing ? 'block' : 'none';
+      if (isProcessing) {
+        this.processingIndicator.classList.add('visible');
+      } else {
+        this.processingIndicator.classList.remove('visible');
+      }
     }
   }
 } 

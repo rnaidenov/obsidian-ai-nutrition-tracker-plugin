@@ -1089,6 +1089,137 @@ textarea[placeholder*="Enter food description"] {
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
+/* Edit Notice Styles */
+.nutrition-tracker-edit-notice {
+  background: linear-gradient(135deg, rgba(219, 234, 254, 0.8), rgba(224, 242, 254, 0.7), rgba(191, 219, 254, 0.6));
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  padding: 14px 16px;
+  border-radius: 12px;
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  margin-bottom: 16px;
+  font-size: 12px;
+  color: #1e40af;
+  box-shadow: 0 8px 32px rgba(59, 130, 246, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.8), inset 0 -1px 0 rgba(0, 0, 0, 0.02);
+  position: relative;
+  overflow: hidden;
+  letter-spacing: 0.01em;
+}
+
+.theme-dark .nutrition-tracker-edit-notice {
+  background: linear-gradient(135deg, rgba(30, 58, 138, 0.4), rgba(55, 48, 163, 0.5), rgba(29, 78, 216, 0.3));
+  border: 1px solid rgba(96, 165, 250, 0.3);
+  color: #dbeafe;
+  box-shadow: 0 8px 32px rgba(30, 58, 138, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.1), inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+/* Processing Indicator */
+.nutrition-tracker-processing-indicator {
+  display: none;
+  text-align: center;
+  margin-top: 10px;
+}
+
+.nutrition-tracker-processing-indicator.visible {
+  display: block;
+}
+
+.nutrition-tracker-processing-spinner {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 3px solid rgba(71, 85, 105, 0.2);
+  border-top: 3px solid #475569;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.theme-dark .nutrition-tracker-processing-spinner {
+  border: 3px solid rgba(71, 85, 105, 0.2);
+  border-top: 3px solid #e2e8f0;
+}
+
+.nutrition-tracker-processing-text {
+  margin-top: 8px;
+  font-size: 14px;
+  color: #475569;
+  font-weight: 500;
+  opacity: 0.9;
+}
+
+.theme-dark .nutrition-tracker-processing-text {
+  color: #e2e8f0;
+}
+
+/* Button Disabled States */
+.nutrition-edit-btn.disabled,
+.nutrition-delete-btn.disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+/* CTA Button Styles */
+.nutrition-add-cta-btn {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.8), rgba(248, 250, 252, 0.7), rgba(241, 245, 249, 0.6));
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border: 1px solid rgba(100, 116, 139, 0.4);
+  border-radius: 20px;
+  padding: 24px 48px;
+  color: #0f172a;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.8), inset 0 -1px 0 rgba(0, 0, 0, 0.03);
+  font-weight: 600;
+  font-size: 18px;
+  text-align: center;
+  display: block;
+  width: 100%;
+  margin: 40px auto;
+  letter-spacing: 0.05em;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
+}
+
+.theme-dark .nutrition-add-cta-btn {
+  background: linear-gradient(135deg, rgba(10, 10, 20, 0.2), rgba(15, 15, 30, 0.3), rgba(5, 5, 15, 0.1));
+  border: 1px solid rgba(120, 120, 140, 0.3);
+  color: #e2e8f0;
+  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.2), 0 6px 24px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.02);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+.nutrition-add-cta-btn:hover {
+  transform: translateY(-2px);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(248, 250, 252, 0.8), rgba(241, 245, 249, 0.7));
+  box-shadow: 0 16px 64px rgba(0, 0, 0, 0.12), 0 8px 32px rgba(0, 0, 0, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.9), inset 0 -1px 0 rgba(0, 0, 0, 0.05);
+  border-color: rgba(100, 116, 139, 0.6);
+  padding: 24px 48px;
+  letter-spacing: 0.06em;
+}
+
+.theme-dark .nutrition-add-cta-btn:hover {
+  background: linear-gradient(135deg, rgba(15, 15, 25, 0.3), rgba(20, 20, 35, 0.4), rgba(10, 10, 20, 0.2));
+  box-shadow: 0 16px 64px rgba(0, 0, 0, 0.3), 0 8px 32px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.03);
+  border-color: rgba(140, 140, 160, 0.5);
+  color: #f1f5f9;
+  padding: 24px 48px;
+  letter-spacing: 0.06em;
+}
+
+/* Delete Button Styles */
+.nutrition-delete-btn {
+  transition: all 0.2s ease;
+}
+
+.theme-dark .nutrition-delete-btn:hover {
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(185, 28, 28, 0.15)) !important;
+}
+
+.nutrition-delete-btn:hover {
+  background: linear-gradient(135deg, rgba(254, 226, 226, 0.8), rgba(252, 165, 165, 0.6)) !important;
+}
+
 /* Keyframes for spinner animation */
 @keyframes spin {
   0% { transform: rotate(0deg); }
