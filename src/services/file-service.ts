@@ -44,10 +44,6 @@ export class FileService {
     return this.mealManager.updateMeal(mealId, updates);
   }
 
-  async deleteMeal(mealId: string): Promise<void> {
-    return this.mealManager.deleteMeal(mealId);
-  }
-
   async deleteMealItem(itemToDelete: { food: string, quantity: string, calories: number, protein: number, carbs: number, fat: number }): Promise<void> {
     return this.mealManager.deleteMealItem(itemToDelete);
   }
@@ -68,37 +64,6 @@ export class FileService {
     return this.mealManager.syncMealNoteToJSON(file);
   }
 
-  async regenerateMealNote(mealId: string): Promise<void> {
-    return this.mealManager.regenerateMealNote(mealId);
-  }
-
-  // Get all meal files from the meal storage directory
-  async getMealFiles(): Promise<TFile[]> {
-    try {
-      const mealStoragePath = this.settings.mealStoragePath;
-      const folder = this.vault.getAbstractFileByPath(mealStoragePath);
-      
-      if (!folder || !(folder instanceof TFolder)) {
-        return [];
-      }
-      
-      const isMealNoteFile = (file: TAbstractFile): file is TFile => {
-        if (!(file instanceof TFile)) return false;
-        if (file.extension !== 'md') return false;
-        if (file.name === 'meals.json') return false;
-        
-        return this.mealManager.isMealNote(file);
-      };
-      
-      const mealFiles = folder.children.filter(isMealNoteFile);
-      
-      return mealFiles;
-      
-    } catch (error) {
-      return [];
-    }
-  }
-
   async updateMealItem(originalItem: { food: string, quantity: string, calories: number, protein: number, carbs: number, fat: number }, newItem: FoodItem): Promise<void> {
     return this.mealManager.updateMealItem(originalItem, newItem);
   }
@@ -107,9 +72,7 @@ export class FileService {
     return this.mealManager.handleFileRename(oldPath, newPath);
   }
 
-  // Convenient method to check if a file path is a meal note before handling rename
   async handleFileRename(oldPath: string, newPath: string): Promise<void> {
-    // Only handle meal file renames
     if (oldPath.startsWith(this.settings.mealStoragePath) || newPath.startsWith(this.settings.mealStoragePath)) {
       await this.handleMealFileRename(oldPath, newPath);
     }

@@ -104,29 +104,6 @@ export class MealManager {
     }
   }
 
-  async deleteMeal(mealId: string): Promise<void> {
-    try {
-      const meals = await this.getMeals();
-      const mealIndex = meals.findIndex(m => m.id === mealId);
-      
-      if (mealIndex === -1) {
-        throw new Error(`Meal with ID ${mealId} not found`);
-      }
-
-      const mealToDelete = meals[mealIndex];
-      meals.splice(mealIndex, 1);
-      
-      await this.saveMealsToFile(meals);
-      
-      // Delete the markdown note
-      await this.deleteMealNote(mealToDelete);
-      
-      new Notice(`✅ Meal "${mealToDelete.name}" deleted successfully`);
-    } catch (error) {
-      throw new Error(`Failed to delete meal: ${error.message}`);
-    }
-  }
-
   async getMealById(mealId: string): Promise<Meal | null> {
     try {
       const meals = await this.getMeals();
@@ -298,15 +275,6 @@ export class MealManager {
     }
   }
 
-  // Method to regenerate meal note after sync (to update totals)
-  async regenerateMealNote(mealId: string): Promise<void> {
-    const meal = await this.getMealById(mealId);
-    if (meal) {
-      await this.createMealNote(meal);
-    }
-  }
-
-  // Method to update a specific item within a meal template
   async updateMealItem(originalItem: { food: string, quantity: string, calories: number, protein: number, carbs: number, fat: number }, newItem: FoodItem): Promise<void> {
     try {
       const meals = await this.getMeals();

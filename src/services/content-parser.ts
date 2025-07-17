@@ -163,52 +163,6 @@ export class ContentParser {
     return { success: false, endIndex: -1 };
   }
 
-  findAndReplaceCompleteCard(content: string, originalEntry: { food: string, quantity: string, calories: number, protein: number, carbs: number, fat: number }): { success: boolean, content: string } {
-    // Find the start of the entry using data attributes
-    const escapedFood = originalEntry.food.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/"/g, '&quot;');
-    const escapedQuantity = originalEntry.quantity.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/"/g, '&quot;');
-    
-    // Try card layout attributes first (data-ntr-*) - new format with complete nutrition data
-    const cardPattern = new RegExp(
-      `<div[^>]*data-ntr-food="${escapedFood}"[^>]*data-ntr-quantity="${escapedQuantity}"[^>]*data-ntr-calories="${originalEntry.calories}"[^>]*data-ntr-protein="${originalEntry.protein}"[^>]*data-ntr-carbs="${originalEntry.carbs}"[^>]*data-ntr-fat="${originalEntry.fat}"[^>]*>`,
-      'gi'
-    );
-    
-    let startMatch = cardPattern.exec(content);
-    if (!startMatch) {
-      // Try legacy card pattern without complete nutrition data
-      const legacyCardPattern = new RegExp(
-        `<div[^>]*data-ntr-food="${escapedFood}"[^>]*data-ntr-quantity="${escapedQuantity}"[^>]*data-ntr-calories="${originalEntry.calories}"[^>]*>`,
-        'gi'
-      );
-      startMatch = legacyCardPattern.exec(content);
-    }
-    
-    if (!startMatch) {
-      // Try simple layout attributes (data-*)
-      const simplePattern = new RegExp(
-        `<div[^>]*data-food="${escapedFood}"[^>]*data-quantity="${escapedQuantity}"[^>]*data-calories="${originalEntry.calories}"[^>]*>`,
-        'gi'
-      );
-      startMatch = simplePattern.exec(content);
-      
-      if (!startMatch) {
-        // Try alternative simple attribute order
-        const simplePattern2 = new RegExp(
-          `<div[^>]*data-calories="${originalEntry.calories}"[^>]*data-food="${escapedFood}"[^>]*data-quantity="${escapedQuantity}"[^>]*>`,
-          'gi'
-        );
-        startMatch = simplePattern2.exec(content);
-      }
-    }
-    
-    if (!startMatch) {
-      return { success: false, content };
-    }
-    
-    return this.extractCompleteCard(content, startMatch.index);
-  }
-
   extractCompleteCard(content: string, startIndex: number): { success: boolean, content: string } {
     let divCount = 0;
     let i = startIndex;
@@ -275,11 +229,9 @@ export class ContentParser {
   }
 
   deleteCardFromContent(content: string, itemToDelete: { food: string, quantity: string, calories: number, protein: number, carbs: number, fat: number }): { success: boolean, content: string } {
-    // Find the card to delete using the same logic as findAndReplaceCompleteCard
     const escapedFood = itemToDelete.food.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/"/g, '&quot;');
     const escapedQuantity = itemToDelete.quantity.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/"/g, '&quot;');
     
-    // Try card layout attributes first (data-ntr-*) - new format with complete nutrition data
     const cardPattern = new RegExp(
       `<div[^>]*data-ntr-food="${escapedFood}"[^>]*data-ntr-quantity="${escapedQuantity}"[^>]*data-ntr-calories="${itemToDelete.calories}"[^>]*data-ntr-protein="${itemToDelete.protein}"[^>]*data-ntr-carbs="${itemToDelete.carbs}"[^>]*data-ntr-fat="${itemToDelete.fat}"[^>]*>`,
       'gi'
