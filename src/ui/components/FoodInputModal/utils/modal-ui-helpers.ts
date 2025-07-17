@@ -178,10 +178,11 @@ export function createProcessButton(
   // Add processing indicator
   const processingIndicator = contentEl.createDiv(`nutrition-tracker-processing-indicator${isProcessing ? ' visible' : ''}`);
   
-  processingIndicator.innerHTML = `
-    <div class="nutrition-tracker-processing-spinner"></div>
-    <p class="nutrition-tracker-processing-text">Processing food data...</p>
-  `;
+  processingIndicator.createDiv('nutrition-tracker-processing-spinner');
+  processingIndicator.createEl('p', { 
+    text: 'Processing food data...', 
+    cls: 'nutrition-tracker-processing-text' 
+  });
   
   return processButton;
 } 
