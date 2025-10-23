@@ -35,11 +35,11 @@ export class ButtonStateManager {
       
       this.processButton.disabled = !enableButton;
       
-      let buttonText = 'Process Food';
+      let buttonText = 'Process food';
       if (initialData) {
-        buttonText = editingContext === 'meal' ? 'Update Meal Item' : 'Update Food';
+        buttonText = editingContext === 'meal' ? 'Update meal item' : 'Update food';
       } else if (targetMealId) {
-        buttonText = 'Add to Meal';
+        buttonText = 'Add to meal';
       }
       this.processButton.textContent = isProcessing ? 'Processing...' : buttonText;
     }

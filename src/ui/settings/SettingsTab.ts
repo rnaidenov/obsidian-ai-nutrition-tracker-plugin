@@ -19,7 +19,7 @@ export class SettingsTab extends PluginSettingTab {
       .setHeading();
 
     new Setting(containerEl)
-      .setName('OpenRouter API Key')
+      .setName('OpenRouter API key')
       .setDesc('Your OpenRouter API key for LLM processing. Get one at openrouter.ai')
       .addText(text => {
         text
@@ -45,7 +45,7 @@ export class SettingsTab extends PluginSettingTab {
       });
 
     new Setting(containerEl)
-      .setName('LLM Model')
+      .setName('LLM model')
       .setDesc('The AI model to use for food analysis')
       .addDropdown(dropdown => dropdown
         .addOption('google/gemini-2.5-flash', 'Gemini 2.5 Flash (Fast & Smart - Recommended)')
@@ -60,7 +60,7 @@ export class SettingsTab extends PluginSettingTab {
         }));
 
     new Setting(containerEl)
-      .setName('Use Custom Model')
+      .setName('Use custom model')
       .setDesc('Enable this to use a custom model instead of the predefined options')
       .addToggle(toggle => toggle
         .setValue(this.plugin.settings.useCustomModel)
@@ -73,7 +73,7 @@ export class SettingsTab extends PluginSettingTab {
     // Only show custom model input when custom model is enabled
     if (this.plugin.settings.useCustomModel) {
       new Setting(containerEl)
-        .setName('Custom Model Name')
+        .setName('Custom model name')
         .setDesc('Enter the model name/identifier (e.g., "anthropic/claude-3.5-sonnet", "openai/gpt-4o", "meta-llama/llama-3.1-405b")')
         .addText(text => text
           .setPlaceholder('Enter model name...')
@@ -86,11 +86,11 @@ export class SettingsTab extends PluginSettingTab {
 
     // Nutrition Goals Section
     new Setting(containerEl)
-      .setName('Daily Nutrition Goals')
+      .setName('Daily nutrition goals')
       .setHeading();
     
     new Setting(containerEl)
-      .setName('Daily Calories')
+      .setName('Daily calories')
       .setDesc('Your daily calorie target')
       .addText(text => text
         .setPlaceholder('2000')
@@ -102,7 +102,7 @@ export class SettingsTab extends PluginSettingTab {
         }));
 
     new Setting(containerEl)
-      .setName('Daily Protein (g)')
+      .setName('Daily protein (g)')
       .setDesc('Your daily protein target in grams')
       .addText(text => text
         .setPlaceholder('150')
@@ -114,7 +114,7 @@ export class SettingsTab extends PluginSettingTab {
         }));
 
     new Setting(containerEl)
-      .setName('Daily Carbs (g)')
+      .setName('Daily carbs (g)')
       .setDesc('Your daily carbohydrates target in grams')
       .addText(text => text
         .setPlaceholder('100')
@@ -126,7 +126,7 @@ export class SettingsTab extends PluginSettingTab {
         }));
 
     new Setting(containerEl)
-      .setName('Daily Fat (g)')
+      .setName('Daily fat (g)')
       .setDesc('Your daily fat target in grams')
       .addText(text => text
         .setPlaceholder('80')
@@ -143,7 +143,7 @@ export class SettingsTab extends PluginSettingTab {
       .setHeading();
     
     new Setting(containerEl)
-      .setName('Food Log Storage Path')
+      .setName('Food log storage path')
       .setDesc('Folder path where daily food logs will be stored')
       .addText(text => text
         .setPlaceholder('tracker/health/food/log')
@@ -154,7 +154,7 @@ export class SettingsTab extends PluginSettingTab {
         }));
 
     new Setting(containerEl)
-      .setName('Meal Storage Path')
+      .setName('Meal storage path')
       .setDesc('Folder path where saved meals will be stored')
       .addText(text => text
         .setPlaceholder('tracker/health/food/meals')
@@ -165,7 +165,7 @@ export class SettingsTab extends PluginSettingTab {
         }));
 
     new Setting(containerEl)
-      .setName('Image Storage Path')
+      .setName('Image storage path')
       .setDesc('Folder path where food images will be stored')
       .addText(text => text
         .setPlaceholder('tracker/health/food/log/images')
@@ -183,13 +183,13 @@ export class SettingsTab extends PluginSettingTab {
       .setHeading();
 
     new Setting(containerEl)
-      .setName('Display Theme')
+      .setName('Display theme')
       .setDesc('Theme for generated food logs')
       .addDropdown(dropdown => {
         dropdown
-          .addOption('auto', 'Auto (Match Obsidian)')
-          .addOption('light', 'Light Theme')
-          .addOption('dark', 'Dark Theme')
+          .addOption('auto', 'Auto (match Obsidian)')
+          .addOption('light', 'Light theme')
+          .addOption('dark', 'Dark theme')
           .setValue(this.plugin.settings.displayTheme)
           .onChange(async (value: 'auto' | 'light' | 'dark') => {
             this.plugin.settings.displayTheme = value;

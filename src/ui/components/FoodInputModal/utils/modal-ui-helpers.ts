@@ -2,11 +2,11 @@ import { Setting } from 'obsidian';
 import { Meal, FoodItem } from '../../../../types/nutrition';
 
 export function createModalTitle(contentEl: HTMLElement, initialData: any, editingContext: 'meal' | 'foodlog', targetMealId?: string) {
-  let title = 'Add Food Entry';
+  let title = 'Add food entry';
   if (initialData) {
-    title = editingContext === 'meal' ? 'Edit Meal Item' : 'Edit Food Entry';
+    title = editingContext === 'meal' ? 'Edit meal item' : 'Edit food entry';
   } else if (targetMealId) {
-    title = '➕ Add Items to Meal';
+    title = '➕ Add items to meal';
   }
   contentEl.createEl('h2', { text: title });
 }
@@ -68,7 +68,7 @@ export function createSelectedMealsDisplay(
   if (selectedMeals.length === 0) return;
   
   const selectedMealsContainer = contentEl.createDiv('nutrition-tracker-selected-meals');
-  selectedMealsContainer.createEl('h3', { text: 'Selected Meals' });
+  selectedMealsContainer.createEl('h3', { text: 'Selected meals' });
   
   selectedMeals.forEach((meal, index) => {
     const mealDiv = selectedMealsContainer.createDiv('nutrition-tracker-selected-meal');
@@ -160,9 +160,9 @@ export function createProcessButton(
 ): HTMLButtonElement {
   const processButtonSetting = new Setting(contentEl)
     .addButton(button => {
-      let buttonText = 'Process Food';
+      let buttonText = 'Process food';
       if (initialData) {
-        buttonText = editingContext === 'meal' ? 'Update Meal Item' : 'Update Food';
+        buttonText = editingContext === 'meal' ? 'Update meal item' : 'Update food';
       }
       
       button

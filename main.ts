@@ -24,14 +24,14 @@ export default class NutritionTrackerPlugin extends Plugin {
     this.fileService = new FileService(this.app, this.app.vault, this.settings);
     
     // Add ribbon icon
-    this.addRibbonIcon('apple', 'Log Food', () => {
+    this.addRibbonIcon('apple', 'Log food', () => {
       this.openFoodInputModal();
     });
 
     // Add command palette command
     this.addCommand({
       id: 'open-food-log-modal',
-      name: 'Log Food Entry',
+      name: 'Log food entry',
       callback: () => {
         this.openFoodInputModal();
       }
@@ -40,7 +40,7 @@ export default class NutritionTrackerPlugin extends Plugin {
     // Add command for quick access to today's food log
     this.addCommand({
       id: 'open-todays-food-log',
-      name: 'Open Today\'s Food Log',
+      name: 'Open today\'s food log',
       callback: () => {
         this.openTodaysFoodLog();
       }
@@ -350,7 +350,7 @@ export default class NutritionTrackerPlugin extends Plugin {
       if (file instanceof TFile) {
         await this.app.workspace.getLeaf().openFile(file);
       } else {
-        new Notice(`No food log found for today. Use "Log Food Entry" to create one.`);
+        new Notice(`No food log found for today. Use "Log food entry" to create one.`);
       }
     } catch (error) {
       new Notice(`Error opening today's food log: ${error.message}`);

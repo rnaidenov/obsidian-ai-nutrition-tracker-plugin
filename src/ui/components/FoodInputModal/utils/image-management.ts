@@ -39,7 +39,7 @@ export class ImageManager {
       .setDesc('Upload additional images for AI analysis (optional)')
       .addButton(button => {
         button
-          .setButtonText('Add Images')
+          .setButtonText('Add images')
           .onClick(onSelectImages)
           .setDisabled(isProcessing);
       });
@@ -89,7 +89,7 @@ export class ImageManager {
 
     if (this.selectedImages.length > 1) {
       const clearAllBtn = imagesContainer.createEl('button', {
-        text: `Clear All Images (${this.selectedImages.length})`,
+        text: `Clear all images (${this.selectedImages.length})`,
         cls: 'nutrition-tracker-clear-all-images'
       });
       clearAllBtn.addEventListener('click', () => {
