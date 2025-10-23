@@ -82,6 +82,7 @@ export class FoodInputModal extends Modal {
     // Only show meal selection dropdown if we're NOT adding to a specific meal
     if (!this.targetMealId) {
       createMealSelectionDropdown(
+        this.app,
         contentEl, 
         this.mealManager.getAvailableMeals(), 
         this.handleMealSelect.bind(this)

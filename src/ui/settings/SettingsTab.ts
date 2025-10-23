@@ -1,5 +1,6 @@
 import { App, PluginSettingTab, Setting, normalizePath } from 'obsidian';
 import NutritionTrackerPlugin from '../../../main';
+import { FolderSuggest } from './FolderSuggest';
 
 export class SettingsTab extends PluginSettingTab {
   plugin: NutritionTrackerPlugin;
@@ -145,35 +146,44 @@ export class SettingsTab extends PluginSettingTab {
     new Setting(containerEl)
       .setName('Food log storage path')
       .setDesc('Folder path where daily food logs will be stored')
-      .addText(text => text
-        .setPlaceholder('tracker/health/food/log')
-        .setValue(this.plugin.settings.logStoragePath)
-        .onChange(async (value) => {
-          this.plugin.settings.logStoragePath = normalizePath(value || 'tracker/health/food/log');
-          await this.plugin.saveSettings();
-        }));
+      .addText(text => {
+        new FolderSuggest(this.app, text.inputEl);
+        text
+          .setPlaceholder('tracker/health/food/log')
+          .setValue(this.plugin.settings.logStoragePath)
+          .onChange(async (value) => {
+            this.plugin.settings.logStoragePath = normalizePath(value || 'tracker/health/food/log');
+            await this.plugin.saveSettings();
+          });
+      });
 
     new Setting(containerEl)
       .setName('Meal storage path')
       .setDesc('Folder path where saved meals will be stored')
-      .addText(text => text
-        .setPlaceholder('tracker/health/food/meals')
-        .setValue(this.plugin.settings.mealStoragePath)
-        .onChange(async (value) => {
-          this.plugin.settings.mealStoragePath = normalizePath(value || 'tracker/health/food/meals');
-          await this.plugin.saveSettings();
-        }));
+      .addText(text => {
+        new FolderSuggest(this.app, text.inputEl);
+        text
+          .setPlaceholder('tracker/health/food/meals')
+          .setValue(this.plugin.settings.mealStoragePath)
+          .onChange(async (value) => {
+            this.plugin.settings.mealStoragePath = normalizePath(value || 'tracker/health/food/meals');
+            await this.plugin.saveSettings();
+          });
+      });
 
     new Setting(containerEl)
       .setName('Image storage path')
       .setDesc('Folder path where food images will be stored')
-      .addText(text => text
-        .setPlaceholder('tracker/health/food/log/images')
-        .setValue(this.plugin.settings.imageStoragePath)
-        .onChange(async (value) => {
-          this.plugin.settings.imageStoragePath = normalizePath(value || 'tracker/health/food/log/images');
-          await this.plugin.saveSettings();
-        }));
+      .addText(text => {
+        new FolderSuggest(this.app, text.inputEl);
+        text
+          .setPlaceholder('tracker/health/food/log/images')
+          .setValue(this.plugin.settings.imageStoragePath)
+          .onChange(async (value) => {
+            this.plugin.settings.imageStoragePath = normalizePath(value || 'tracker/health/food/log/images');
+            await this.plugin.saveSettings();
+          });
+      });
 
 
 

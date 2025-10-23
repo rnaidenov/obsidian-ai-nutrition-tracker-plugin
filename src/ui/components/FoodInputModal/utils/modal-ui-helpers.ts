@@ -1,5 +1,6 @@
-import { Setting } from 'obsidian';
+import { Setting, App } from 'obsidian';
 import { Meal, FoodItem } from '../../../../types/nutrition';
+import { MealSuggest } from './MealSuggest';
 
 export function createModalTitle(contentEl: HTMLElement, initialData: any, editingContext: 'meal' | 'foodlog', targetMealId?: string) {
   let title = 'Add food entry';
@@ -36,6 +37,7 @@ export function createEditingNotice(contentEl: HTMLElement, initialData: any, ed
 }
 
 export function createMealSelectionDropdown(
+  app: App,
   contentEl: HTMLElement, 
   availableMeals: Meal[], 
   onMealSelect: (mealId: string) => Promise<void>
@@ -44,19 +46,15 @@ export function createMealSelectionDropdown(
   
   const mealSelectionSetting = new Setting(contentEl)
     .setName('Add saved meals')
-    .setDesc('Select from your saved meals to add to this entry')
-    .addDropdown(dropdown => {
-      dropdown.addOption('', 'Select a meal...');
-      availableMeals.forEach(meal => {
-        dropdown.addOption(meal.id, `${meal.name} (${meal.items.length} items)`);
+    .setDesc('Type to search and select from your saved meals')
+    .addText(text => {
+      new MealSuggest(app, text.inputEl, availableMeals, async (mealId) => {
+        await onMealSelect(mealId);
+        text.setValue(''); // Reset input
       });
-      dropdown.onChange(async (value) => {
-        if (value) {
-          await onMealSelect(value);
-          dropdown.setValue(''); // Reset dropdown
-        }
-      });
+      text.setPlaceholder('Type to search meals...');
     });
+  
   mealSelectionSetting.settingEl.addClass('nutrition-tracker-meal-selection');
 }
 
