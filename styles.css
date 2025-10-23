@@ -717,8 +717,8 @@
   margin-left: 0 !important;
 }
 
-/* Fallback by placeholder */
-textarea[placeholder*="Enter food description"] {
+/* Fallback by placeholder - scoped to nutrition tracker modal */
+.nutrition-tracker-modal textarea[placeholder*="Enter food description"] {
   min-height: 100px !important;
   width: 100% !important;
   min-width: 100% !important;

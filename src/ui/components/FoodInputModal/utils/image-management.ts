@@ -9,12 +9,12 @@ export class ImageManager {
     fileInput.type = 'file';
     fileInput.accept = 'image/*';
     fileInput.multiple = true;
-    
-    fileInput.addEventListener('change', (event) => {
+
+    const handleChange = (event: Event) => {
       const target = event.target as HTMLInputElement;
       if (target.files) {
         const newImages = Array.from(target.files);
-        
+
         // Check file sizes (max 10MB per image)
         const validImages = newImages.filter(file => {
           if (file.size > 10 * 1024 * 1024) { // 10MB
@@ -23,12 +23,17 @@ export class ImageManager {
           }
           return true;
         });
-        
+
         this.selectedImages.push(...validImages);
         onImagesSelected();
       }
-    });
-    
+
+      fileInput.removeEventListener('change', handleChange);
+      fileInput.remove();
+    };
+
+    fileInput.addEventListener('change', handleChange);
+
     // Trigger file selection
     fileInput.click();
   }
@@ -43,41 +48,41 @@ export class ImageManager {
           .onClick(onSelectImages)
           .setDisabled(isProcessing);
       });
-    
+
     imageUploadSetting.settingEl.addClass('nutrition-tracker-image-setting');
   }
 
   createImagePreview(contentEl: HTMLElement, onImageRemoved: () => void): void {
     if (this.selectedImages.length === 0) return;
-    
+
     const imagesContainer = contentEl.createDiv('nutrition-tracker-images-container');
-    
+
     this.selectedImages.forEach((image, index) => {
       const imagePreview = imagesContainer.createDiv('nutrition-tracker-image-preview');
-      
+
       // Create image container with relative positioning for the remove button
       const imageContainer = imagePreview.createDiv('nutrition-tracker-image-container');
-      
-      const img = imageContainer.createEl('img', { 
-        cls: 'nutrition-tracker-preview-image' 
+
+      const img = imageContainer.createEl('img', {
+        cls: 'nutrition-tracker-preview-image'
       });
-      
+
       const reader = new FileReader();
       reader.onload = (e) => {
         img.src = e.target?.result as string;
       };
       reader.readAsDataURL(image);
-      
+
       const imageInfo = imagePreview.createDiv('nutrition-tracker-image-info');
       const imageDetails = imageInfo.createDiv('nutrition-tracker-image-details');
       imageDetails.createEl('p', { text: `📷 ${image.name}` });
-      imageDetails.createEl('p', { 
+      imageDetails.createEl('p', {
         text: `${(image.size / 1024 / 1024).toFixed(1)} MB`,
         cls: 'nutrition-tracker-image-size'
       });
-      
+
       // Position remove button in image info section
-      const removeBtn = imageInfo.createEl('button', { 
+      const removeBtn = imageInfo.createEl('button', {
         text: '✕',
         cls: 'nutrition-tracker-remove-image'
       });

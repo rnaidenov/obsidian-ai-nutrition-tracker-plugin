@@ -4,23 +4,9 @@ export class FileUtils {
   constructor(private vault: Vault) {}
 
   async ensureDirectoryExists(path: string): Promise<void> {
-    const dirs = path.split('/');
-    let currentPath = '';
-    
-    for (const dir of dirs) {
-      currentPath = currentPath ? `${currentPath}/${dir}` : dir;
-      
-      const exists = this.vault.getAbstractFileByPath(currentPath);
-
-      if (exists) {
-        return;
-      }
-
-      try {
-        await this.vault.createFolder(currentPath);
-      } catch (error) {
-        throw new Error(`Failed to create directory ${currentPath}: ${error.message}`);
-      }
+    const exists = this.vault.getAbstractFileByPath(path);
+    if (!exists) {
+      await this.vault.createFolder(path);
     }
   }
 

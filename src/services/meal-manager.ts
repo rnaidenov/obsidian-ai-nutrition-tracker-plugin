@@ -125,7 +125,7 @@ export class MealManager {
       const existingFile = this.vault.getAbstractFileByPath(mealsPath);
       
       if (existingFile instanceof TFile) {
-        await this.vault.modify(existingFile, content);
+        await this.vault.process(existingFile, () => content);
       } else {
         await this.vault.create(mealsPath, content);
       }
@@ -149,7 +149,7 @@ export class MealManager {
       
       const existingFile = this.vault.getAbstractFileByPath(notePath);
       if (existingFile && existingFile instanceof TFile) {
-        await this.vault.modify(existingFile, content);
+        await this.vault.process(existingFile, () => content);
       } else {
         await this.vault.create(notePath, content);
       }
