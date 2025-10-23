@@ -12,7 +12,7 @@ export default class NutritionTrackerPlugin extends Plugin {
   private editButtonHandler: (event: Event) => void;
   private deleteButtonHandler: (event: Event) => void;
   private ctaButtonHandler: (event: Event) => void;
-  private mealSyncTimeouts: Map<string, NodeJS.Timeout> = new Map();
+  private mealSyncTimeouts: Map<string, number> = new Map();
   private isDeleteInProgress: boolean = false;
   private currentModal: FoodInputModal | null = null; 
 
@@ -71,7 +71,7 @@ export default class NutritionTrackerPlugin extends Plugin {
   }
 
   async onunload() {
-    this.mealSyncTimeouts.forEach(timeout => clearTimeout(timeout));
+    this.mealSyncTimeouts.forEach(timeout => window.clearTimeout(timeout));
     this.mealSyncTimeouts.clear();
     
     this.isDeleteInProgress = false;
@@ -302,10 +302,10 @@ export default class NutritionTrackerPlugin extends Plugin {
           const filePath = file.path;
           
           if (this.mealSyncTimeouts.has(filePath)) {
-            clearTimeout(this.mealSyncTimeouts.get(filePath)!);
+            window.clearTimeout(this.mealSyncTimeouts.get(filePath)!);
           }
           
-          const timeout = setTimeout(async () => {
+          const timeout = window.setTimeout(async () => {
             await this.fileService.syncMealNoteToJSON(file);
             this.mealSyncTimeouts.delete(filePath);
           }, 1000);
