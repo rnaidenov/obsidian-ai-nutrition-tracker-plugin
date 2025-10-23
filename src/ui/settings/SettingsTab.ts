@@ -1,4 +1,4 @@
-import { App, PluginSettingTab, Setting } from 'obsidian';
+import { App, PluginSettingTab, Setting, normalizePath } from 'obsidian';
 import NutritionTrackerPlugin from '../../../main';
 
 export class SettingsTab extends PluginSettingTab {
@@ -149,7 +149,7 @@ export class SettingsTab extends PluginSettingTab {
         .setPlaceholder('tracker/health/food/log')
         .setValue(this.plugin.settings.logStoragePath)
         .onChange(async (value) => {
-          this.plugin.settings.logStoragePath = value || 'tracker/health/food/log';
+          this.plugin.settings.logStoragePath = normalizePath(value || 'tracker/health/food/log');
           await this.plugin.saveSettings();
         }));
 
@@ -160,7 +160,7 @@ export class SettingsTab extends PluginSettingTab {
         .setPlaceholder('tracker/health/food/meals')
         .setValue(this.plugin.settings.mealStoragePath)
         .onChange(async (value) => {
-          this.plugin.settings.mealStoragePath = value || 'tracker/health/food/meals';
+          this.plugin.settings.mealStoragePath = normalizePath(value || 'tracker/health/food/meals');
           await this.plugin.saveSettings();
         }));
 
@@ -171,7 +171,7 @@ export class SettingsTab extends PluginSettingTab {
         .setPlaceholder('tracker/health/food/log/images')
         .setValue(this.plugin.settings.imageStoragePath)
         .onChange(async (value) => {
-          this.plugin.settings.imageStoragePath = value || 'tracker/health/food/log/images';
+          this.plugin.settings.imageStoragePath = normalizePath(value || 'tracker/health/food/log/images');
           await this.plugin.saveSettings();
         }));
 

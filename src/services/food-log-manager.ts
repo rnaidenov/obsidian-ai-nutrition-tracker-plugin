@@ -1,4 +1,4 @@
-import { TFile, Vault, Notice } from 'obsidian';
+import { TFile, Vault, Notice, normalizePath } from 'obsidian';
 import { FoodItem, NutritionData } from '../types/nutrition';
 import { PluginSettings } from '../types/settings';
 import { FileUtils } from './file-utils';
@@ -18,7 +18,7 @@ export class FoodLogManager {
 
   async createOrUpdateFoodLog(foodItems: FoodItem[], replaceEntry?: { food: string, quantity: string, calories: number, protein: number, carbs: number, fat: number }): Promise<void> {
     const today = this.fileUtils.getTodayString();
-    const logPath = `${this.settings.logStoragePath}/${today}.md`;
+    const logPath = normalizePath(`${this.settings.logStoragePath}/${today}.md`);
     
     try {
       // Ensure the directory exists
@@ -49,7 +49,7 @@ export class FoodLogManager {
 
   async deleteFoodLogItem(itemToDelete: { food: string, quantity: string, calories: number, protein: number, carbs: number, fat: number }): Promise<void> {
     const today = this.fileUtils.getTodayString();
-    const logPath = `${this.settings.logStoragePath}/${today}.md`;
+    const logPath = normalizePath(`${this.settings.logStoragePath}/${today}.md`);
     
     try {
       const existingFile = this.vault.getAbstractFileByPath(logPath);

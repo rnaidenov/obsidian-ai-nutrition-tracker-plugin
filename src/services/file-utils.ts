@@ -1,4 +1,4 @@
-import { TFile, Vault, TAbstractFile } from 'obsidian';
+import { TFile, Vault, TAbstractFile, normalizePath } from 'obsidian';
 
 export class FileUtils {
   constructor(private vault: Vault) {}
@@ -31,7 +31,7 @@ export class FileUtils {
       const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
       const extension = imageFile.name.split('.').pop() || 'jpg';
       const filename = `food-image-${timestamp}.${extension}`;
-      const imagePath = `${imageStoragePath}/${filename}`;
+      const imagePath = normalizePath(`${imageStoragePath}/${filename}`);
       
       // Convert File to ArrayBuffer
       const arrayBuffer = await imageFile.arrayBuffer();
@@ -61,15 +61,15 @@ export class FileUtils {
     if (!(file instanceof TFile)) return false;
     
     // Check if file is in meal storage path and has .md extension
-    const normalizedPath = file.path.replace(/\\/g, '/');
-    const normalizedMealPath = mealStoragePath.replace(/\\/g, '/');
-    const normalizedLogPath = logStoragePath.replace(/\\/g, '/');
+    const normalizedFilePath = normalizePath(file.path);
+    const normalizedMealPath = normalizePath(mealStoragePath);
+    const normalizedLogPath = normalizePath(logStoragePath);
     
     // Must be in meal storage path
-    const inMealPath = normalizedPath.startsWith(normalizedMealPath);
+    const inMealPath = normalizedFilePath.startsWith(normalizedMealPath);
     
     // Must NOT be in log storage path (prevent cross-contamination)
-    const inLogPath = normalizedPath.startsWith(normalizedLogPath);
+    const inLogPath = normalizedFilePath.startsWith(normalizedLogPath);
     
     // Must have .md extension and not be meals.json
     const validExtension = file.extension === 'md' && file.name !== 'meals.json';

@@ -1,4 +1,4 @@
-import { TFile, Vault, Notice, TAbstractFile, App } from 'obsidian';
+import { TFile, Vault, Notice, TAbstractFile, App, normalizePath } from 'obsidian';
 import { FoodItem, Meal } from '../types/nutrition';
 import { PluginSettings } from '../types/settings';
 import { FileUtils } from './file-utils';
@@ -17,7 +17,7 @@ export class MealManager {
   }
 
   private getMealsFilePath(): string {
-    return `${this.settings.mealStoragePath}/meals.json`;
+    return normalizePath(`${this.settings.mealStoragePath}/meals.json`);
   }
 
   async saveMeal(name: string, foodItems: FoodItem[], description?: string, images?: string[]): Promise<Meal> {
@@ -143,7 +143,7 @@ export class MealManager {
       // Sanitize meal name for filename
       const sanitizedName = this.fileUtils.sanitizeMealName(meal.name);
       const filename = `${sanitizedName}.md`;
-      const notePath = `${this.settings.mealStoragePath}/${filename}`;
+      const notePath = normalizePath(`${this.settings.mealStoragePath}/${filename}`);
       
       const content = await this.generateMealNoteContent(meal);
       
@@ -174,7 +174,7 @@ export class MealManager {
     try {
       const sanitizedName = this.fileUtils.sanitizeMealName(meal.name);
       const filename = `${sanitizedName}.md`;
-      const notePath = `${this.settings.mealStoragePath}/${filename}`;
+      const notePath = normalizePath(`${this.settings.mealStoragePath}/${filename}`);
       
       const existingFile = this.vault.getAbstractFileByPath(notePath);
       if (existingFile instanceof TFile) {
@@ -302,11 +302,11 @@ export class MealManager {
           
           // Force immediate sync from file back to JSON to ensure consistency
           const mealFileName = this.fileUtils.sanitizeMealName(meal.name) + '.md';
-          const mealFilePath = `${this.settings.mealStoragePath}/${mealFileName}`;
+          const mealFilePath = normalizePath(`${this.settings.mealStoragePath}/${mealFileName}`);
           const mealFile = this.vault.getAbstractFileByPath(mealFilePath);
           if (mealFile instanceof TFile) {
             // Small delay to ensure file write is complete
-            setTimeout(async () => {
+            window.setTimeout(async () => {
               await this.syncMealNoteToJSON(mealFile);
             }, 100);
           }
@@ -354,11 +354,11 @@ export class MealManager {
           
           // Force immediate sync from file back to JSON to ensure consistency
           const mealFileName = this.fileUtils.sanitizeMealName(meal.name) + '.md';
-          const mealFilePath = `${this.settings.mealStoragePath}/${mealFileName}`;
+          const mealFilePath = normalizePath(`${this.settings.mealStoragePath}/${mealFileName}`);
           const mealFile = this.vault.getAbstractFileByPath(mealFilePath);
           if (mealFile instanceof TFile) {
             // Small delay to ensure file write is complete
-            setTimeout(async () => {
+            window.setTimeout(async () => {
               await this.syncMealNoteToJSON(mealFile);
             }, 100);
           }
@@ -409,10 +409,10 @@ export class MealManager {
       
       // Force immediate sync from file back to JSON to ensure consistency
       const mealFileName = this.fileUtils.sanitizeMealName(meal.name) + '.md';
-      const mealFilePath = `${this.settings.mealStoragePath}/${mealFileName}`;
+      const mealFilePath = normalizePath(`${this.settings.mealStoragePath}/${mealFileName}`);
       const mealFile = this.vault.getAbstractFileByPath(mealFilePath);
       if (mealFile instanceof TFile) {
-        setTimeout(async () => {
+        window.setTimeout(async () => {
           await this.syncMealNoteToJSON(mealFile);
         }, 100);
       }
@@ -431,12 +431,12 @@ export class MealManager {
       // Calculate what the old filename should have been
       const oldSanitizedName = this.fileUtils.sanitizeMealName(oldMeal.name);
       const oldFilename = `${oldSanitizedName}.md`;
-      const oldNotePath = `${this.settings.mealStoragePath}/${oldFilename}`;
+      const oldNotePath = normalizePath(`${this.settings.mealStoragePath}/${oldFilename}`);
       
       // Calculate what the new filename should be
       const newSanitizedName = this.fileUtils.sanitizeMealName(newMeal.name);
       const newFilename = `${newSanitizedName}.md`;
-      const newNotePath = `${this.settings.mealStoragePath}/${newFilename}`;
+      const newNotePath = normalizePath(`${this.settings.mealStoragePath}/${newFilename}`);
       
       // If the current file doesn't match the expected new filename, rename it
       if (currentFile.path !== newNotePath) {

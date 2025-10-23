@@ -3,7 +3,7 @@
   "name": "AI Nutrition Tracker",
   "version": "1.0.7",
   "minAppVersion": "0.15.0",
-  "description": "AI-powered nutrition tracking with food image analysis and daily logging",
+  "description": "AI-powered nutrition tracking with food image analysis and daily logging.",
   "author": "rnaidenov",
   "authorUrl": "https://github.com/rnaidenov",
   "isDesktopOnly": false
