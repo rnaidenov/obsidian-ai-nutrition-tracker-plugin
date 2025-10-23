@@ -13,10 +13,10 @@ export class SettingsTab extends PluginSettingTab {
     const { containerEl } = this;
     containerEl.empty();
     
-    containerEl.createEl('h2', { text: 'AI Nutrition Tracker Settings' });
-
-    // API Configuration Section
-    containerEl.createEl('h3', { text: 'AI Configuration' });
+    // AI Section
+    new Setting(containerEl)
+      .setName('AI')
+      .setHeading();
 
     new Setting(containerEl)
       .setName('OpenRouter API Key')
@@ -85,7 +85,9 @@ export class SettingsTab extends PluginSettingTab {
     }
 
     // Nutrition Goals Section
-    containerEl.createEl('h3', { text: 'Daily Nutrition Goals' });
+    new Setting(containerEl)
+      .setName('Daily Nutrition Goals')
+      .setHeading();
     
     new Setting(containerEl)
       .setName('Daily Calories')
@@ -135,8 +137,10 @@ export class SettingsTab extends PluginSettingTab {
           await this.plugin.saveSettings();
         }));
 
-    // Storage Settings Section
-    containerEl.createEl('h3', { text: 'Storage Configuration' });
+    // Storage Section
+    new Setting(containerEl)
+      .setName('Storage')
+      .setHeading();
     
     new Setting(containerEl)
       .setName('Food Log Storage Path')
@@ -174,7 +178,9 @@ export class SettingsTab extends PluginSettingTab {
 
 
     // Display Settings Section
-    containerEl.createEl('h3', { text: 'Display Settings' });
+    new Setting(containerEl)
+      .setName('Display')
+      .setHeading();
 
     new Setting(containerEl)
       .setName('Display Theme')
