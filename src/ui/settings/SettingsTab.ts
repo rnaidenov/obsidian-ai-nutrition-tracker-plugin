@@ -87,7 +87,7 @@ export class SettingsTab extends PluginSettingTab {
 
     // Nutrition Goals Section
     new Setting(containerEl)
-      .setName('Daily nutrition goals')
+      .setName('Nutrition goals')
       .setHeading();
     
     new Setting(containerEl)
