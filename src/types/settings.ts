@@ -9,9 +9,6 @@ export interface PluginSettings {
   logStoragePath: string;
   mealStoragePath: string;
   imageStoragePath: string;
-  
-  // Display Settings
-  displayTheme: 'auto' | 'light' | 'dark';
 }
 
 export const DEFAULT_SETTINGS: PluginSettings = {
@@ -27,8 +24,5 @@ export const DEFAULT_SETTINGS: PluginSettings = {
   },
   logStoragePath: 'tracker/health/food/log',
   mealStoragePath: 'tracker/health/food/meals',
-  imageStoragePath: 'tracker/health/food/log/images',
-  
-  // Display Settings Defaults
-  displayTheme: 'auto'
+  imageStoragePath: 'tracker/health/food/log/images'
 }; 

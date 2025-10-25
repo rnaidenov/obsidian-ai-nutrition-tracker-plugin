@@ -1224,4 +1224,561 @@
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
+}
+
+/* ============================================
+   Food Item Cards (Batch 1)
+   ============================================ */
+
+/* Main food card container */
+.ntr-food-card {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(248, 250, 252, 0.9));
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 16px;
+  padding: 14px;
+  margin: 10px 0;
+  box-shadow: 0 0px 8px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.9);
+  border: 1px solid rgba(255,255,255,0.6);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Dark theme - works both when body has theme-dark OR when element has theme-dark */
+.theme-dark .ntr-food-card,
+.ntr-food-card.theme-dark {
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.75), rgba(51, 65, 85, 0.75));
+  box-shadow: 0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.1);
+  border: 1px solid rgba(148,163,184,0.2);
+}
+
+/* Header container with food info and actions */
+.ntr-food-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+/* Left side: emoji and text info */
+.ntr-food-card-info {
+  display: flex;
+  align-items: center;
+  flex: 1;
+}
+
+/* Food emoji */
+.ntr-food-card-emoji {
+  font-size: 32px;
+  margin-right: 10px;
+}
+
+/* Text container (title, quantity, timestamp) */
+.ntr-food-card-text {
+  flex: 1;
+}
+
+/* Food name/title */
+.ntr-food-card-title {
+  color: #0f172a;
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.theme-dark .ntr-food-card-title,
+.ntr-food-card.theme-dark .ntr-food-card-title {
+  color: #f8fafc;
+}
+
+/* Quantity text */
+.ntr-food-card-quantity {
+  color: #64748b;
+  font-size: 12px;
+  margin-top: 2px;
+}
+
+.theme-dark .ntr-food-card-quantity,
+.ntr-food-card.theme-dark .ntr-food-card-quantity {
+  color: #94a3b8;
+}
+
+/* Timestamp text */
+.ntr-food-card-timestamp {
+  color: #64748b;
+  font-size: 10px;
+  margin-top: 1px;
+  opacity: 0.8;
+}
+
+.theme-dark .ntr-food-card-timestamp,
+.ntr-food-card.theme-dark .ntr-food-card-timestamp {
+  color: #94a3b8;
+}
+
+/* Action buttons container */
+.ntr-food-card-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+/* Edit button */
+.ntr-edit-btn {
+  background: linear-gradient(135deg, rgba(255,255,255,0.7), rgba(248,250,252,0.5));
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  border: 1px solid rgba(255,255,255,0.6);
+  border-radius: 8px;
+  padding: 6px 10px;
+  color: #475569;
+  font-size: 10px;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.8);
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+.theme-dark .ntr-edit-btn,
+.ntr-food-card.theme-dark .ntr-edit-btn {
+  background: linear-gradient(135deg, rgba(148,163,184,0.12), rgba(100,116,139,0.08));
+  border: 1px solid rgba(148,163,184,0.25);
+  color: #cbd5e1;
+  box-shadow: 0 2px 8px rgba(148,163,184,0.1), inset 0 1px 0 rgba(255,255,255,0.1);
+}
+
+.ntr-edit-btn:hover {
+  background: linear-gradient(135deg, rgba(255,255,255,0.85), rgba(248,250,252,0.65));
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.9);
+}
+
+.theme-dark .ntr-edit-btn:hover,
+.ntr-food-card.theme-dark .ntr-edit-btn:hover {
+  background: linear-gradient(135deg, rgba(148,163,184,0.18), rgba(100,116,139,0.12));
+  box-shadow: 0 4px 12px rgba(148,163,184,0.15), inset 0 1px 0 rgba(255,255,255,0.15);
+}
+
+/* Delete button */
+.ntr-delete-btn {
+  background: linear-gradient(135deg, rgba(255,255,255,0.7), rgba(254,226,226,0.5));
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  border: 1px solid rgba(252,165,165,0.6);
+  border-radius: 8px;
+  padding: 6px 10px;
+  color: #dc2626;
+  font-size: 10px;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.8);
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+.theme-dark .ntr-delete-btn,
+.ntr-food-card.theme-dark .ntr-delete-btn {
+  background: linear-gradient(135deg, rgba(239,68,68,0.12), rgba(185,28,28,0.08));
+  border: 1px solid rgba(239,68,68,0.25);
+  color: #fca5a5;
+  box-shadow: 0 2px 8px rgba(239,68,68,0.1), inset 0 1px 0 rgba(255,255,255,0.1);
+}
+
+.ntr-delete-btn:hover {
+  background: linear-gradient(135deg, rgba(254,226,226,0.8), rgba(252,165,165,0.6));
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(239,68,68,0.15), inset 0 1px 0 rgba(255,255,255,0.9);
+}
+
+.theme-dark .ntr-delete-btn:hover,
+.ntr-food-card.theme-dark .ntr-delete-btn:hover {
+  background: linear-gradient(135deg, rgba(239,68,68,0.2), rgba(185,28,28,0.15));
+  box-shadow: 0 4px 12px rgba(239,68,68,0.15), inset 0 1px 0 rgba(255,255,255,0.15);
+}
+
+/* ============================================
+   Nutrition Stats Grid (Batch 2)
+   ============================================ */
+
+/* 4-column grid for nutrition stats */
+.ntr-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+/* Base stat card styling */
+.ntr-stat-card {
+  text-align: center;
+  padding: 8px;
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  border-radius: 12px;
+}
+
+/* Calories card - red theme */
+.ntr-stat-card-calories {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(254, 226, 226, 0.9));
+  border: 1px solid rgba(252, 165, 165, 0.3);
+  box-shadow: 0 4px 16px rgba(239, 68, 68, 0.06), inset 0 1px 0 rgba(255,255,255,0.8);
+}
+
+.theme-dark .ntr-stat-card-calories,
+.ntr-food-card.theme-dark .ntr-stat-card-calories {
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(185, 28, 28, 0.1));
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  box-shadow: 0 4px 16px rgba(239, 68, 68, 0.1);
+}
+
+/* Protein card - green theme */
+.ntr-stat-card-protein {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(220, 252, 231, 0.9));
+  border: 1px solid rgba(134, 239, 172, 0.3);
+  box-shadow: 0 4px 16px rgba(34, 197, 2, 0.06), inset 0 1px 0 rgba(255,255,255,0.8);
+}
+
+.theme-dark .ntr-stat-card-protein,
+.ntr-food-card.theme-dark .ntr-stat-card-protein {
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.2), rgba(22, 163, 74, 0.1));
+  border: 1px solid rgba(34, 197, 94, 0.25);
+  box-shadow: 0 4px 16px rgba(34, 197, 94, 0.1);
+}
+
+/* Carbs card - yellow/orange theme */
+.ntr-stat-card-carbs {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(254, 243, 199, 0.9));
+  border: 1px solid rgba(252, 211, 77, 0.3);
+  box-shadow: 0 4px 16px rgba(251, 191, 36, 0.06), inset 0 1px 0 rgba(255,255,255,0.8);
+}
+
+.theme-dark .ntr-stat-card-carbs,
+.ntr-food-card.theme-dark .ntr-stat-card-carbs {
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.2), rgba(217, 119, 6, 0.1));
+  border: 1px solid rgba(251, 191, 36, 0.25);
+  box-shadow: 0 4px 16px rgba(251, 191, 36, 0.1);
+}
+
+/* Fat card - purple theme */
+.ntr-stat-card-fat {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(237, 233, 254, 0.9));
+  border: 1px solid rgba(196, 181, 253, 0.3);
+  box-shadow: 0 4px 16px rgba(168, 85, 247, 0.06), inset 0 1px 0 rgba(255,255,255,0.8);
+}
+
+.theme-dark .ntr-stat-card-fat,
+.ntr-food-card.theme-dark .ntr-stat-card-fat {
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.2), rgba(124, 58, 237, 0.1));
+  border: 1px solid rgba(168, 85, 247, 0.25);
+  box-shadow: 0 4px 16px rgba(168, 85, 247, 0.1);
+}
+
+/* Emoji in stat cards */
+.ntr-stat-emoji {
+  font-size: 16px;
+  margin-bottom: 2px;
+}
+
+/* Numeric value in stat cards */
+.ntr-stat-value {
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.ntr-stat-card-calories .ntr-stat-value {
+  color: #dc2626;
+}
+
+.theme-dark .ntr-stat-card-calories .ntr-stat-value,
+.ntr-food-card.theme-dark .ntr-stat-card-calories .ntr-stat-value {
+  color: #fecaca;
+}
+
+.ntr-stat-card-protein .ntr-stat-value {
+  color: #16a34a;
+}
+
+.theme-dark .ntr-stat-card-protein .ntr-stat-value,
+.ntr-food-card.theme-dark .ntr-stat-card-protein .ntr-stat-value {
+  color: #bbf7d0;
+}
+
+.ntr-stat-card-carbs .ntr-stat-value {
+  color: #d97706;
+}
+
+.theme-dark .ntr-stat-card-carbs .ntr-stat-value,
+.ntr-food-card.theme-dark .ntr-stat-card-carbs .ntr-stat-value {
+  color: #fde68a;
+}
+
+.ntr-stat-card-fat .ntr-stat-value {
+  color: #7c3aed;
+}
+
+.theme-dark .ntr-stat-card-fat .ntr-stat-value,
+.ntr-food-card.theme-dark .ntr-stat-card-fat .ntr-stat-value {
+  color: #ddd6fe;
+}
+
+/* Label text in stat cards */
+.ntr-stat-label {
+  font-size: 9px;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.ntr-stat-card-calories .ntr-stat-label {
+  color: #ef4444;
+  font-weight: 600;
+}
+
+.theme-dark .ntr-stat-card-calories .ntr-stat-label,
+.ntr-food-card.theme-dark .ntr-stat-card-calories .ntr-stat-label {
+  color: #f87171;
+  font-weight: 500;
+}
+
+.ntr-stat-card-protein .ntr-stat-label {
+  color: #22c55e;
+  font-weight: 600;
+}
+
+.theme-dark .ntr-stat-card-protein .ntr-stat-label,
+.ntr-food-card.theme-dark .ntr-stat-card-protein .ntr-stat-label {
+  color: #86efac;
+  font-weight: 500;
+}
+
+.ntr-stat-card-carbs .ntr-stat-label {
+  color: #f59e0b;
+  font-weight: 600;
+}
+
+.theme-dark .ntr-stat-card-carbs .ntr-stat-label,
+.ntr-food-card.theme-dark .ntr-stat-card-carbs .ntr-stat-label {
+  color: #fbbf24;
+  font-weight: 500;
+}
+
+.ntr-stat-card-fat .ntr-stat-label {
+  color: #8b5cf6;
+  font-weight: 600;
+}
+
+.theme-dark .ntr-stat-card-fat .ntr-stat-label,
+.ntr-food-card.theme-dark .ntr-stat-card-fat .ntr-stat-label {
+  color: #c4b5fd;
+  font-weight: 500;
+}
+
+/* ============================================
+   Progress Bars & Summary Cards (Batch 4)
+   ============================================ */
+
+/* Summary card container */
+.ntr-summary-card {
+  background: linear-gradient(135deg, rgb(240 240 240 / 80%), rgba(248, 250, 252, 0.7));
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: 16px;
+  padding: 20px;
+  margin: 12px 0;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.9);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+}
+
+.theme-dark .ntr-summary-card,
+.ntr-summary-card.theme-dark {
+  background: linear-gradient(135deg, rgba(51, 65, 85, 0.6), rgba(30, 41, 59, 0.5));
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.08);
+}
+
+/* Summary title */
+.ntr-summary-title {
+  color: #0f172a;
+  margin-top: 0;
+  margin-bottom: 16px;
+  font-size: 18px;
+  font-weight: 500;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  letter-spacing: -0.5px;
+}
+
+.theme-dark .ntr-summary-title,
+.ntr-summary-card.theme-dark .ntr-summary-title {
+  color: #f8fafc;
+}
+
+/* Divider line */
+.ntr-summary-divider {
+  background: linear-gradient(90deg, transparent, rgba(80, 80, 80, 0.4), transparent);
+  height: 1px;
+  border: none;
+  margin-bottom: 16px;
+}
+
+.theme-dark .ntr-summary-divider,
+.ntr-summary-card.theme-dark .ntr-summary-divider {
+  background: linear-gradient(90deg, transparent, rgba(60, 60, 60, 0.8), transparent);
+}
+
+/* Progress row (contains label, values, percentage, and bar) */
+.ntr-progress-row {
+  margin-bottom: 12px;
+}
+
+/* Progress label (emoji + name) */
+.ntr-progress-label {
+  color: #333;
+  font-weight: 500;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 15px;
+  letter-spacing: -0.3px;
+}
+
+.theme-dark .ntr-progress-label,
+.ntr-summary-card.theme-dark .ntr-progress-label {
+  color: #e0e0e0;
+}
+
+/* Progress values (current / goal unit) */
+.ntr-progress-values {
+  color: #666;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 13px;
+  font-weight: 400;
+}
+
+.theme-dark .ntr-progress-values,
+.ntr-summary-card.theme-dark .ntr-progress-values {
+  color: #a0a0a0;
+}
+
+/* Progress percentage */
+.ntr-progress-percentage {
+  font-weight: 500;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 14px;
+}
+
+/* Progress track (background bar) */
+.ntr-progress-track {
+  width: 100%;
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.02), rgba(0, 0, 0, 0.01));
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: 10px;
+  height: 16px;
+  margin: 6px 0 12px 0;
+  padding: 2px;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.06), 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+.theme-dark .ntr-progress-track,
+.ntr-summary-card.theme-dark .ntr-progress-track {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01));
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1), 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+
+/* Progress fill (colored bar) - uses CSS custom properties for dynamic colors */
+.ntr-progress-fill {
+  height: 100%;
+  border-radius: 8px;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  /* Dynamic colors set via inline style using CSS custom properties:
+     --progress-r, --progress-g, --progress-b, --progress-opacity-base */
+  background: linear-gradient(135deg, 
+    rgba(var(--progress-r), var(--progress-g), var(--progress-b), var(--progress-opacity-base, 0.3)) 0%,
+    rgba(var(--progress-r), var(--progress-g), var(--progress-b), calc(var(--progress-opacity-base, 0.3) * 0.8)) 50%,
+    rgba(var(--progress-r), var(--progress-g), var(--progress-b), calc(var(--progress-opacity-base, 0.3) * 0.6)) 100%);
+  border: 1px solid rgba(var(--progress-r), var(--progress-g), var(--progress-b), var(--progress-border-opacity, 0.45));
+}
+
+.theme-dark .ntr-progress-fill,
+.ntr-summary-card.theme-dark .ntr-progress-fill {
+  background: linear-gradient(135deg, 
+    rgba(var(--progress-r), var(--progress-g), var(--progress-b), var(--progress-opacity-base, 0.45)) 0%,
+    rgba(var(--progress-r), var(--progress-g), var(--progress-b), calc(var(--progress-opacity-base, 0.45) * 0.8)) 50%,
+    rgba(var(--progress-r), var(--progress-g), var(--progress-b), calc(var(--progress-opacity-base, 0.45) * 0.6)) 100%);
+  border: 1px solid rgba(var(--progress-r), var(--progress-g), var(--progress-b), var(--progress-border-opacity, 0.6));
+}
+
+/* Glass shine effect on progress bar */
+.ntr-progress-shine {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50%;
+  background: linear-gradient(180deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.036) 70%, transparent 100%);
+  border-radius: 8px 8px 0 0;
+}
+
+.theme-dark .ntr-progress-shine,
+.ntr-summary-card.theme-dark .ntr-progress-shine {
+  background: linear-gradient(180deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.018) 70%, transparent 100%);
+}
+
+/* Inner glow on progress bar */
+.ntr-progress-glow {
+  position: absolute;
+  inset: 0;
+  border-radius: 8px;
+  box-shadow: inset 0 0 8px rgba(255,255,255,0.04);
+}
+
+.theme-dark .ntr-progress-glow,
+.ntr-summary-card.theme-dark .ntr-progress-glow {
+  box-shadow: inset 0 0 8px rgba(255,255,255,0.03);
+}
+
+/* Overall progress section */
+.ntr-overall-progress {
+  text-align: center;
+  margin: 32px 0 0;
+}
+
+/* Overall progress border wrapper */
+.ntr-overall-progress-border {
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.15), rgba(100, 100, 100, 0.1));
+  padding: 1px;
+  border-radius: 13px;
+}
+
+.theme-dark .ntr-overall-progress-border,
+.ntr-summary-card.theme-dark .ntr-overall-progress-border {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(148, 163, 184, 0.15));
+}
+
+/* Overall progress inner container */
+.ntr-overall-progress-inner {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(248, 248, 248, 0.15));
+  border-radius: 12px;
+  padding: 12px;
+}
+
+.theme-dark .ntr-overall-progress-inner,
+.ntr-summary-card.theme-dark .ntr-overall-progress-inner {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* Overall progress title */
+.ntr-overall-progress-title {
+  color: #0f172a;
+  margin: 0;
+  font-size: 20px;
+  font-weight: 500;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  letter-spacing: -0.8px;
+}
+
+.theme-dark .ntr-overall-progress-title,
+.ntr-summary-card.theme-dark .ntr-overall-progress-title {
+  color: #f8fafc;
 } 

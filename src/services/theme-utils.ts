@@ -1,14 +1,7 @@
-import { PluginSettings } from '../types/settings';
-
 export class ThemeUtils {
-  constructor(private settings: PluginSettings) {}
-
   getEffectiveTheme(): 'light' | 'dark' {
-    if (this.settings.displayTheme === 'auto') {
-      // Auto-detect Obsidian's theme
-      return document.body.classList.contains('theme-dark') ? 'dark' : 'light';
-    }
-    return this.settings.displayTheme as 'light' | 'dark';
+    // Always detect from Obsidian's theme
+    return document.body.classList.contains('theme-dark') ? 'dark' : 'light';
   }
 
 

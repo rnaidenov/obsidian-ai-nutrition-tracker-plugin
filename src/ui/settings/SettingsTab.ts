@@ -184,27 +184,5 @@ export class SettingsTab extends PluginSettingTab {
             await this.plugin.saveSettings();
           });
       });
-
-
-
-    // Display Settings Section
-    new Setting(containerEl)
-      .setName('Display')
-      .setHeading();
-
-    new Setting(containerEl)
-      .setName('Display theme')
-      .setDesc('Theme for generated food logs')
-      .addDropdown(dropdown => {
-        dropdown
-          .addOption('auto', 'Auto (match Obsidian)')
-          .addOption('light', 'Light theme')
-          .addOption('dark', 'Dark theme')
-          .setValue(this.plugin.settings.displayTheme)
-          .onChange(async (value: 'auto' | 'light' | 'dark') => {
-            this.plugin.settings.displayTheme = value;
-            await this.plugin.saveSettings();
-          });
-      });
   }
 } 
