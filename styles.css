@@ -1161,20 +1161,22 @@
 
 /* CTA Button Styles */
 .nutrition-add-cta-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  font-size: 14px;
+  font-weight: 500;
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.8), rgba(248, 250, 252, 0.7), rgba(241, 245, 249, 0.6));
   backdrop-filter: blur(15px);
   -webkit-backdrop-filter: blur(15px);
-  border: 1px solid rgba(100, 116, 139, 0.4);
+  border: 0.5px solid rgba(100, 116, 139, 0.4);
   border-radius: 20px;
-  padding: 24px 48px;
   color: #0f172a;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.4s ease-out;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.8), inset 0 -1px 0 rgba(0, 0, 0, 0.03);
-  font-weight: 600;
-  font-size: 18px;
   text-align: center;
-  display: block;
   width: 100%;
   margin: 40px auto;
   letter-spacing: 0.05em;
@@ -1190,21 +1192,21 @@
 }
 
 .nutrition-add-cta-btn:hover {
-  transform: translateY(-2px);
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(248, 250, 252, 0.8), rgba(241, 245, 249, 0.7));
-  box-shadow: 0 16px 64px rgba(0, 0, 0, 0.12), 0 8px 32px rgba(0, 0, 0, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.9), inset 0 -1px 0 rgba(0, 0, 0, 0.05);
-  border-color: rgba(100, 116, 139, 0.6);
-  padding: 24px 48px;
-  letter-spacing: 0.06em;
+  transform: translateY(-0.5px);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.82), rgba(248, 250, 252, 0.72), rgba(241, 245, 249, 0.62));
+  box-shadow: 0 9px 36px rgba(0, 0, 0, 0.09), 0 5px 18px rgba(0, 0, 0, 0.045), inset 0 1px 0 rgba(255, 255, 255, 0.82), inset 0 -1px 0 rgba(0, 0, 0, 0.035);
+  border-color: rgba(100, 116, 139, 0.45);
+  padding: 24px;
+  letter-spacing: 0.05em;
 }
 
 .theme-dark .nutrition-add-cta-btn:hover {
-  background: linear-gradient(135deg, rgba(15, 15, 25, 0.3), rgba(20, 20, 35, 0.4), rgba(10, 10, 20, 0.2));
-  box-shadow: 0 16px 64px rgba(0, 0, 0, 0.3), 0 8px 32px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.03);
-  border-color: rgba(140, 140, 160, 0.5);
-  color: #f1f5f9;
-  padding: 24px 48px;
-  letter-spacing: 0.06em;
+  background: linear-gradient(135deg, rgba(11, 11, 21, 0.22), rgba(16, 16, 31, 0.32), rgba(6, 6, 16, 0.12));
+  box-shadow: 0 9px 36px rgba(0, 0, 0, 0.22), 0 5px 18px rgba(0, 0, 0, 0.11), inset 0 1px 0 rgba(255, 255, 255, 0.022);
+  border-color: rgba(125, 125, 145, 0.35);
+  color: #e5eaf0;
+  padding: 24px;
+  letter-spacing: 0.05em;
 }
 
 /* Delete Button Styles */
@@ -1746,7 +1748,7 @@
 
 /* Overall progress border wrapper */
 .ntr-overall-progress-border {
-  background: linear-gradient(135deg, rgba(0, 0, 0, 0.15), rgba(100, 100, 100, 0.1));
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.10), rgba(100, 100, 100, 0.025));
   padding: 1px;
   border-radius: 13px;
 }
@@ -1758,7 +1760,7 @@
 
 /* Overall progress inner container */
 .ntr-overall-progress-inner {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(248, 248, 248, 0.15));
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.7), rgba(248, 248, 248, 0.7));
   border-radius: 12px;
   padding: 12px;
 }
