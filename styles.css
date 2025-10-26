@@ -1,5 +1,13 @@
 /* Nutrition Tracker Plugin Styles */
 
+/* CSS Variables for customizable emojis */
+:root {
+  --ntr-emoji-calories: '🔥';
+  --ntr-emoji-protein: '💪';
+  --ntr-emoji-carbs: '🌾';
+  --ntr-emoji-fat: '🥑';
+}
+
 .nutrition-tracker-modal {
   min-width: 600px;
   max-width: 800px;
@@ -1477,6 +1485,40 @@
 .ntr-stat-emoji {
   font-size: 16px;
   margin-bottom: 2px;
+}
+
+/* Use CSS variables for dynamic emoji content */
+.ntr-stat-emoji-calories::before {
+  content: var(--ntr-emoji-calories);
+}
+
+.ntr-stat-emoji-protein::before {
+  content: var(--ntr-emoji-protein);
+}
+
+.ntr-stat-emoji-carbs::before {
+  content: var(--ntr-emoji-carbs);
+}
+
+.ntr-stat-emoji-fat::before {
+  content: var(--ntr-emoji-fat);
+}
+
+/* Progress bar emoji classes */
+.ntr-progress-emoji-calories::before {
+  content: var(--ntr-emoji-calories);
+}
+
+.ntr-progress-emoji-protein::before {
+  content: var(--ntr-emoji-protein);
+}
+
+.ntr-progress-emoji-carbs::before {
+  content: var(--ntr-emoji-carbs);
+}
+
+.ntr-progress-emoji-fat::before {
+  content: var(--ntr-emoji-fat);
 }
 
 /* Numeric value in stat cards */

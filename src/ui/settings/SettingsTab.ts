@@ -10,6 +10,73 @@ export class SettingsTab extends PluginSettingTab {
     this.plugin = plugin;
   }
 
+  private createEmojiPicker(
+    containerEl: HTMLElement,
+    name: string,
+    desc: string,
+    currentValue: string,
+    defaultEmoji: string,
+    emojis: string[],
+    onChange: (value: string) => Promise<void>
+  ): void {
+    const setting = new Setting(containerEl)
+      .setName(name)
+      .setDesc(desc);
+
+    setting.addText(text => {
+      text
+        .setPlaceholder(defaultEmoji)
+        .setValue(currentValue)
+        .onChange(async (value) => {
+          await onChange(value || defaultEmoji);
+        });
+      
+      text.inputEl.style.width = '80px';
+      text.inputEl.style.fontSize = '24px';
+      text.inputEl.style.textAlign = 'center';
+    });
+
+    // Add emoji picker buttons
+    const pickerContainer = setting.controlEl.createDiv({ cls: 'emoji-picker-container' });
+    pickerContainer.style.display = 'flex';
+    pickerContainer.style.flexWrap = 'wrap';
+    pickerContainer.style.gap = '4px';
+    pickerContainer.style.marginTop = '8px';
+
+    emojis.forEach(emoji => {
+      const button = pickerContainer.createEl('button', {
+        text: emoji,
+        cls: 'emoji-picker-button'
+      });
+      button.style.fontSize = '20px';
+      button.style.padding = '4px 8px';
+      button.style.border = '1px solid var(--background-modifier-border)';
+      button.style.borderRadius = '4px';
+      button.style.background = 'var(--background-primary)';
+      button.style.cursor = 'pointer';
+      button.style.transition = 'all 0.2s';
+
+      button.addEventListener('mouseenter', () => {
+        button.style.background = 'var(--background-modifier-hover)';
+        button.style.transform = 'scale(1.1)';
+      });
+
+      button.addEventListener('mouseleave', () => {
+        button.style.background = 'var(--background-primary)';
+        button.style.transform = 'scale(1)';
+      });
+
+      button.addEventListener('click', async (e) => {
+        e.preventDefault();
+        const textInput = setting.controlEl.querySelector('input') as HTMLInputElement;
+        if (textInput) {
+          textInput.value = emoji;
+          await onChange(emoji);
+        }
+      });
+    });
+  }
+
   display(): void {
     const { containerEl } = this;
     containerEl.empty();
@@ -137,6 +204,67 @@ export class SettingsTab extends PluginSettingTab {
           this.plugin.settings.nutritionGoals.fat = fat;
           await this.plugin.saveSettings();
         }));
+
+    // Appearance Section
+    new Setting(containerEl)
+      .setName('Appearance')
+      .setHeading();
+
+    // Calories emoji picker
+    this.createEmojiPicker(
+      containerEl,
+      'Calories emoji',
+      'Emoji to display for calories',
+      this.plugin.settings.appearance.caloriesEmoji,
+      '🔥',
+      ['🔥', '⚡', '💥', '🌟', '☀️', '🔆', '💫', '✨', '🎯', '📊'],
+      async (value) => {
+        this.plugin.settings.appearance.caloriesEmoji = value;
+        await this.plugin.saveSettings();
+      }
+    );
+
+    // Protein emoji picker
+    this.createEmojiPicker(
+      containerEl,
+      'Protein emoji',
+      'Emoji to display for protein',
+      this.plugin.settings.appearance.proteinEmoji,
+      '💪',
+      ['💪', '🥩', '🍗', '🥚', '🐟', '🦐', '🧀', '🥛', '🫘', '🌰'],
+      async (value) => {
+        this.plugin.settings.appearance.proteinEmoji = value;
+        await this.plugin.saveSettings();
+      }
+    );
+
+    // Carbs emoji picker
+    this.createEmojiPicker(
+      containerEl,
+      'Carbs emoji',
+      'Emoji to display for carbohydrates',
+      this.plugin.settings.appearance.carbsEmoji,
+      '🌾',
+      ['🌾', '🍞', '🍚', '🍝', '🥐', '🥖', '🥨', '🍠', '🥔', '🌽'],
+      async (value) => {
+        this.plugin.settings.appearance.carbsEmoji = value;
+        await this.plugin.saveSettings();
+      }
+    );
+
+    // Fat emoji picker
+    this.createEmojiPicker(
+      containerEl,
+      'Fat emoji',
+      'Emoji to display for fat',
+      this.plugin.settings.appearance.fatEmoji,
+      '🥑',
+      ['🥑', '🧈', '🫒', '🥜', '🌰', '🥥', '🧀', '🍳', '🥓', '🐟'],
+      async (value) => {
+        this.plugin.settings.appearance.fatEmoji = value;
+        await this.plugin.saveSettings();
+      }
+    );
 
     // Storage Section
     new Setting(containerEl)

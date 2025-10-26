@@ -48,22 +48,22 @@ export class LayoutGenerator {
       
       content += `  <div class="ntr-stats-grid">\n`;
       content += `    <div class="ntr-stat-card ntr-stat-card-calories">\n`;
-      content += `      <div class="ntr-stat-emoji">🔥</div>\n`;
+      content += `      <div class="ntr-stat-emoji ntr-stat-emoji-calories"></div>\n`;
       content += `      <div class="ntr-stat-value">${item.calories}</div>\n`;
       content += `      <div class="ntr-stat-label">kcal</div>\n`;
         content += `    </div>\n`;
       content += `    <div class="ntr-stat-card ntr-stat-card-protein">\n`;
-      content += `      <div class="ntr-stat-emoji">💪</div>\n`;
+      content += `      <div class="ntr-stat-emoji ntr-stat-emoji-protein"></div>\n`;
       content += `      <div class="ntr-stat-value">${item.protein}g</div>\n`;
       content += `      <div class="ntr-stat-label">protein</div>\n`;
         content += `    </div>\n`;
       content += `    <div class="ntr-stat-card ntr-stat-card-carbs">\n`;
-      content += `      <div class="ntr-stat-emoji">🌾</div>\n`;
+      content += `      <div class="ntr-stat-emoji ntr-stat-emoji-carbs"></div>\n`;
       content += `      <div class="ntr-stat-value">${item.carbs}g</div>\n`;
       content += `      <div class="ntr-stat-label">carbs</div>\n`;
         content += `    </div>\n`;
       content += `    <div class="ntr-stat-card ntr-stat-card-fat">\n`;
-      content += `      <div class="ntr-stat-emoji">🥑</div>\n`;
+      content += `      <div class="ntr-stat-emoji ntr-stat-emoji-fat"></div>\n`;
       content += `      <div class="ntr-stat-value">${item.fat}g</div>\n`;
       content += `      <div class="ntr-stat-label">fat</div>\n`;
         content += `    </div>\n`;
@@ -129,10 +129,10 @@ ${nutritionRows}  <div class="ntr-overall-progress">
     const isDark = this.themeUtils.getEffectiveTheme() === 'dark';
     
     const nutrients = [
-      { name: 'Calories', emoji: '🔥', current: totals.calories, goal: goals.calories, unit: 'kcal' },
-      { name: 'Protein', emoji: '💪', current: totals.protein, goal: goals.protein, unit: 'g' },
-      { name: 'Carbs', emoji: '🌾', current: totals.carbs, goal: goals.carbs, unit: 'g' },
-      { name: 'Fat', emoji: '🥑', current: totals.fat, goal: goals.fat, unit: 'g' }
+      { name: 'Calories', emojiClass: 'ntr-progress-emoji-calories', current: totals.calories, goal: goals.calories, unit: 'kcal' },
+      { name: 'Protein', emojiClass: 'ntr-progress-emoji-protein', current: totals.protein, goal: goals.protein, unit: 'g' },
+      { name: 'Carbs', emojiClass: 'ntr-progress-emoji-carbs', current: totals.carbs, goal: goals.carbs, unit: 'g' },
+      { name: 'Fat', emojiClass: 'ntr-progress-emoji-fat', current: totals.fat, goal: goals.fat, unit: 'g' }
     ];
     
     for (const nutrient of nutrients) {
@@ -151,7 +151,7 @@ ${nutritionRows}  <div class="ntr-overall-progress">
         ? `<div class="ntr-progress-shine"></div><div class="ntr-progress-glow"></div>` 
         : '';
       
-      content += `  <div class="ntr-progress-row"><span class="ntr-progress-label">${nutrient.emoji} ${nutrient.name}:</span> <span class="ntr-progress-values">${Math.round(nutrient.current)} / ${nutrient.goal} ${nutrient.unit}</span> <span class="ntr-progress-percentage" style="color: ${textColor};">(${percentage}%)</span><div class="ntr-progress-track"><div class="ntr-progress-fill" style="width: ${Math.min(percentage, 100)}%; --progress-r: ${r}; --progress-g: ${g}; --progress-b: ${b}; --progress-opacity-base: ${baseOpacity}; --progress-border-opacity: ${borderOpacity};">${shineAndGlow}</div></div></div>
+      content += `  <div class="ntr-progress-row"><span class="ntr-progress-label"><span class="${nutrient.emojiClass}"></span> ${nutrient.name}:</span> <span class="ntr-progress-values">${Math.round(nutrient.current)} / ${nutrient.goal} ${nutrient.unit}</span> <span class="ntr-progress-percentage" style="color: ${textColor};">(${percentage}%)</span><div class="ntr-progress-track"><div class="ntr-progress-fill" style="width: ${Math.min(percentage, 100)}%; --progress-r: ${r}; --progress-g: ${g}; --progress-b: ${b}; --progress-opacity-base: ${baseOpacity}; --progress-border-opacity: ${borderOpacity};">${shineAndGlow}</div></div></div>
 `;
     }
     

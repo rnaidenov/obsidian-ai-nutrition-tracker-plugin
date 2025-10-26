@@ -1,5 +1,12 @@
 import { NutritionGoals } from './nutrition';
 
+export interface AppearanceSettings {
+  caloriesEmoji: string;
+  proteinEmoji: string;
+  carbsEmoji: string;
+  fatEmoji: string;
+}
+
 export interface PluginSettings {
   openRouterApiKey: string;
   llmModel: string;
@@ -9,6 +16,7 @@ export interface PluginSettings {
   logStoragePath: string;
   mealStoragePath: string;
   imageStoragePath: string;
+  appearance: AppearanceSettings;
 }
 
 export const DEFAULT_SETTINGS: PluginSettings = {
@@ -24,5 +32,11 @@ export const DEFAULT_SETTINGS: PluginSettings = {
   },
   logStoragePath: 'tracker/health/food/log',
   mealStoragePath: 'tracker/health/food/meals',
-  imageStoragePath: 'tracker/health/food/log/images'
+  imageStoragePath: 'tracker/health/food/log/images',
+  appearance: {
+    caloriesEmoji: '🔥',
+    proteinEmoji: '💪',
+    carbsEmoji: '🌾',
+    fatEmoji: '🥑'
+  }
 }; 
