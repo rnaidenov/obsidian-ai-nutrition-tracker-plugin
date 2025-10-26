@@ -108,12 +108,10 @@ export class LayoutGenerator {
 
     const nutritionRows = this.generateModernProgressBars(totals, goals);
     
-    summary += `
-<div class="ntr-summary-card ${themeClass}">
+    summary += `<div class="ntr-summary-card ${themeClass}">
   <h3 class="ntr-summary-title">🎯 Totals vs Goals</h3>
   <div class="ntr-summary-divider"></div>
-  ${nutritionRows}
-  <div class="ntr-overall-progress">
+${nutritionRows}  <div class="ntr-overall-progress">
     <div class="ntr-overall-progress-border">
       <div class="ntr-overall-progress-inner">
         <h3 class="ntr-overall-progress-title">${this.themeUtils.getOverallStatusEmoji(overallProgress)} Overall Progress: ${overallProgress}%</h3>
@@ -142,8 +140,6 @@ export class LayoutGenerator {
       const percentage = this.contentParser.calculatePercentage(nutrient.current, nutrient.goal);
       const { gradient, textColor, borderColor } = this.themeUtils.getProgressGradient(percentage, isDark);
       
-      // Extract RGB values from gradient for CSS custom properties
-      // The gradient format is: linear-gradient(135deg, rgba(r, g, b, opacity) ...)
       const rgbMatch = gradient.match(/rgba\((\d+),\s*(\d+),\s*(\d+),/);
       const r = rgbMatch ? rgbMatch[1] : '100';
       const g = rgbMatch ? rgbMatch[2] : '100';
@@ -152,22 +148,14 @@ export class LayoutGenerator {
       const baseOpacity = isDark ? 0.45 : 0.3;
       const borderOpacity = isDark ? 0.6 : 0.45;
       
-      content += `<div class="ntr-progress-row">`;
-      content += `<span class="ntr-progress-label">${nutrient.emoji} ${nutrient.name}:</span> `;
-      content += `<span class="ntr-progress-values">${Math.round(nutrient.current)} / ${nutrient.goal} ${nutrient.unit}</span> `;
-      content += `<span class="ntr-progress-percentage" style="color: ${textColor};">(${percentage}%)</span>\n`;
+      const shineAndGlow = percentage > 0 
+        ? `<div class="ntr-progress-shine"></div><div class="ntr-progress-glow"></div>` 
+        : '';
       
-      content += `<div class="ntr-progress-track">`;
-      content += `<div class="ntr-progress-fill" style="width: ${Math.min(percentage, 100)}%; --progress-r: ${r}; --progress-g: ${g}; --progress-b: ${b}; --progress-opacity-base: ${baseOpacity}; --progress-border-opacity: ${borderOpacity};">`;
-      
-      if (percentage > 0) {
-        content += `<div class="ntr-progress-shine"></div>`;
-        content += `<div class="ntr-progress-glow"></div>`;
-      }
-      
-      content += `</div>`;
-      content += `</div>`;
-      content += `</div>\n\n`;
+      content += `<div class="ntr-progress-row"><span class="ntr-progress-label">${nutrient.emoji} ${nutrient.name}:</span> <span class="ntr-progress-values">${Math.round(nutrient.current)} / ${nutrient.goal} ${nutrient.unit}</span> <span class="ntr-progress-percentage" style="color: ${textColor};">(${percentage}%)</span>
+<div class="ntr-progress-track"><div class="ntr-progress-fill" style="width: ${Math.min(percentage, 100)}%; --progress-r: ${r}; --progress-g: ${g}; --progress-b: ${b}; --progress-opacity-base: ${baseOpacity}; --progress-border-opacity: ${borderOpacity};">${shineAndGlow}</div></div></div>
+
+`;
     }
     
     return content;
