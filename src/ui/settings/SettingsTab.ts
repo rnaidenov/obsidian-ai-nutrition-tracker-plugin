@@ -158,8 +158,7 @@ export class SettingsTab extends PluginSettingTab {
       .setHeading();
     
     new Setting(containerEl)
-      .setName('Daily calories')
-      .setDesc('Your daily calorie target')
+      .setName('Target daily calories')
       .addText(text => text
         .setPlaceholder('2000')
         .setValue(this.plugin.settings.nutritionGoals.calories.toString())
@@ -170,8 +169,7 @@ export class SettingsTab extends PluginSettingTab {
         }));
 
     new Setting(containerEl)
-      .setName('Daily protein (g)')
-      .setDesc('Your daily protein target in grams')
+      .setName('Target daily protein (g)')
       .addText(text => text
         .setPlaceholder('150')
         .setValue(this.plugin.settings.nutritionGoals.protein.toString())
@@ -182,8 +180,7 @@ export class SettingsTab extends PluginSettingTab {
         }));
 
     new Setting(containerEl)
-      .setName('Daily carbs (g)')
-      .setDesc('Your daily carbohydrates target in grams')
+      .setName('Target daily carbs (g)')
       .addText(text => text
         .setPlaceholder('100')
         .setValue(this.plugin.settings.nutritionGoals.carbs.toString())
@@ -194,8 +191,7 @@ export class SettingsTab extends PluginSettingTab {
         }));
 
     new Setting(containerEl)
-      .setName('Daily fat (g)')
-      .setDesc('Your daily fat target in grams')
+      .setName('Target daily fat (g)')
       .addText(text => text
         .setPlaceholder('80')
         .setValue(this.plugin.settings.nutritionGoals.fat.toString())
@@ -213,8 +209,8 @@ export class SettingsTab extends PluginSettingTab {
     // Calories emoji picker
     this.createEmojiPicker(
       containerEl,
-      'Calories emoji',
-      'Emoji to display for calories',
+      'Calories icon',
+      'Choose icon for calories',
       this.plugin.settings.appearance.caloriesEmoji,
       '🔥',
       ['🔥', '⚡', '💥', '🌟', '☀️', '🔆', '💫', '✨', '🎯', '📊'],
@@ -227,8 +223,8 @@ export class SettingsTab extends PluginSettingTab {
     // Protein emoji picker
     this.createEmojiPicker(
       containerEl,
-      'Protein emoji',
-      'Emoji to display for protein',
+      'Protein icon',
+      'Choose icon for protein',
       this.plugin.settings.appearance.proteinEmoji,
       '💪',
       ['💪', '🥩', '🍗', '🥚', '🐟', '🦐', '🧀', '🥛', '🫘', '🌰'],
@@ -241,8 +237,8 @@ export class SettingsTab extends PluginSettingTab {
     // Carbs emoji picker
     this.createEmojiPicker(
       containerEl,
-      'Carbs emoji',
-      'Emoji to display for carbohydrates',
+      'Carbs icon',
+      'Choose icon for carbohydrates',
       this.plugin.settings.appearance.carbsEmoji,
       '🌾',
       ['🌾', '🍞', '🍚', '🍝', '🥐', '🥖', '🥨', '🍠', '🥔', '🌽'],
@@ -255,8 +251,8 @@ export class SettingsTab extends PluginSettingTab {
     // Fat emoji picker
     this.createEmojiPicker(
       containerEl,
-      'Fat emoji',
-      'Emoji to display for fat',
+      'Fat icon',
+      'Choose icon for fat',
       this.plugin.settings.appearance.fatEmoji,
       '🥑',
       ['🥑', '🧈', '🫒', '🥜', '🌰', '🥥', '🧀', '🍳', '🥓', '🐟'],
@@ -272,8 +268,8 @@ export class SettingsTab extends PluginSettingTab {
       .setHeading();
     
     new Setting(containerEl)
-      .setName('Food log storage path')
-      .setDesc('Folder path where daily food logs will be stored')
+      .setName('Food log folder')
+      .setDesc('Location for daily logs')
       .addText(text => {
         new FolderSuggest(this.app, text.inputEl);
         text
@@ -286,8 +282,8 @@ export class SettingsTab extends PluginSettingTab {
       });
 
     new Setting(containerEl)
-      .setName('Meal storage path')
-      .setDesc('Folder path where saved meals will be stored')
+      .setName('Meal folder')
+      .setDesc('Location for saved meals')
       .addText(text => {
         new FolderSuggest(this.app, text.inputEl);
         text
@@ -300,8 +296,8 @@ export class SettingsTab extends PluginSettingTab {
       });
 
     new Setting(containerEl)
-      .setName('Image storage path')
-      .setDesc('Folder path where food images will be stored')
+      .setName('Image folder')
+      .setDesc('Location for food images')
       .addText(text => {
         new FolderSuggest(this.app, text.inputEl);
         text

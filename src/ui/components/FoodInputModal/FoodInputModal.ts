@@ -27,6 +27,7 @@ export class FoodInputModal extends Modal {
   private editingContext: 'meal' | 'foodlog' = 'foodlog';
   private targetMealId: string | null = null;
   private onCloseCallback?: () => void;
+  private foodDescriptionInput: HTMLTextAreaElement | null = null;
 
   private mealManager: MealManager;
   private imageManager: ImageManager;
@@ -95,10 +96,11 @@ export class FoodInputModal extends Modal {
       );
     }
     
-    createFoodDescriptionInput(
+    this.foodDescriptionInput = createFoodDescriptionInput(
       contentEl, 
       this.description, 
-      this.handleDescriptionChange.bind(this)
+      this.handleDescriptionChange.bind(this),
+      this.handleProcessFood.bind(this)
     );
     
     this.imageManager.createImageUploadButton(
@@ -136,6 +138,14 @@ export class FoodInputModal extends Modal {
     
     // Update button state
     this.updateButtonState();
+    
+    // Focus the food description input
+    if (this.foodDescriptionInput) {
+      // Use setTimeout to ensure the modal is fully rendered
+      setTimeout(() => {
+        this.foodDescriptionInput?.focus();
+      }, 0);
+    }
   }
 
   private async handleMealSelect(mealId: string) {

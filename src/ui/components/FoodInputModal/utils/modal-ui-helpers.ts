@@ -91,8 +91,11 @@ export function createSelectedMealsDisplay(
 export function createFoodDescriptionInput(
   contentEl: HTMLElement, 
   description: string, 
-  onDescriptionChange: (value: string) => void
-) {
+  onDescriptionChange: (value: string) => void,
+  onSubmit: () => void
+): HTMLTextAreaElement {
+  let textareaEl: HTMLTextAreaElement;
+  
   const foodDescSetting = new Setting(contentEl)
     .setName('Additional food description')
     .setDesc('Add extra items or details (optional - will be processed with AI)')
@@ -105,9 +108,20 @@ export function createFoodDescriptionInput(
         });
       
       text.inputEl.addClass('nutrition-tracker-food-input');
+      textareaEl = text.inputEl;
+      
+      // Add Enter key handler (Ctrl/Cmd+Enter to submit, plain Enter for new line)
+      text.inputEl.addEventListener('keydown', (e: KeyboardEvent) => {
+        if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+          e.preventDefault();
+          onSubmit();
+        }
+      });
     });
   
   foodDescSetting.settingEl.addClass('nutrition-tracker-food-setting');
+  
+  return textareaEl!;
 }
 
 export function createSaveAsMealToggle(
