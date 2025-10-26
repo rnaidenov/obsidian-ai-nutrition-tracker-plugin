@@ -47,7 +47,7 @@ export class FoodInputModal extends Modal {
     // Initialize helper classes
     this.mealManager = new MealManager(fileService);
     this.imageManager = new ImageManager();
-    this.foodProcessor = new FoodProcessor(settings, llmService, fileService);
+    this.foodProcessor = new FoodProcessor(this.app, settings, llmService, fileService);
     this.buttonStateManager = new ButtonStateManager(this.processButton, this.processingIndicator);
   }
 

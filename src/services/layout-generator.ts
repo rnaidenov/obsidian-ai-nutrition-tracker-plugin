@@ -119,7 +119,6 @@ ${nutritionRows}  <div class="ntr-overall-progress">
     </div>
   </div>
 </div>
-
 `;
     
     return summary;
@@ -152,9 +151,7 @@ ${nutritionRows}  <div class="ntr-overall-progress">
         ? `<div class="ntr-progress-shine"></div><div class="ntr-progress-glow"></div>` 
         : '';
       
-      content += `<div class="ntr-progress-row"><span class="ntr-progress-label">${nutrient.emoji} ${nutrient.name}:</span> <span class="ntr-progress-values">${Math.round(nutrient.current)} / ${nutrient.goal} ${nutrient.unit}</span> <span class="ntr-progress-percentage" style="color: ${textColor};">(${percentage}%)</span>
-<div class="ntr-progress-track"><div class="ntr-progress-fill" style="width: ${Math.min(percentage, 100)}%; --progress-r: ${r}; --progress-g: ${g}; --progress-b: ${b}; --progress-opacity-base: ${baseOpacity}; --progress-border-opacity: ${borderOpacity};">${shineAndGlow}</div></div></div>
-
+      content += `  <div class="ntr-progress-row"><span class="ntr-progress-label">${nutrient.emoji} ${nutrient.name}:</span> <span class="ntr-progress-values">${Math.round(nutrient.current)} / ${nutrient.goal} ${nutrient.unit}</span> <span class="ntr-progress-percentage" style="color: ${textColor};">(${percentage}%)</span><div class="ntr-progress-track"><div class="ntr-progress-fill" style="width: ${Math.min(percentage, 100)}%; --progress-r: ${r}; --progress-g: ${g}; --progress-b: ${b}; --progress-opacity-base: ${baseOpacity}; --progress-border-opacity: ${borderOpacity};">${shineAndGlow}</div></div></div>
 `;
     }
     

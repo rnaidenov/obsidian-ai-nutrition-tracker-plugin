@@ -41,8 +41,20 @@ export class MealManager {
       await this.saveMealsToFile(meals);
       
       // Create individual markdown note for the meal
-      await this.createMealNote(meal);
-      
+      const noteResult = await this.createMealNote(meal);
+
+      // Open the newly created meal note
+      if (noteResult.createdNewFile) {
+        try {
+          const file = this.vault.getAbstractFileByPath(noteResult.filePath);
+          if (file instanceof TFile) {
+            await this.app.workspace.getLeaf().openFile(file);
+          }
+        } catch (error) {
+          console.error('Error opening newly created meal note:', error);
+        }
+      }
+
       new Notice(`✅ Meal "${name}" saved successfully`);
       return meal;
     } catch (error) {
@@ -138,23 +150,29 @@ export class MealManager {
     }
   }
 
-  private async createMealNote(meal: Meal): Promise<void> {
+  private async createMealNote(meal: Meal): Promise<{ createdNewFile: boolean; filePath: string }> {
     try {
       // Sanitize meal name for filename
       const sanitizedName = this.fileUtils.sanitizeMealName(meal.name);
       const filename = `${sanitizedName}.md`;
       const notePath = normalizePath(`${this.settings.mealStoragePath}/${filename}`);
-      
+
       const content = await this.generateMealNoteContent(meal);
-      
+
       const existingFile = this.vault.getAbstractFileByPath(notePath);
+      let createdNewFile = false;
+
       if (existingFile && existingFile instanceof TFile) {
         await this.vault.process(existingFile, () => content);
       } else {
         await this.vault.create(notePath, content);
+        createdNewFile = true;
       }
+
+      return { createdNewFile, filePath: notePath };
     } catch (error) {
       new Notice(`Warning: Failed to create meal note: ${error.message}`);
+      throw error;
     }
   }
 
@@ -163,7 +181,7 @@ export class MealManager {
       if (oldMeal.name !== newMeal.name) {
         await this.deleteMealNote(oldMeal);
       }
-      
+
       await this.createMealNote(newMeal);
     } catch (error) {
       new Notice(`Warning: Failed to update meal note: ${error.message}`);

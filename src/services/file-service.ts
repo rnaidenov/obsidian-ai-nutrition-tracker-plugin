@@ -23,7 +23,7 @@ export class FileService {
   }
 
   // Food Log Operations - delegate to FoodLogManager
-  async createOrUpdateFoodLog(foodItems: FoodItem[], replaceEntry?: { food: string, quantity: string, calories: number, protein: number, carbs: number, fat: number }): Promise<void> {
+  async createOrUpdateFoodLog(foodItems: FoodItem[], replaceEntry?: { food: string, quantity: string, calories: number, protein: number, carbs: number, fat: number }): Promise<{ createdNewFile: boolean; filePath: string }> {
     return this.foodLogManager.createOrUpdateFoodLog(foodItems, replaceEntry);
   }
 

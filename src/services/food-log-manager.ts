@@ -16,16 +16,17 @@ export class FoodLogManager {
     this.contentParser = new ContentParser();
   }
 
-  async createOrUpdateFoodLog(foodItems: FoodItem[], replaceEntry?: { food: string, quantity: string, calories: number, protein: number, carbs: number, fat: number }): Promise<void> {
+  async createOrUpdateFoodLog(foodItems: FoodItem[], replaceEntry?: { food: string, quantity: string, calories: number, protein: number, carbs: number, fat: number }): Promise<{ createdNewFile: boolean; filePath: string }> {
     const today = this.fileUtils.getTodayString();
     const logPath = normalizePath(`${this.settings.logStoragePath}/${today}.md`);
-    
+
     try {
       // Ensure the directory exists
       await this.fileUtils.ensureDirectoryExists(this.settings.logStoragePath);
-      
+
       const existingFile = this.vault.getAbstractFileByPath(logPath);
-      
+      let createdNewFile = false;
+
       if (existingFile instanceof TFile) {
         if (replaceEntry) {
           await this.replaceInExistingLog(existingFile, foodItems, replaceEntry);
@@ -34,13 +35,16 @@ export class FoodLogManager {
         }
       } else {
         await this.createNewFoodLog(logPath, foodItems);
+        createdNewFile = true;
       }
-      
+
       if (replaceEntry) {
         new Notice(`✏️ Food entry replaced in: ${today}.md`);
       } else {
         new Notice(`Food log updated: ${today}.md`);
       }
+
+      return { createdNewFile, filePath: logPath };
     } catch (error) {
       console.error('Error creating/updating food log:', error);
       throw new Error(`Failed to save food log: ${error.message}`);

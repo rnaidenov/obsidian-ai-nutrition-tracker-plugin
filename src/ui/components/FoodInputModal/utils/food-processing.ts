@@ -1,4 +1,4 @@
-import { Notice } from 'obsidian';
+import { Notice, App, TFile } from 'obsidian';
 import { FoodItem, Meal } from '../../../../types/nutrition';
 import { PluginSettings } from '../../../../types/settings';
 import { LLMService } from '../../../../services/llm-service';
@@ -6,6 +6,7 @@ import { FileService } from '../../../../services/file-service';
 
 export class FoodProcessor {
   constructor(
+    private app: App,
     private settings: PluginSettings,
     private llmService: LLMService,
     private fileService: FileService
@@ -121,7 +122,18 @@ export class FoodProcessor {
         }
       } else {
         // Create new entry
-        await this.fileService.createOrUpdateFoodLog(allFoodItems);
+        const result = await this.fileService.createOrUpdateFoodLog(allFoodItems);
+        if (result.createdNewFile) {
+          // Open the newly created food log file
+          try {
+            const file = this.app.vault.getAbstractFileByPath(result.filePath);
+            if (file instanceof TFile) {
+              await this.app.workspace.getLeaf().openFile(file);
+            }
+          } catch (error) {
+            console.error('Error opening newly created food log:', error);
+          }
+        }
         return { success: true, message: `✅ Food log created with ${allFoodItems.length} item(s)` };
       }
 
