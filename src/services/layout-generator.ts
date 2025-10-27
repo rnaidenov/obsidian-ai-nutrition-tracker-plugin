@@ -163,8 +163,6 @@ ${nutritionRows}  <div class="ntr-overall-progress">
     const effectiveTheme = this.themeUtils.getEffectiveTheme();
     const themeClass = effectiveTheme === 'dark' ? 'theme-dark' : 'theme-light';
     
-    let summary = '## 🎯 Meal vs Goals\n\n';
-    
     const overallProgress = Math.round((
       this.contentParser.calculatePercentage(totals.calories, goals.calories) +
       this.contentParser.calculatePercentage(totals.protein, goals.protein) +
@@ -174,15 +172,15 @@ ${nutritionRows}  <div class="ntr-overall-progress">
     
     let nutritionRows = this.generateModernProgressBars(totals, goals);
     
-    summary += `<div class="ntr-summary-card ${themeClass}" data-meal-id="${mealId}">`;
-    summary += `<h3 class="ntr-summary-title">🎯 Meal vs Goals</h3>`;
-    summary += `<div class="ntr-summary-divider"></div>`;
-    summary += nutritionRows;
-    summary += `<div class="ntr-overall-progress">`;
-    summary += `<div class="ntr-overall-progress-border">`;
-    summary += `<div class="ntr-overall-progress-inner">`;
-    summary += `<h3 class="ntr-overall-progress-title">${this.themeUtils.getOverallStatusEmoji(overallProgress)} Overall Progress: ${overallProgress}%</h3>`;
-    summary += `</div></div></div></div>\n\n`;
+    const summary = `<div class="ntr-summary-card ${themeClass}" data-meal-id="${mealId}">
+<h3 class="ntr-summary-title">🎯 Meal vs Goals</h3>
+<div class="ntr-summary-divider"></div>
+${nutritionRows}<div class="ntr-overall-progress">
+<div class="ntr-overall-progress-border">
+<div class="ntr-overall-progress-inner">
+<h3 class="ntr-overall-progress-title">${this.themeUtils.getOverallStatusEmoji(overallProgress)} Overall Progress: ${overallProgress}%</h3>
+</div></div></div></div>
+`;
     
     return summary;
   }
