@@ -21,7 +21,7 @@ export interface PluginSettings {
 
 export const DEFAULT_SETTINGS: PluginSettings = {
   openRouterApiKey: '',
-  llmModel: 'anthropic/claude-3.5-sonnet',
+  llmModel: 'google/gemini-2.5-flash',
   useCustomModel: false,
   customModelName: '',
   nutritionGoals: {
@@ -35,8 +35,8 @@ export const DEFAULT_SETTINGS: PluginSettings = {
   imageStoragePath: 'tracker/health/food/log/images',
   appearance: {
     caloriesEmoji: '🔥',
-    proteinEmoji: '💪',
-    carbsEmoji: '🌾',
+    proteinEmoji: '🥩',
+    carbsEmoji: '🍚',
     fatEmoji: '🥑'
   }
 }; 
