@@ -6,7 +6,7 @@ Transform your nutrition tracking with AI-powered food analysis. No more tedious
 
 **Smart Food Logging**: Describe your meals in natural language or upload photos, and AI automatically extracts nutrition data and creates beautiful food logs in your Obsidian vault.
 
-<img width="489" alt="image" src="https://github.com/user-attachments/assets/c90feeff-2c7a-4a23-ab6f-b447f4527a18" />
+<img width="502" height="756" alt="image" src="https://github.com/user-attachments/assets/1b1f9381-06e5-49b1-a3a8-bc94ee1829ba" />
 
 ### 📝 Text Input
 ```
@@ -27,27 +27,27 @@ Save your favorite meals for quick reuse! Perfect for:
 
 Create a meal once, then add it to future logs with a single click.
 
-<img width="462" alt="image" src="https://github.com/user-attachments/assets/9e33389a-1a77-4a68-a915-7422d90f8288" />
-<img width="194" alt="image" src="https://github.com/user-attachments/assets/3b173eb7-326e-4e33-ae78-4b32eb018cd2" />
-<img width="553" alt="image" src="https://github.com/user-attachments/assets/c7bed974-123a-4855-acf4-d217e81ef14e" />
+<img width="459" height="218" alt="image" src="https://github.com/user-attachments/assets/42be5f83-82cb-4b2a-a5c9-2819c0054a59" />
+<img width="550" height="899" alt="image" src="https://github.com/user-attachments/assets/4fc43c17-9035-4405-a46d-3481e11874f3" />
+<img width="410" height="620" alt="image" src="https://github.com/user-attachments/assets/247f53cf-baef-47da-a814-dbd8b07da7ef" />
+<img width="455" height="205" alt="image" src="https://github.com/user-attachments/assets/f8d58447-8a6a-4310-8cf8-af8faa910d98" />
+
 
 ### 🤖 AI Analysis
-Choose from powerful models like Claude 3.5 Sonnet, GPT-4, or Gemini to analyze your food and extract:
+Choose from powerful models like Gemini, Claude 4.5 Sonnet, GPT-5 to analyze your food and extract:
 - 🔥 Calories
 - 💪 Protein  
 - 🌾 Carbohydrates
 - 🥑 Fat
 
-<img width="460" alt="image" src="https://github.com/user-attachments/assets/2c63ee9b-b4d0-4984-82d5-dedfaa81fdd4" />
-
 ## 🎨 Beautiful Food Logs
 
 ### Light Theme
-<img width="623" alt="image" src="https://github.com/user-attachments/assets/f648a224-4f79-480e-aaaf-95d0966db5b0" />
+<img width="493" height="913" alt="image" src="https://github.com/user-attachments/assets/beb09d9b-1f73-4239-9a81-e85c97fa361b" />
 
 
 ### Dark Theme
-<img width="603" alt="image" src="https://github.com/user-attachments/assets/351cbb48-89a5-4cd1-b7b3-279fe40cfc91" />
+<img width="505" height="913" alt="image" src="https://github.com/user-attachments/assets/1df185a9-c17d-45a8-98df-22b4ca3bc77b" />
 
 ## 🚀 Getting Started
 
