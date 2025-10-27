@@ -14,8 +14,6 @@ export class LayoutGenerator {
 
   generateCardLayout(foodItems: FoodItem[], context?: 'meal' | 'foodlog', mealId?: string): string {
     let content = '';
-    const effectiveTheme = this.themeUtils.getEffectiveTheme();
-    const themeClass = effectiveTheme === 'dark' ? 'theme-dark' : 'theme-light';
     
     for (const item of foodItems) {
       const emoji = item.emoji || '🍽️';
@@ -28,7 +26,7 @@ export class LayoutGenerator {
       const editContext = context || 'foodlog';
       
         const entryId = `ntr-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`;
-      content += `\n<div id="${entryId}" class="ntr-food-card ${themeClass}" data-ntr-food="${item.food.replace(/"/g, '&quot;')}" data-ntr-quantity="${item.quantity.replace(/"/g, '&quot;')}" data-ntr-calories="${item.calories}" data-ntr-protein="${item.protein}" data-ntr-carbs="${item.carbs}" data-ntr-fat="${item.fat}">\n`;
+      content += `\n<div id="${entryId}" class="ntr-food-card" data-ntr-food="${item.food.replace(/"/g, '&quot;')}" data-ntr-quantity="${item.quantity.replace(/"/g, '&quot;')}" data-ntr-calories="${item.calories}" data-ntr-protein="${item.protein}" data-ntr-carbs="${item.carbs}" data-ntr-fat="${item.fat}">\n`;
       content += `  <div class="ntr-food-card-header">\n`;
       content += `    <div class="ntr-food-card-info">\n`;
       content += `      <span class="ntr-food-card-emoji">${emoji}</span>\n`;
@@ -94,8 +92,6 @@ export class LayoutGenerator {
 
   async generateDailySummary(totals: NutritionData): Promise<string> {
     const goals = this.settings.nutritionGoals;
-    const effectiveTheme = this.themeUtils.getEffectiveTheme();
-    const themeClass = effectiveTheme === 'dark' ? 'theme-dark' : 'theme-light';
     
     let summary = '';
     
@@ -108,7 +104,7 @@ export class LayoutGenerator {
 
     const nutritionRows = this.generateModernProgressBars(totals, goals);
     
-    summary += `<div class="ntr-summary-card ${themeClass}">
+    summary += `<div class="ntr-summary-card">
   <h3 class="ntr-summary-title">🎯 Totals vs Goals</h3>
   <div class="ntr-summary-divider"></div>
 ${nutritionRows}  <div class="ntr-overall-progress">
@@ -160,8 +156,6 @@ ${nutritionRows}  <div class="ntr-overall-progress">
 
   async generateMealProgressSummaryWithId(totals: NutritionData, mealId: string): Promise<string> {
     const goals = this.settings.nutritionGoals;
-    const effectiveTheme = this.themeUtils.getEffectiveTheme();
-    const themeClass = effectiveTheme === 'dark' ? 'theme-dark' : 'theme-light';
     
     const overallProgress = Math.round((
       this.contentParser.calculatePercentage(totals.calories, goals.calories) +
@@ -172,7 +166,7 @@ ${nutritionRows}  <div class="ntr-overall-progress">
     
     let nutritionRows = this.generateModernProgressBars(totals, goals);
     
-    const summary = `<div class="ntr-summary-card ${themeClass}" data-meal-id="${mealId}">
+    const summary = `<div class="ntr-summary-card" data-meal-id="${mealId}">
 <h3 class="ntr-summary-title">🎯 Meal vs Goals</h3>
 <div class="ntr-summary-divider"></div>
 ${nutritionRows}<div class="ntr-overall-progress">
