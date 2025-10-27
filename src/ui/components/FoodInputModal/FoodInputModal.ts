@@ -23,6 +23,7 @@ export class FoodInputModal extends Modal {
   private isProcessing: boolean = false;
   private processButton: HTMLButtonElement | null = null;
   private processingIndicator: HTMLElement | null = null;
+  private errorMessageEl: HTMLElement | null = null;
   private initialData: any = null;
   private editingContext: 'meal' | 'foodlog' = 'foodlog';
   private targetMealId: string | null = null;
@@ -122,6 +123,9 @@ export class FoodInputModal extends Modal {
       );
     }
     
+    // Create error message display
+    this.errorMessageEl = contentEl.createDiv('nutrition-tracker-error-message');
+    
     // Create process button and get references
     this.processButton = createProcessButton(
       contentEl, 
@@ -179,6 +183,7 @@ export class FoodInputModal extends Modal {
 
   private async handleProcessFood() {
     this.isProcessing = true;
+    this.clearErrorMessage();
     this.updateButtonState();
 
     try {
@@ -196,13 +201,30 @@ export class FoodInputModal extends Modal {
       if (result.success) {
         this.close();
         return;
-      };
+      } else if (result.message) {
+        this.showErrorMessage(result.message);
+      }
     } catch (error) {
       console.error('Error during food processing:', error);
+      this.showErrorMessage(error.message || 'An unexpected error occurred');
     }
 
     this.isProcessing = false;
     this.updateButtonState();
+  }
+
+  private showErrorMessage(message: string) {
+    if (this.errorMessageEl) {
+      this.errorMessageEl.textContent = message;
+      this.errorMessageEl.style.display = 'block';
+    }
+  }
+
+  private clearErrorMessage() {
+    if (this.errorMessageEl) {
+      this.errorMessageEl.textContent = '';
+      this.errorMessageEl.style.display = 'none';
+    }
   }
 
   private updateButtonState() {

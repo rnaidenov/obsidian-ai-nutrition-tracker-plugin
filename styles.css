@@ -1133,6 +1133,25 @@
   display: block;
 }
 
+/* Error Message */
+.nutrition-tracker-error-message {
+  display: none;
+  margin-top: 10px;
+  padding: 12px 16px;
+  background: rgba(220, 38, 38, 0.1);
+  border: 1px solid rgba(220, 38, 38, 0.3);
+  border-radius: 8px;
+  color: rgb(185, 28, 28);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.theme-dark .nutrition-tracker-error-message {
+  background: rgba(239, 68, 68, 0.15);
+  border-color: rgba(239, 68, 68, 0.4);
+  color: rgb(252, 165, 165);
+}
+
 .nutrition-tracker-processing-spinner {
   display: inline-block;
   width: 20px;
