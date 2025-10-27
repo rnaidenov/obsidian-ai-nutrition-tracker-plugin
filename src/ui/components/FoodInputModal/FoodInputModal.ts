@@ -216,14 +216,14 @@ export class FoodInputModal extends Modal {
   private showErrorMessage(message: string) {
     if (this.errorMessageEl) {
       this.errorMessageEl.textContent = message;
-      this.errorMessageEl.style.display = 'block';
+      this.errorMessageEl.addClass('visible');
     }
   }
 
   private clearErrorMessage() {
     if (this.errorMessageEl) {
       this.errorMessageEl.textContent = '';
-      this.errorMessageEl.style.display = 'none';
+      this.errorMessageEl.removeClass('visible');
     }
   }
 

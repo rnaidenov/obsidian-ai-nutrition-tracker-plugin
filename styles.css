@@ -1186,6 +1186,10 @@
   line-height: 1.5;
 }
 
+.nutrition-tracker-error-message.visible {
+  display: block;
+}
+
 .theme-dark .nutrition-tracker-error-message {
   background: rgba(239, 68, 68, 0.15);
   border-color: rgba(239, 68, 68, 0.4);
