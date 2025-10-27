@@ -826,6 +826,46 @@
   padding-bottom: 5px;
 }
 
+/* Emoji Picker Styles */
+.emoji-picker-text-input {
+  width: 64px;
+  height: 64px;
+  text-align: center;
+  margin-right: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  font-size: 20px;
+  box-shadow: 0 2px 8px rgba(251, 146, 60, 0.3), 0 0 0 1px rgba(251, 146, 60, 0.2);
+  border-radius: 8px;
+}
+
+.emoji-picker-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.emoji-picker-button {
+  font-size: 20px;
+  padding: 4px 8px;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 4px;
+  background: var(--background-primary);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.emoji-picker-button:hover {
+  background: var(--background-modifier-hover);
+  transform: scale(1.1);
+}
+
+.emoji-picker-button:active {
+  transform: scale(0.95);
+}
+
 /* Food Input Modal Styles */
 /* Image Preview Styles */
 .nutrition-tracker-images-container {

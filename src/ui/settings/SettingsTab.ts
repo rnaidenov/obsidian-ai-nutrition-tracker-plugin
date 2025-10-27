@@ -31,39 +31,16 @@ export class SettingsTab extends PluginSettingTab {
           await onChange(value || defaultEmoji);
         });
       
-      text.inputEl.style.width = '80px';
-      text.inputEl.style.fontSize = '24px';
-      text.inputEl.style.textAlign = 'center';
+      text.inputEl.addClass('emoji-picker-text-input');
     });
 
     // Add emoji picker buttons
     const pickerContainer = setting.controlEl.createDiv({ cls: 'emoji-picker-container' });
-    pickerContainer.style.display = 'flex';
-    pickerContainer.style.flexWrap = 'wrap';
-    pickerContainer.style.gap = '4px';
-    pickerContainer.style.marginTop = '8px';
 
     emojis.forEach(emoji => {
       const button = pickerContainer.createEl('button', {
         text: emoji,
         cls: 'emoji-picker-button'
-      });
-      button.style.fontSize = '20px';
-      button.style.padding = '4px 8px';
-      button.style.border = '1px solid var(--background-modifier-border)';
-      button.style.borderRadius = '4px';
-      button.style.background = 'var(--background-primary)';
-      button.style.cursor = 'pointer';
-      button.style.transition = 'all 0.2s';
-
-      button.addEventListener('mouseenter', () => {
-        button.style.background = 'var(--background-modifier-hover)';
-        button.style.transform = 'scale(1.1)';
-      });
-
-      button.addEventListener('mouseleave', () => {
-        button.style.background = 'var(--background-primary)';
-        button.style.transform = 'scale(1)';
       });
 
       button.addEventListener('click', async (e) => {
