@@ -5,61 +5,34 @@ export class ThemeUtils {
   }
 
 
-  getProgressGradient(percentage: number, isDark: boolean): { gradient: string, textColor: string, borderColor: string } {
-    // Smooth, muted color transitions: Red (0%) → Orange (50%) → Green (100%)
-    // Cap at 100% to prevent color changes beyond completion
-    const cappedPercentage = Math.min(percentage, 100);
-    let r, g, b;
-    
-    if (isDark) {
-      // Dark theme: Natural, muted colors with good visibility
-      if (cappedPercentage <= 50) {
-        // Red to Yellow transition (0% to 50%) - natural warm tones
-        const factor = cappedPercentage / 50;
-        r = Math.round(200 + (220 - 200) * factor); // 200 (natural red) to 220 (natural yellow)
-        g = Math.round(90 + (180 - 90) * factor);   // 90 (natural red) to 180 (natural yellow)
-        b = Math.round(90 + (85 - 90) * factor);    // 90 (natural red) to 85 (natural yellow)
-      } else {
-        // Yellow to Green transition (50% to 100%) - natural warm to cool
-        const factor = (cappedPercentage - 50) / 50;
-        r = Math.round(220 - (220 - 110) * factor); // 220 (natural yellow) to 110 (natural green)
-        g = Math.round(180 - (180 - 170) * factor); // 180 (natural yellow) to 170 (natural green)
-        b = Math.round(85 + (110 - 85) * factor);   // 85 (natural yellow) to 110 (natural green)
-      }
-    } else {
-      // Light theme: Natural, muted colors - traffic light progression
-      if (cappedPercentage <= 50) {
-        // Red to Yellow transition (0% to 50%) - natural coral to warm yellow
-        const factor = cappedPercentage / 50;
-        r = Math.round(190 + (210 - 190) * factor); // 190 (natural coral) to 210 (natural yellow)
-        g = Math.round(110 + (175 - 110) * factor); // 110 (natural coral) to 175 (natural yellow)
-        b = Math.round(110 + (90 - 110) * factor);  // 110 (natural coral) to 90 (natural yellow)
-      } else {
-        // Yellow to Green transition (50% to 100%) - natural yellow to sage
-        const factor = (cappedPercentage - 50) / 50;
-        r = Math.round(210 - (210 - 130) * factor); // 210 (natural yellow) to 130 (natural sage)
-        g = Math.round(175 - (175 - 150) * factor); // 175 (natural yellow) to 150 (natural sage)
-        b = Math.round(90 + (120 - 90) * factor);   // 90 (natural yellow) to 120 (natural sage)
-      }
+  getProgressToneClass(percentage: number): string {
+    if (!Number.isFinite(percentage)) {
+      return 'ntr-progress-tone-critical';
     }
     
-    // Create glassy gradients with enhanced visibility for dark theme
-    const baseOpacity = isDark ? 0.45 : 0.3;
-    const primaryColor = `rgba(${r}, ${g}, ${b}, ${baseOpacity})`;
-    const secondaryColor = `rgba(${r}, ${g}, ${b}, ${baseOpacity * 0.6})`;
+    const normalized = Math.max(0, Math.round(percentage));
     
-    // Multi-stop gradient for more sophisticated glass effect
-    const gradient = `linear-gradient(135deg, ${primaryColor} 0%, rgba(${r}, ${g}, ${b}, ${baseOpacity * 0.8}) 50%, ${secondaryColor} 100%)`;
+    if (normalized >= 140) {
+      return 'ntr-progress-tone-surplus';
+    }
     
-    // Enhanced border visibility for dark theme
-    const borderOpacity = isDark ? 0.6 : 0.45;
-    const borderColor = `rgba(${r}, ${g}, ${b}, ${borderOpacity})`;
+    if (normalized >= 100) {
+      return 'ntr-progress-tone-goal';
+    }
     
-    // Text color - enhanced visibility for dark theme
-    const textOpacity = isDark ? 0.95 : 0.75;
-    const textColor = `rgba(${Math.round(r * 0.9)}, ${Math.round(g * 0.9)}, ${Math.round(b * 0.9)}, ${textOpacity})`;
+    if (normalized >= 80) {
+      return 'ntr-progress-tone-strong';
+    }
     
-    return { gradient, textColor, borderColor };
+    if (normalized >= 60) {
+      return 'ntr-progress-tone-progress';
+    }
+    
+    if (normalized >= 30) {
+      return 'ntr-progress-tone-early';
+    }
+    
+    return 'ntr-progress-tone-critical';
   }
 
   getOverallStatusEmoji(percentage: number): string {

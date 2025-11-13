@@ -1789,32 +1789,240 @@
   box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1), 0 1px 0 rgba(255, 255, 255, 0.03);
 }
 
-/* Progress fill (colored bar) - uses CSS custom properties for dynamic colors */
-.ntr-progress-fill {
-  height: 100%;
-  border-radius: 8px;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  position: relative;
-  overflow: hidden;
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-    /* Dynamic colors supplied via injected CSS custom properties:
-     --progress-r, --progress-g, --progress-b, --progress-opacity-base */
-  background: linear-gradient(135deg, 
-    rgba(var(--progress-r), var(--progress-g), var(--progress-b), var(--progress-opacity-base, 0.3)) 0%,
-    rgba(var(--progress-r), var(--progress-g), var(--progress-b), calc(var(--progress-opacity-base, 0.3) * 0.8)) 50%,
-    rgba(var(--progress-r), var(--progress-g), var(--progress-b), calc(var(--progress-opacity-base, 0.3) * 0.6)) 100%);
-  border: 1px solid rgba(var(--progress-r), var(--progress-g), var(--progress-b), var(--progress-border-opacity, 0.45));
-}
+  /* Progress fill (colored bar) - base styling before tone modifiers */
+  .ntr-progress-fill {
+    height: 100%;
+    border-radius: 8px;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    background: linear-gradient(135deg, rgba(148, 163, 184, 0.24) 0%, rgba(148, 163, 184, 0.12) 100%);
+    border: 1px solid rgba(148, 163, 184, 0.35);
+    width: 0%;
+  }
+  
+  .theme-dark .ntr-progress-fill,
+  .ntr-summary-card.theme-dark .ntr-progress-fill {
+    background: linear-gradient(135deg, rgba(203, 213, 225, 0.18) 0%, rgba(148, 163, 184, 0.12) 100%);
+    border: 1px solid rgba(148, 163, 184, 0.28);
+  }
 
-.theme-dark .ntr-progress-fill,
-.ntr-summary-card.theme-dark .ntr-progress-fill {
-  background: linear-gradient(135deg, 
-    rgba(var(--progress-r), var(--progress-g), var(--progress-b), var(--progress-opacity-base, 0.45)) 0%,
-    rgba(var(--progress-r), var(--progress-g), var(--progress-b), calc(var(--progress-opacity-base, 0.45) * 0.8)) 50%,
-    rgba(var(--progress-r), var(--progress-g), var(--progress-b), calc(var(--progress-opacity-base, 0.45) * 0.6)) 100%);
-  border: 1px solid rgba(var(--progress-r), var(--progress-g), var(--progress-b), var(--progress-border-opacity, 0.6));
-}
+  /* Utility classes for progress widths (0-100%) */
+  .ntr-progress-fill--w-0 { width: 0%; }
+  .ntr-progress-fill--w-1 { width: 1%; }
+  .ntr-progress-fill--w-2 { width: 2%; }
+  .ntr-progress-fill--w-3 { width: 3%; }
+  .ntr-progress-fill--w-4 { width: 4%; }
+  .ntr-progress-fill--w-5 { width: 5%; }
+  .ntr-progress-fill--w-6 { width: 6%; }
+  .ntr-progress-fill--w-7 { width: 7%; }
+  .ntr-progress-fill--w-8 { width: 8%; }
+  .ntr-progress-fill--w-9 { width: 9%; }
+  .ntr-progress-fill--w-10 { width: 10%; }
+  .ntr-progress-fill--w-11 { width: 11%; }
+  .ntr-progress-fill--w-12 { width: 12%; }
+  .ntr-progress-fill--w-13 { width: 13%; }
+  .ntr-progress-fill--w-14 { width: 14%; }
+  .ntr-progress-fill--w-15 { width: 15%; }
+  .ntr-progress-fill--w-16 { width: 16%; }
+  .ntr-progress-fill--w-17 { width: 17%; }
+  .ntr-progress-fill--w-18 { width: 18%; }
+  .ntr-progress-fill--w-19 { width: 19%; }
+  .ntr-progress-fill--w-20 { width: 20%; }
+  .ntr-progress-fill--w-21 { width: 21%; }
+  .ntr-progress-fill--w-22 { width: 22%; }
+  .ntr-progress-fill--w-23 { width: 23%; }
+  .ntr-progress-fill--w-24 { width: 24%; }
+  .ntr-progress-fill--w-25 { width: 25%; }
+  .ntr-progress-fill--w-26 { width: 26%; }
+  .ntr-progress-fill--w-27 { width: 27%; }
+  .ntr-progress-fill--w-28 { width: 28%; }
+  .ntr-progress-fill--w-29 { width: 29%; }
+  .ntr-progress-fill--w-30 { width: 30%; }
+  .ntr-progress-fill--w-31 { width: 31%; }
+  .ntr-progress-fill--w-32 { width: 32%; }
+  .ntr-progress-fill--w-33 { width: 33%; }
+  .ntr-progress-fill--w-34 { width: 34%; }
+  .ntr-progress-fill--w-35 { width: 35%; }
+  .ntr-progress-fill--w-36 { width: 36%; }
+  .ntr-progress-fill--w-37 { width: 37%; }
+  .ntr-progress-fill--w-38 { width: 38%; }
+  .ntr-progress-fill--w-39 { width: 39%; }
+  .ntr-progress-fill--w-40 { width: 40%; }
+  .ntr-progress-fill--w-41 { width: 41%; }
+  .ntr-progress-fill--w-42 { width: 42%; }
+  .ntr-progress-fill--w-43 { width: 43%; }
+  .ntr-progress-fill--w-44 { width: 44%; }
+  .ntr-progress-fill--w-45 { width: 45%; }
+  .ntr-progress-fill--w-46 { width: 46%; }
+  .ntr-progress-fill--w-47 { width: 47%; }
+  .ntr-progress-fill--w-48 { width: 48%; }
+  .ntr-progress-fill--w-49 { width: 49%; }
+  .ntr-progress-fill--w-50 { width: 50%; }
+  .ntr-progress-fill--w-51 { width: 51%; }
+  .ntr-progress-fill--w-52 { width: 52%; }
+  .ntr-progress-fill--w-53 { width: 53%; }
+  .ntr-progress-fill--w-54 { width: 54%; }
+  .ntr-progress-fill--w-55 { width: 55%; }
+  .ntr-progress-fill--w-56 { width: 56%; }
+  .ntr-progress-fill--w-57 { width: 57%; }
+  .ntr-progress-fill--w-58 { width: 58%; }
+  .ntr-progress-fill--w-59 { width: 59%; }
+  .ntr-progress-fill--w-60 { width: 60%; }
+  .ntr-progress-fill--w-61 { width: 61%; }
+  .ntr-progress-fill--w-62 { width: 62%; }
+  .ntr-progress-fill--w-63 { width: 63%; }
+  .ntr-progress-fill--w-64 { width: 64%; }
+  .ntr-progress-fill--w-65 { width: 65%; }
+  .ntr-progress-fill--w-66 { width: 66%; }
+  .ntr-progress-fill--w-67 { width: 67%; }
+  .ntr-progress-fill--w-68 { width: 68%; }
+  .ntr-progress-fill--w-69 { width: 69%; }
+  .ntr-progress-fill--w-70 { width: 70%; }
+  .ntr-progress-fill--w-71 { width: 71%; }
+  .ntr-progress-fill--w-72 { width: 72%; }
+  .ntr-progress-fill--w-73 { width: 73%; }
+  .ntr-progress-fill--w-74 { width: 74%; }
+  .ntr-progress-fill--w-75 { width: 75%; }
+  .ntr-progress-fill--w-76 { width: 76%; }
+  .ntr-progress-fill--w-77 { width: 77%; }
+  .ntr-progress-fill--w-78 { width: 78%; }
+  .ntr-progress-fill--w-79 { width: 79%; }
+  .ntr-progress-fill--w-80 { width: 80%; }
+  .ntr-progress-fill--w-81 { width: 81%; }
+  .ntr-progress-fill--w-82 { width: 82%; }
+  .ntr-progress-fill--w-83 { width: 83%; }
+  .ntr-progress-fill--w-84 { width: 84%; }
+  .ntr-progress-fill--w-85 { width: 85%; }
+  .ntr-progress-fill--w-86 { width: 86%; }
+  .ntr-progress-fill--w-87 { width: 87%; }
+  .ntr-progress-fill--w-88 { width: 88%; }
+  .ntr-progress-fill--w-89 { width: 89%; }
+  .ntr-progress-fill--w-90 { width: 90%; }
+  .ntr-progress-fill--w-91 { width: 91%; }
+  .ntr-progress-fill--w-92 { width: 92%; }
+  .ntr-progress-fill--w-93 { width: 93%; }
+  .ntr-progress-fill--w-94 { width: 94%; }
+  .ntr-progress-fill--w-95 { width: 95%; }
+  .ntr-progress-fill--w-96 { width: 96%; }
+  .ntr-progress-fill--w-97 { width: 97%; }
+  .ntr-progress-fill--w-98 { width: 98%; }
+  .ntr-progress-fill--w-99 { width: 99%; }
+  .ntr-progress-fill--w-100 { width: 100%; }
+
+  /* Progress tone modifiers */
+  .ntr-progress-row.ntr-progress-tone-critical .ntr-progress-percentage {
+    color: #b91c1c;
+  }
+  .theme-dark .ntr-progress-row.ntr-progress-tone-critical .ntr-progress-percentage,
+  .ntr-summary-card.theme-dark .ntr-progress-row.ntr-progress-tone-critical .ntr-progress-percentage {
+    color: #fca5a5;
+  }
+  .ntr-progress-row.ntr-progress-tone-critical .ntr-progress-fill {
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.32) 0%, rgba(248, 113, 113, 0.18) 100%);
+    border: 1px solid rgba(239, 68, 68, 0.45);
+  }
+  .theme-dark .ntr-progress-row.ntr-progress-tone-critical .ntr-progress-fill,
+  .ntr-summary-card.theme-dark .ntr-progress-row.ntr-progress-tone-critical .ntr-progress-fill {
+    background: linear-gradient(135deg, rgba(185, 28, 28, 0.45) 0%, rgba(248, 113, 113, 0.24) 100%);
+    border: 1px solid rgba(252, 165, 165, 0.55);
+  }
+
+  .ntr-progress-row.ntr-progress-tone-early .ntr-progress-percentage {
+    color: #b45309;
+  }
+  .theme-dark .ntr-progress-row.ntr-progress-tone-early .ntr-progress-percentage,
+  .ntr-summary-card.theme-dark .ntr-progress-row.ntr-progress-tone-early .ntr-progress-percentage {
+    color: #fcd34d;
+  }
+  .ntr-progress-row.ntr-progress-tone-early .ntr-progress-fill {
+    background: linear-gradient(135deg, rgba(251, 191, 36, 0.28) 0%, rgba(249, 115, 22, 0.14) 100%);
+    border: 1px solid rgba(249, 115, 22, 0.38);
+  }
+  .theme-dark .ntr-progress-row.ntr-progress-tone-early .ntr-progress-fill,
+  .ntr-summary-card.theme-dark .ntr-progress-row.ntr-progress-tone-early .ntr-progress-fill {
+    background: linear-gradient(135deg, rgba(249, 115, 22, 0.4) 0%, rgba(217, 119, 6, 0.22) 100%);
+    border: 1px solid rgba(251, 191, 36, 0.48);
+  }
+
+  .ntr-progress-row.ntr-progress-tone-progress .ntr-progress-percentage {
+    color: #4d7c0f;
+  }
+  .theme-dark .ntr-progress-row.ntr-progress-tone-progress .ntr-progress-percentage,
+  .ntr-summary-card.theme-dark .ntr-progress-row.ntr-progress-tone-progress .ntr-progress-percentage {
+    color: #bef264;
+  }
+  .ntr-progress-row.ntr-progress-tone-progress .ntr-progress-fill {
+    background: linear-gradient(135deg, rgba(163, 230, 53, 0.28) 0%, rgba(132, 204, 22, 0.14) 100%);
+    border: 1px solid rgba(132, 204, 22, 0.36);
+  }
+  .theme-dark .ntr-progress-row.ntr-progress-tone-progress .ntr-progress-fill,
+  .ntr-summary-card.theme-dark .ntr-progress-row.ntr-progress-tone-progress .ntr-progress-fill {
+    background: linear-gradient(135deg, rgba(132, 204, 22, 0.38) 0%, rgba(63, 157, 11, 0.24) 100%);
+    border: 1px solid rgba(190, 242, 100, 0.5);
+  }
+
+  .ntr-progress-row.ntr-progress-tone-strong .ntr-progress-percentage {
+    color: #0f766e;
+  }
+  .theme-dark .ntr-progress-row.ntr-progress-tone-strong .ntr-progress-percentage,
+  .ntr-summary-card.theme-dark .ntr-progress-row.ntr-progress-tone-strong .ntr-progress-percentage {
+    color: #5eead4;
+  }
+  .ntr-progress-row.ntr-progress-tone-strong .ntr-progress-fill {
+    background: linear-gradient(135deg, rgba(45, 212, 191, 0.26) 0%, rgba(13, 148, 136, 0.14) 100%);
+    border: 1px solid rgba(13, 148, 136, 0.38);
+  }
+  .theme-dark .ntr-progress-row.ntr-progress-tone-strong .ntr-progress-fill,
+  .ntr-summary-card.theme-dark .ntr-progress-row.ntr-progress-tone-strong .ntr-progress-fill {
+    background: linear-gradient(135deg, rgba(20, 184, 166, 0.38) 0%, rgba(13, 148, 136, 0.22) 100%);
+    border: 1px solid rgba(94, 234, 212, 0.5);
+  }
+
+  .ntr-progress-row.ntr-progress-tone-goal .ntr-progress-percentage {
+    color: #1d4ed8;
+  }
+  .theme-dark .ntr-progress-row.ntr-progress-tone-goal .ntr-progress-percentage,
+  .ntr-summary-card.theme-dark .ntr-progress-row.ntr-progress-tone-goal .ntr-progress-percentage {
+    color: #93c5fd;
+  }
+  .ntr-progress-row.ntr-progress-tone-goal .ntr-progress-fill {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.26) 0%, rgba(37, 99, 235, 0.14) 100%);
+    border: 1px solid rgba(37, 99, 235, 0.4);
+  }
+  .theme-dark .ntr-progress-row.ntr-progress-tone-goal .ntr-progress-fill,
+  .ntr-summary-card.theme-dark .ntr-progress-row.ntr-progress-tone-goal .ntr-progress-fill {
+    background: linear-gradient(135deg, rgba(30, 64, 175, 0.42) 0%, rgba(59, 130, 246, 0.24) 100%);
+    border: 1px solid rgba(147, 197, 253, 0.5);
+  }
+
+  .ntr-progress-row.ntr-progress-tone-surplus .ntr-progress-percentage {
+    color: #6d28d9;
+  }
+  .theme-dark .ntr-progress-row.ntr-progress-tone-surplus .ntr-progress-percentage,
+  .ntr-summary-card.theme-dark .ntr-progress-row.ntr-progress-tone-surplus .ntr-progress-percentage {
+    color: #c4b5fd;
+  }
+  .ntr-progress-row.ntr-progress-tone-surplus .ntr-progress-fill {
+    background: linear-gradient(135deg, rgba(147, 51, 234, 0.28) 0%, rgba(124, 58, 237, 0.16) 100%);
+    border: 1px solid rgba(124, 58, 237, 0.42);
+  }
+  .theme-dark .ntr-progress-row.ntr-progress-tone-surplus .ntr-progress-fill,
+  .ntr-summary-card.theme-dark .ntr-progress-row.ntr-progress-tone-surplus .ntr-progress-fill {
+    background: linear-gradient(135deg, rgba(109, 40, 217, 0.42) 0%, rgba(168, 85, 247, 0.26) 100%);
+    border: 1px solid rgba(221, 214, 254, 0.52);
+  }
+
+  .ntr-progress-row.ntr-progress-row--surplus .ntr-progress-values {
+    color: #6d28d9;
+    font-weight: 500;
+  }
+  .theme-dark .ntr-progress-row.ntr-progress-row--surplus .ntr-progress-values,
+  .ntr-summary-card.theme-dark .ntr-progress-row.ntr-progress-row--surplus .ntr-progress-values {
+    color: #c4b5fd;
+  }
 
 /* Glass shine effect on progress bar */
 .ntr-progress-shine {
