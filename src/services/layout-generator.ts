@@ -85,7 +85,7 @@ export class LayoutGenerator {
       `➕ Add More Items to Meal` :
       `➕ Add More Items to Food Log`;
     
-    const buttonHtml = `<div style="text-align: center; margin: 24px 0 60px; padding: 0px 0;"><button id="${buttonId}" class="nutrition-add-cta-btn" data-context="${context}"${mealIdAttr}>${buttonText}</button></div>`;
+    const buttonHtml = `<div class="nutrition-add-cta-container"><button id="${buttonId}" class="nutrition-add-cta-btn" data-context="${context}"${mealIdAttr}>${buttonText}</button></div>`;
     
     return buttonHtml;
   }

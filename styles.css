@@ -1230,6 +1230,12 @@
   pointer-events: none;
 }
 
+.nutrition-add-cta-container {
+  text-align: center;
+  margin: 24px 0 60px;
+  padding: 0;
+}
+
 /* CTA Button Styles */
 .nutrition-add-cta-btn {
   display: flex;
