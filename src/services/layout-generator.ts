@@ -122,36 +122,36 @@ ${nutritionRows}  <div class="ntr-overall-progress">
 
   generateModernProgressBars(totals: NutritionData, goals: any): string {
     let content = '';
-    const isDark = this.themeUtils.getEffectiveTheme() === 'dark';
     
     const nutrients = [
-      { name: 'Calories', emojiClass: 'ntr-progress-emoji-calories', current: totals.calories, goal: goals.calories, unit: 'kcal' },
-      { name: 'Protein', emojiClass: 'ntr-progress-emoji-protein', current: totals.protein, goal: goals.protein, unit: 'g' },
-      { name: 'Carbs', emojiClass: 'ntr-progress-emoji-carbs', current: totals.carbs, goal: goals.carbs, unit: 'g' },
-      { name: 'Fat', emojiClass: 'ntr-progress-emoji-fat', current: totals.fat, goal: goals.fat, unit: 'g' }
+      { name: 'Calories', emojiClass: 'ntr-progress-emoji-calories', current: totals.calories, goal: goals.calories, unit: 'kcal', key: 'calories' },
+      { name: 'Protein', emojiClass: 'ntr-progress-emoji-protein', current: totals.protein, goal: goals.protein, unit: 'g', key: 'protein' },
+      { name: 'Carbs', emojiClass: 'ntr-progress-emoji-carbs', current: totals.carbs, goal: goals.carbs, unit: 'g', key: 'carbs' },
+      { name: 'Fat', emojiClass: 'ntr-progress-emoji-fat', current: totals.fat, goal: goals.fat, unit: 'g', key: 'fat' }
     ];
     
     for (const nutrient of nutrients) {
       const percentage = this.contentParser.calculatePercentage(nutrient.current, nutrient.goal);
-      const { gradient, textColor, borderColor } = this.themeUtils.getProgressGradient(percentage, isDark);
       
-      const rgbMatch = gradient.match(/rgba\((\d+),\s*(\d+),\s*(\d+),/);
-      const r = rgbMatch ? rgbMatch[1] : '100';
-      const g = rgbMatch ? rgbMatch[2] : '100';
-      const b = rgbMatch ? rgbMatch[3] : '100';
-      
-      const baseOpacity = isDark ? 0.45 : 0.3;
-      const borderOpacity = isDark ? 0.6 : 0.45;
+      const colorZone = this.getColorZone(percentage);
       
       const shineAndGlow = percentage > 0 
         ? `<div class="ntr-progress-shine"></div><div class="ntr-progress-glow"></div>` 
         : '';
       
-      content += `  <div class="ntr-progress-row"><span class="ntr-progress-label"><span class="${nutrient.emojiClass}"></span> ${nutrient.name}:</span> <span class="ntr-progress-values">${Math.round(nutrient.current)} / ${nutrient.goal} ${nutrient.unit}</span> <span class="ntr-progress-percentage" style="color: ${textColor};">(${percentage}%)</span><div class="ntr-progress-track"><div class="ntr-progress-fill" style="width: ${Math.min(percentage, 100)}%; --progress-r: ${r}; --progress-g: ${g}; --progress-b: ${b}; --progress-opacity-base: ${baseOpacity}; --progress-border-opacity: ${borderOpacity};">${shineAndGlow}</div></div></div>
+      content += `  <div class="ntr-progress-row" data-nutrient="${nutrient.key}"><span class="ntr-progress-label"><span class="${nutrient.emojiClass}"></span> ${nutrient.name}:</span> <span class="ntr-progress-values">${Math.round(nutrient.current)} / ${nutrient.goal} ${nutrient.unit}</span> <span class="ntr-progress-percentage ${colorZone}">(${percentage}%)</span><div class="ntr-progress-track"><div class="ntr-progress-fill ${colorZone}" style="--progress-width: ${Math.min(percentage, 100)};">${shineAndGlow}</div></div></div>
 `;
     }
     
     return content;
+  }
+
+  private getColorZone(percentage: number): string {
+    if (percentage < 25) return 'zone-red';
+    if (percentage < 50) return 'zone-orange';
+    if (percentage < 75) return 'zone-yellow';
+    if (percentage < 90) return 'zone-light-green';
+    return 'zone-green';
   }
 
   generateMealProgressSummaryWithId(totals: NutritionData, mealId: string): string {

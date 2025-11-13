@@ -1774,6 +1774,58 @@
   font-size: 14px;
 }
 
+/* Text color zones for percentage display - Light Theme */
+.ntr-progress-percentage.zone-red {
+  color: #dc2626;
+  font-weight: 600;
+}
+
+.ntr-progress-percentage.zone-orange {
+  color: #ea580c;
+  font-weight: 600;
+}
+
+.ntr-progress-percentage.zone-yellow {
+  color: #d97706;
+  font-weight: 600;
+}
+
+.ntr-progress-percentage.zone-light-green {
+  color: #65a30d;
+  font-weight: 600;
+}
+
+.ntr-progress-percentage.zone-green {
+  color: #16a34a;
+  font-weight: 600;
+}
+
+/* Text color zones for percentage display - Dark Theme */
+.theme-dark .ntr-progress-percentage.zone-red,
+.ntr-summary-card.theme-dark .ntr-progress-percentage.zone-red {
+  color: #fca5a5;
+}
+
+.theme-dark .ntr-progress-percentage.zone-orange,
+.ntr-summary-card.theme-dark .ntr-progress-percentage.zone-orange {
+  color: #fdba74;
+}
+
+.theme-dark .ntr-progress-percentage.zone-yellow,
+.ntr-summary-card.theme-dark .ntr-progress-percentage.zone-yellow {
+  color: #fde68a;
+}
+
+.theme-dark .ntr-progress-percentage.zone-light-green,
+.ntr-summary-card.theme-dark .ntr-progress-percentage.zone-light-green {
+  color: #bef264;
+}
+
+.theme-dark .ntr-progress-percentage.zone-green,
+.ntr-summary-card.theme-dark .ntr-progress-percentage.zone-green {
+  color: #86efac;
+}
+
 /* Progress track (background bar) */
 .ntr-progress-track {
   width: 100%;
@@ -1795,7 +1847,7 @@
   box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1), 0 1px 0 rgba(255, 255, 255, 0.03);
 }
 
-/* Progress fill (colored bar) - uses CSS custom properties for dynamic colors */
+/* Progress fill (colored bar) - uses color zone classes */
 .ntr-progress-fill {
   height: 100%;
   border-radius: 8px;
@@ -1804,22 +1856,71 @@
   overflow: hidden;
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  /* Dynamic colors set via inline style using CSS custom properties:
-     --progress-r, --progress-g, --progress-b, --progress-opacity-base */
-  background: linear-gradient(135deg, 
-    rgba(var(--progress-r), var(--progress-g), var(--progress-b), var(--progress-opacity-base, 0.3)) 0%,
-    rgba(var(--progress-r), var(--progress-g), var(--progress-b), calc(var(--progress-opacity-base, 0.3) * 0.8)) 50%,
-    rgba(var(--progress-r), var(--progress-g), var(--progress-b), calc(var(--progress-opacity-base, 0.3) * 0.6)) 100%);
-  border: 1px solid rgba(var(--progress-r), var(--progress-g), var(--progress-b), var(--progress-border-opacity, 0.45));
+  /* Width controlled by CSS custom property --progress-width */
+  width: calc(var(--progress-width, 0) * 1%);
+  /* Default gray styling - can be overridden by zone classes */
+  background: linear-gradient(135deg,
+    rgba(100, 100, 100, 0.3) 0%,
+    rgba(100, 100, 100, 0.24) 50%,
+    rgba(100, 100, 100, 0.18) 100%);
+  border: 1px solid rgba(100, 100, 100, 0.45);
 }
 
-.theme-dark .ntr-progress-fill,
-.ntr-summary-card.theme-dark .ntr-progress-fill {
-  background: linear-gradient(135deg, 
-    rgba(var(--progress-r), var(--progress-g), var(--progress-b), var(--progress-opacity-base, 0.45)) 0%,
-    rgba(var(--progress-r), var(--progress-g), var(--progress-b), calc(var(--progress-opacity-base, 0.45) * 0.8)) 50%,
-    rgba(var(--progress-r), var(--progress-g), var(--progress-b), calc(var(--progress-opacity-base, 0.45) * 0.6)) 100%);
-  border: 1px solid rgba(var(--progress-r), var(--progress-g), var(--progress-b), var(--progress-border-opacity, 0.6));
+/* Progress Fill Color Zones - Light Theme */
+.ntr-progress-fill.zone-red {
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.3) 0%, rgba(239, 68, 68, 0.24) 50%, rgba(220, 38, 38, 0.18) 100%);
+  border: 1px solid rgba(239, 68, 68, 0.45);
+}
+
+.ntr-progress-fill.zone-orange {
+  background: linear-gradient(135deg, rgba(251, 146, 60, 0.3) 0%, rgba(251, 146, 60, 0.24) 50%, rgba(249, 115, 22, 0.18) 100%);
+  border: 1px solid rgba(251, 146, 60, 0.45);
+}
+
+.ntr-progress-fill.zone-yellow {
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.3) 0%, rgba(251, 191, 36, 0.24) 50%, rgba(245, 158, 11, 0.18) 100%);
+  border: 1px solid rgba(251, 191, 36, 0.45);
+}
+
+.ntr-progress-fill.zone-light-green {
+  background: linear-gradient(135deg, rgba(132, 204, 22, 0.3) 0%, rgba(132, 204, 22, 0.24) 50%, rgba(101, 163, 13, 0.18) 100%);
+  border: 1px solid rgba(132, 204, 22, 0.45);
+}
+
+.ntr-progress-fill.zone-green {
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.3) 0%, rgba(34, 197, 94, 0.24) 50%, rgba(22, 163, 74, 0.18) 100%);
+  border: 1px solid rgba(34, 197, 94, 0.45);
+}
+
+/* Progress Fill Color Zones - Dark Theme */
+.theme-dark .ntr-progress-fill.zone-red,
+.ntr-summary-card.theme-dark .ntr-progress-fill.zone-red {
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.45) 0%, rgba(239, 68, 68, 0.36) 50%, rgba(220, 38, 38, 0.27) 100%);
+  border: 1px solid rgba(239, 68, 68, 0.6);
+}
+
+.theme-dark .ntr-progress-fill.zone-orange,
+.ntr-summary-card.theme-dark .ntr-progress-fill.zone-orange {
+  background: linear-gradient(135deg, rgba(251, 146, 60, 0.45) 0%, rgba(251, 146, 60, 0.36) 50%, rgba(249, 115, 22, 0.27) 100%);
+  border: 1px solid rgba(251, 146, 60, 0.6);
+}
+
+.theme-dark .ntr-progress-fill.zone-yellow,
+.ntr-summary-card.theme-dark .ntr-progress-fill.zone-yellow {
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.45) 0%, rgba(251, 191, 36, 0.36) 50%, rgba(245, 158, 11, 0.27) 100%);
+  border: 1px solid rgba(251, 191, 36, 0.6);
+}
+
+.theme-dark .ntr-progress-fill.zone-light-green,
+.ntr-summary-card.theme-dark .ntr-progress-fill.zone-light-green {
+  background: linear-gradient(135deg, rgba(132, 204, 22, 0.45) 0%, rgba(132, 204, 22, 0.36) 50%, rgba(101, 163, 13, 0.27) 100%);
+  border: 1px solid rgba(132, 204, 22, 0.6);
+}
+
+.theme-dark .ntr-progress-fill.zone-green,
+.ntr-summary-card.theme-dark .ntr-progress-fill.zone-green {
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.45) 0%, rgba(34, 197, 94, 0.36) 50%, rgba(22, 163, 74, 0.27) 100%);
+  border: 1px solid rgba(34, 197, 94, 0.6);
 }
 
 /* Glass shine effect on progress bar */
