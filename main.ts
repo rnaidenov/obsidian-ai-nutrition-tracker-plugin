@@ -4,7 +4,7 @@ import { SettingsTab } from './src/ui/settings/SettingsTab';
 import { PluginSettings, DEFAULT_SETTINGS } from './src/types/settings';
 import { LLMService } from './src/services/llm-service';
 import { FileService } from './src/services/file-service';
-import { setEmojiIcons } from './src/services/set-emoji-icons';
+import { applyEmojiPreferences } from './src/utils/apply-emoji-preferences';
 
 export default class NutritionTrackerPlugin extends Plugin {
   settings: PluginSettings;
@@ -24,8 +24,8 @@ export default class NutritionTrackerPlugin extends Plugin {
     this.llmService = new LLMService(this.settings);
     this.fileService = new FileService(this.app, this.app.vault, this.settings);
     
-    // Inject emoji styles
-    setEmojiIcons(this.settings.appearance);
+    // Apply emoji preferences
+    applyEmojiPreferences(this.settings.appearance);
    
     // Add ribbon icon
     this.addRibbonIcon('apple', 'Log food', () => {
@@ -344,7 +344,7 @@ export default class NutritionTrackerPlugin extends Plugin {
     this.llmService = new LLMService(this.settings);
     this.fileService = new FileService(this.app, this.app.vault, this.settings);
     
-    setEmojiIcons(this.settings.appearance);
+    applyEmojiPreferences(this.settings.appearance);
   }
 
   private async openTodaysFoodLog() {
