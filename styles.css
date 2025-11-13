@@ -1798,7 +1798,7 @@
   overflow: hidden;
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  /* Dynamic colors set via inline style using CSS custom properties:
+    /* Dynamic colors supplied via injected CSS custom properties:
      --progress-r, --progress-g, --progress-b, --progress-opacity-base */
   background: linear-gradient(135deg, 
     rgba(var(--progress-r), var(--progress-g), var(--progress-b), var(--progress-opacity-base, 0.3)) 0%,
