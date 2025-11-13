@@ -129,7 +129,6 @@ export class MealManager {
     try {
       const mealsPath = this.getMealsFilePath();
       
-      // Ensure directory exists
       await this.fileUtils.ensureDirectoryExists(this.settings.mealStoragePath);
       
       const content = JSON.stringify(meals, null, 2);
@@ -137,14 +136,10 @@ export class MealManager {
       const existingFile = this.vault.getAbstractFileByPath(mealsPath);
       
       if (existingFile instanceof TFile) {
-        await this.vault.process(existingFile, () => content);
+        this.vault.modify(existingFile, content);
       } else {
         await this.vault.create(mealsPath, content);
       }
-      
-      // Verify file was created/updated
-      const verifyFile = this.vault.getAbstractFileByPath(mealsPath);
-      
     } catch (error) {
       throw error;
     }
@@ -152,18 +147,17 @@ export class MealManager {
 
   private async createMealNote(meal: Meal): Promise<{ createdNewFile: boolean; filePath: string }> {
     try {
-      // Sanitize meal name for filename
       const sanitizedName = this.fileUtils.sanitizeMealName(meal.name);
       const filename = `${sanitizedName}.md`;
       const notePath = normalizePath(`${this.settings.mealStoragePath}/${filename}`);
 
-      const content = await this.generateMealNoteContent(meal);
+      const content = this.generateMealNoteContent(meal);
 
       const existingFile = this.vault.getAbstractFileByPath(notePath);
       let createdNewFile = false;
 
       if (existingFile && existingFile instanceof TFile) {
-        await this.vault.process(existingFile, () => content);
+        this.vault.modify(existingFile, content);
       } else {
         await this.vault.create(notePath, content);
         createdNewFile = true;
@@ -203,13 +197,12 @@ export class MealManager {
     }
   }
 
-  private async generateMealNoteContent(meal: Meal): Promise<string> {
+  private generateMealNoteContent(meal: Meal): string {
     const totalCalories = meal.items.reduce((sum, item) => sum + item.calories, 0);
     const totalProtein = meal.items.reduce((sum, item) => sum + item.protein, 0);
     const totalCarbs = meal.items.reduce((sum, item) => sum + item.carbs, 0);
     const totalFat = meal.items.reduce((sum, item) => sum + item.fat, 0);
     
-    // Create totals object for progress summary
     const totals = {
       calories: totalCalories,
       protein: totalProtein,
@@ -218,14 +211,9 @@ export class MealManager {
     };
     
     let content = '';
-    
-    // Add meal items section with collapsible heading
     content += '## 🥗 Meal Items\n\n';
-    
     content += this.layoutGenerator.generateCardLayout(meal.items, 'meal', meal.id);
-    
-    // Add beautiful progress summary with hidden meal ID
-    content += await this.layoutGenerator.generateMealProgressSummaryWithId(totals, meal.id);
+    content += this.layoutGenerator.generateMealProgressSummaryWithId(totals, meal.id);
     
     return content;
   }

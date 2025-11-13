@@ -21,7 +21,6 @@ export class FoodLogManager {
     const logPath = normalizePath(`${this.settings.logStoragePath}/${today}.md`);
 
     try {
-      // Ensure the directory exists
       await this.fileUtils.ensureDirectoryExists(this.settings.logStoragePath);
 
       const existingFile = this.vault.getAbstractFileByPath(logPath);
@@ -62,18 +61,15 @@ export class FoodLogManager {
         throw new Error('Food log file not found for today');
       }
       
-      // Read content, process it, then write back
-      const existingContent = await this.vault.read(existingFile);
-      const deleteResult = this.contentParser.deleteCardFromContent(existingContent, itemToDelete);
-      
-      if (!deleteResult.success) {
-        throw new Error('Item not found in food log');
-      }
-      
-      const finalContent = await this.recalculateTotals(deleteResult.content);
-      
-      // Use process to write the final content
-      await this.vault.process(existingFile, () => finalContent);
+      await this.vault.process(existingFile, (content) => {
+        const deleteResult = this.contentParser.deleteCardFromContent(content, itemToDelete);
+        
+        if (!deleteResult.success) {
+          throw new Error('Item not found in food log');
+        }
+        
+        return this.recalculateTotals(deleteResult.content);
+      });
     } catch (error) {
       console.error('Error deleting food log item:', error);
       throw new Error(`Failed to delete food log item: ${error.message}`);
@@ -97,56 +93,61 @@ export class FoodLogManager {
   }
 
   private async appendToExistingLog(file: TFile, foodItems: FoodItem[]): Promise<void> {
-    const existingContent = await this.vault.read(file);
-    const placeholder = '<div class="food-placeholder"></div>';
-    const placeholderIndex = existingContent.indexOf(placeholder);
-    
     const newCard = this.layoutGenerator.generateCardLayout(foodItems);
+    const placeholder = '<div class="food-placeholder"></div>';
     
-    if (placeholderIndex !== -1) {
-      // Replace placeholder with new card + new placeholder
-      const updatedContent = existingContent.replace(
-        placeholder,
-        newCard + '\n' + placeholder
-      );
-      const finalContent = await this.recalculateTotals(updatedContent);
-      await this.vault.process(file, () => finalContent);
-    } else {
-      // No placeholder found - this is an old format file, add placeholder and content
-      const ctaButtonIndex = existingContent.indexOf('class="nutrition-add-cta-btn"');
-      if (ctaButtonIndex !== -1) {
-        const insertPosition = existingContent.lastIndexOf('<div', ctaButtonIndex);
-        const beforeInsert = existingContent.substring(0, insertPosition);
-        const afterInsert = existingContent.substring(insertPosition);
-        const updatedContent = beforeInsert + newCard + '\n' + placeholder + '\n\n' + afterInsert;
-        const finalContent = await this.recalculateTotals(updatedContent);
-        await this.vault.process(file, () => finalContent);
+    await this.vault.process(file, (content) => {
+      const placeholderIndex = content.indexOf(placeholder);
+      
+      if (placeholderIndex !== -1) {
+        const updatedContent = content.replace(
+          placeholder,
+          newCard + '\n' + placeholder
+        );
+        return this.recalculateTotals(updatedContent);
+      } else {
+        const ctaButtonIndex = content.indexOf('class="nutrition-add-cta-btn"');
+        if (ctaButtonIndex !== -1) {
+          const insertPosition = content.lastIndexOf('<div', ctaButtonIndex);
+          const beforeInsert = content.substring(0, insertPosition);
+          const afterInsert = content.substring(insertPosition);
+          const updatedContent = beforeInsert + newCard + '\n' + placeholder + '\n\n' + afterInsert;
+          return this.recalculateTotals(updatedContent);
+        }
       }
-    }
+      
+      return content;
+    });
   }
 
   private async replaceInExistingLog(file: TFile, newFoodItems: FoodItem[], originalEntry: { food: string, quantity: string, calories: number, protein: number, carbs: number, fat: number }): Promise<void> {
     const newCardContent = this.layoutGenerator.generateCardLayout(newFoodItems);
-    const existingContent = await this.vault.read(file);
     
-    const replacement = this.contentParser.replaceCardInPosition(existingContent, originalEntry, newCardContent);
-    
-    if (replacement.success) {
-      const finalContent = await this.recalculateTotals(replacement.content);
-      // Use process to write the final content
-      await this.vault.process(file, () => finalContent);
-    } else {
-      // If replacement failed, append as new entry
-      await this.appendToExistingLog(file, newFoodItems);
+    try {
+      await this.vault.process(file, (content) => {
+        const replacement = this.contentParser.replaceCardInPosition(content, originalEntry, newCardContent);
+        
+        if (replacement.success) {
+          return this.recalculateTotals(replacement.content);
+        } else {
+          throw new Error('Could not find card to replace');
+        }
+      });
+    } catch (error) {
+      if (error.message === 'Could not find card to replace') {
+        await this.appendToExistingLog(file, newFoodItems);
+      } else {
+        throw error;
+      }
     }
   }
 
 
-  private async recalculateTotals(content: string): Promise<string> {
+  private recalculateTotals(content: string): string {
     const foodItems = this.contentParser.extractFoodItemsFromContent(content);
     const totals = this.contentParser.calculateTotals(foodItems);
     
-    const newSummary = await this.layoutGenerator.generateDailySummary(totals);
+    const newSummary = this.layoutGenerator.generateDailySummary(totals);
     
     // Find the summary card
     const summaryStart = content.indexOf('<div class="ntr-summary-card');

@@ -90,7 +90,7 @@ export class LayoutGenerator {
     return buttonHtml;
   }
 
-  async generateDailySummary(totals: NutritionData): Promise<string> {
+  generateDailySummary(totals: NutritionData): string {
     const goals = this.settings.nutritionGoals;
     
     let summary = '';
@@ -154,7 +154,7 @@ ${nutritionRows}  <div class="ntr-overall-progress">
     return content;
   }
 
-  async generateMealProgressSummaryWithId(totals: NutritionData, mealId: string): Promise<string> {
+  generateMealProgressSummaryWithId(totals: NutritionData, mealId: string): string {
     const goals = this.settings.nutritionGoals;
     
     const overallProgress = Math.round((
