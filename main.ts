@@ -75,7 +75,7 @@ export default class NutritionTrackerPlugin extends Plugin {
     );
   }
 
-  async onunload() {
+  onunload() {
     this.mealSyncTimeouts.forEach(timeout => window.clearTimeout(timeout));
     this.mealSyncTimeouts.clear();
     
