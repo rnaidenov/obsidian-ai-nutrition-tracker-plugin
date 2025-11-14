@@ -45,7 +45,7 @@ export class SettingsTab extends PluginSettingTab {
 
       button.addEventListener('click', async (e) => {
         e.preventDefault();
-        const textInput = setting.controlEl.querySelector('input') as HTMLInputElement;
+        const textInput = setting.controlEl.querySelector('input');
         if (textInput) {
           textInput.value = emoji;
           await onChange(emoji);

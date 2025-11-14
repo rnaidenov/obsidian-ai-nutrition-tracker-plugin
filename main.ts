@@ -302,7 +302,7 @@ export default class NutritionTrackerPlugin extends Plugin {
           const filePath = file.path;
           
           if (this.mealSyncTimeouts.has(filePath)) {
-            window.clearTimeout(this.mealSyncTimeouts.get(filePath)!);
+            window.clearTimeout(this.mealSyncTimeouts.get(filePath));
           }
           
           const timeout = window.setTimeout(async () => {

@@ -135,7 +135,7 @@ export class FoodInputModal extends Modal {
       this.handleProcessFood.bind(this)
     );
     
-    this.processingIndicator = contentEl.querySelector('.nutrition-tracker-processing-indicator') as HTMLElement;
+    this.processingIndicator = contentEl.querySelector('.nutrition-tracker-processing-indicator');
     
     // Initialize button state manager with actual elements
     this.buttonStateManager = new ButtonStateManager(this.processButton, this.processingIndicator);

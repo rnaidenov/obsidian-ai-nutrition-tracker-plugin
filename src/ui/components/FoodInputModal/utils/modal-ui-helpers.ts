@@ -121,7 +121,7 @@ export function createFoodDescriptionInput(
   
   foodDescSetting.settingEl.addClass('nutrition-tracker-food-setting');
   
-  return textareaEl!;
+  return textareaEl;
 }
 
 export function createSaveAsMealToggle(
@@ -185,7 +185,7 @@ export function createProcessButton(
   
   processButtonSetting.settingEl.addClass('nutrition-tracker-process-button-setting');
   
-  const processButton = processButtonSetting.settingEl.querySelector('button') as HTMLButtonElement;
+  const processButton = processButtonSetting.settingEl.querySelector('button');
   
   // Add processing indicator
   const processingIndicator = contentEl.createDiv(`nutrition-tracker-processing-indicator${isProcessing ? ' visible' : ''}`);
