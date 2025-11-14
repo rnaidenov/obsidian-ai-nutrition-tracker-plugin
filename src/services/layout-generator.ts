@@ -164,7 +164,7 @@ ${nutritionRows}  <div class="ntr-overall-progress">
       this.contentParser.calculatePercentage(totals.fat, goals.fat)
     ) / 4);
     
-    let nutritionRows = this.generateModernProgressBars(totals, goals);
+    const nutritionRows = this.generateModernProgressBars(totals, goals);
     
     const summary = `<div class="ntr-summary-card" data-meal-id="${mealId}">
 <h3 class="ntr-summary-title">🎯 Meal vs Goals</h3>

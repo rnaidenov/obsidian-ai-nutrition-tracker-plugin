@@ -112,7 +112,7 @@ export class ContentParser {
   extractCompleteCard(content: string, startIndex: number): { success: boolean, content: string } {
     let divCount = 0;
     let i = startIndex;
-    let cardStart = startIndex;
+    const cardStart = startIndex;
     let cardEnd = -1;
     
     // Find the opening div

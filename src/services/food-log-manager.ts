@@ -1,5 +1,5 @@
 import { TFile, Vault, Notice, normalizePath } from 'obsidian';
-import { FoodItem, NutritionData } from '../types/nutrition';
+import { FoodItem } from '../types/nutrition';
 import { PluginSettings } from '../types/settings';
 import { FileUtils } from './file-utils';
 import { LayoutGenerator } from './layout-generator';

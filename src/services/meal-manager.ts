@@ -25,7 +25,7 @@ export class MealManager {
       id: this.fileUtils.generateMealId(),
       name: name.trim(),
       items: foodItems.map(item => {
-        const { mealId, ...itemWithoutMealId } = item;
+        const { mealId: _, ...itemWithoutMealId } = item;
         return itemWithoutMealId;
       }),
       description: description?.trim(),
@@ -82,7 +82,7 @@ export class MealManager {
       }
 
       return meals;
-    } catch (error) {
+    } catch (_error) {
       return [];
     }
   }
@@ -120,7 +120,7 @@ export class MealManager {
     try {
       const meals = await this.getMeals();
       return meals.find(m => m.id === mealId) || null;
-    } catch (error) {
+    } catch (_error) {
       return null;
     }
   }
@@ -292,7 +292,7 @@ export class MealManager {
         
         if (itemIndex >= 0) {
           // Update the item in the meal
-          const { mealId, timestamp, ...itemWithoutMealData } = newItem;
+          const { mealId: _mealId, timestamp: _timestamp, ...itemWithoutMealData } = newItem;
           meal.items[itemIndex] = itemWithoutMealData;
           meal.updatedAt = new Date().toISOString();
           
@@ -395,7 +395,7 @@ export class MealManager {
       
       // Clean items to remove any meal-specific data
       const cleanItems = items.map(item => {
-        const { mealId: itemMealId, timestamp, ...cleanItem } = item;
+        const { mealId: _itemMealId, timestamp: _timestamp, ...cleanItem } = item;
         return cleanItem;
       });
       
@@ -451,7 +451,6 @@ export class MealManager {
         }
         
         // Rename the file to match the new meal name
-        const newFileBasename = newFilename.replace('.md', '');
         await this.vault.rename(currentFile, newNotePath);
         
       }

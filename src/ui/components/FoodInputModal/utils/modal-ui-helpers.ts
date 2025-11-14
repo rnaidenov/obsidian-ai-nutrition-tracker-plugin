@@ -29,8 +29,8 @@ export function createEditingNotice(contentEl: HTMLElement, initialData: any, ed
   }
   
   if (!noticeText) return; // No notice needed
-  
-  const notice = contentEl.createEl('p', { 
+
+  contentEl.createEl('p', {
     text: noticeText,
     cls: 'nutrition-tracker-edit-notice'
   });

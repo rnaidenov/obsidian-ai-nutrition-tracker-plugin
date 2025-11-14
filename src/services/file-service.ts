@@ -1,4 +1,4 @@
-import { TFile, Vault, TAbstractFile, TFolder, App } from 'obsidian';
+import { TFile, Vault, TAbstractFile, App } from 'obsidian';
 import { FoodItem, Meal } from '../types/nutrition';
 import { PluginSettings } from '../types/settings';
 import { FileUtils } from './file-utils';

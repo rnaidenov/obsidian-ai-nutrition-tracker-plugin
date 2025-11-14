@@ -48,7 +48,7 @@ export class FoodProcessor {
       }
 
       // Process food items
-      let allFoodItems: FoodItem[] = [];
+      const allFoodItems: FoodItem[] = [];
       
       // Add selected meals (but not when adding to a specific meal to avoid duplication)
       if (hasSelectedMeals && !targetMealId) {

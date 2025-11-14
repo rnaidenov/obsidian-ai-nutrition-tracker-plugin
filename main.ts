@@ -1,4 +1,4 @@
-import { Plugin, TFile, Notice, TFolder, TAbstractFile } from 'obsidian';
+import { Plugin, TFile, Notice } from 'obsidian';
 import { FoodInputModal } from './src/ui/components/FoodInputModal/FoodInputModal';
 import { SettingsTab } from './src/ui/settings/SettingsTab';
 import { PluginSettings, DEFAULT_SETTINGS } from './src/types/settings';
@@ -96,22 +96,18 @@ export default class NutritionTrackerPlugin extends Plugin {
     const existingModalContainers = document.querySelectorAll('.modal-container.mod-dim');
     const existingModalContent = document.querySelectorAll('.nutrition-tracker-modal');
     
-    let removedCount = 0;
     existingModalContainers.forEach(modal => {
       if (modal.querySelector('.nutrition-tracker-modal')) {
         modal.remove();
-        removedCount++;
       }
     });
-    
+
     existingModalContent.forEach(modal => {
       const container = modal.closest('.modal-container');
       if (container) {
         container.remove();
-        removedCount++;
       } else {
         modal.remove();
-        removedCount++;
       }
     });
   }
