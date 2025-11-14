@@ -126,22 +126,18 @@ export class MealManager {
   }
 
   private async saveMealsToFile(meals: Meal[]): Promise<void> {
-    try {
-      const mealsPath = this.getMealsFilePath();
-      
-      await this.fileUtils.ensureDirectoryExists(this.settings.mealStoragePath);
-      
-      const content = JSON.stringify(meals, null, 2);
-      
-      const existingFile = this.vault.getAbstractFileByPath(mealsPath);
-      
-      if (existingFile instanceof TFile) {
-        await this.vault.modify(existingFile, content);
-      } else {
-        await this.vault.create(mealsPath, content);
-      }
-    } catch (error) {
-      throw error;
+    const mealsPath = this.getMealsFilePath();
+    
+    await this.fileUtils.ensureDirectoryExists(this.settings.mealStoragePath);
+    
+    const content = JSON.stringify(meals, null, 2);
+    
+    const existingFile = this.vault.getAbstractFileByPath(mealsPath);
+    
+    if (existingFile instanceof TFile) {
+      await this.vault.modify(existingFile, content);
+    } else {
+      await this.vault.create(mealsPath, content);
     }
   }
 

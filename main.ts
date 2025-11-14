@@ -250,7 +250,7 @@ export default class NutritionTrackerPlugin extends Plugin {
           const context = target.getAttribute('data-ntr-edit-context') as 'meal' | 'foodlog' || 'foodlog';
           const entryId = target.getAttribute('data-ntr-entry-id') || '';
           
-          const confirmDelete = confirm(`Are you sure you want to delete "${food} (${quantity})"?`);
+          const confirmDelete = window.confirm(`Are you sure you want to delete "${food} (${quantity})"?`);
           
           if (confirmDelete) {
             void this.deleteFoodEntry(food, quantity, calories, protein, carbs, fat, context, entryId);
@@ -299,7 +299,7 @@ export default class NutritionTrackerPlugin extends Plugin {
 
   private setupMealNoteSyncHandler() {
     this.registerEvent(
-      this.app.vault.on('modify', async (file) => {
+      this.app.vault.on('modify', (file) => {
         const isMealNote = this.fileService.isMealNote(file);
         
         if (isMealNote && file instanceof TFile) {
