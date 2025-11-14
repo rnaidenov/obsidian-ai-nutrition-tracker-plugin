@@ -26,6 +26,7 @@ export default class NutritionTrackerPlugin extends Plugin {
     
     // Apply emoji preferences
     applyEmojiPreferences(this.settings.appearance);
+
    
     // Add ribbon icon
     this.addRibbonIcon('apple', 'Log food', () => {
@@ -201,13 +202,13 @@ export default class NutritionTrackerPlugin extends Plugin {
         event.stopPropagation();
         
         // Extract data from button attributes
-        const food = target.getAttribute('data-food') || '';
-        const quantity = target.getAttribute('data-quantity') || '';
-        const calories = parseFloat(target.getAttribute('data-calories') || '0');
-        const protein = parseFloat(target.getAttribute('data-protein') || '0');
-        const carbs = parseFloat(target.getAttribute('data-carbs') || '0');
-        const fat = parseFloat(target.getAttribute('data-fat') || '0');
-        const context = target.getAttribute('data-edit-context') as 'meal' | 'foodlog' || 'foodlog';
+        const food = target.getAttribute('data-ntr-food') || '';
+        const quantity = target.getAttribute('data-ntr-quantity') || '';
+        const calories = parseFloat(target.getAttribute('data-ntr-calories') || '0');
+        const protein = parseFloat(target.getAttribute('data-ntr-protein') || '0');
+        const carbs = parseFloat(target.getAttribute('data-ntr-carbs') || '0');
+        const fat = parseFloat(target.getAttribute('data-ntr-fat') || '0');
+        const context = target.getAttribute('data-ntr-edit-context') as 'meal' | 'foodlog' || 'foodlog';
         
         if (context === 'meal') {
           new Notice(`🍽️ Opening meal item editor: ${food} (${quantity})`);
@@ -241,14 +242,14 @@ export default class NutritionTrackerPlugin extends Plugin {
         
         
         try {
-          const food = target.getAttribute('data-food') || '';
-          const quantity = target.getAttribute('data-quantity') || '';
-          const calories = parseFloat(target.getAttribute('data-calories') || '0');
-          const protein = parseFloat(target.getAttribute('data-protein') || '0');
-          const carbs = parseFloat(target.getAttribute('data-carbs') || '0');
-          const fat = parseFloat(target.getAttribute('data-fat') || '0');
-          const context = target.getAttribute('data-edit-context') as 'meal' | 'foodlog' || 'foodlog';
-          const entryId = target.getAttribute('data-entry-id') || '';
+          const food = target.getAttribute('data-ntr-food') || '';
+          const quantity = target.getAttribute('data-ntr-quantity') || '';
+          const calories = parseFloat(target.getAttribute('data-ntr-calories') || '0');
+          const protein = parseFloat(target.getAttribute('data-ntr-protein') || '0');
+          const carbs = parseFloat(target.getAttribute('data-ntr-carbs') || '0');
+          const fat = parseFloat(target.getAttribute('data-ntr-fat') || '0');
+          const context = target.getAttribute('data-ntr-edit-context') as 'meal' | 'foodlog' || 'foodlog';
+          const entryId = target.getAttribute('data-ntr-entry-id') || '';
           
           const confirmDelete = confirm(`Are you sure you want to delete "${food} (${quantity})"?`);
           
@@ -353,11 +354,11 @@ export default class NutritionTrackerPlugin extends Plugin {
     
     try {
       const file = this.app.vault.getAbstractFileByPath(logPath);
-      if (file instanceof TFile) {
-        await this.app.workspace.getLeaf().openFile(file);
-      } else {
-        new Notice(`No food log found for today. Use "Log food entry" to create one.`);
-      }
+        if (file instanceof TFile) {
+          await this.app.workspace.getLeaf().openFile(file);
+        } else {
+          new Notice(`No food log found for today. Use "Log food entry" to create one.`);
+        }
     } catch (error) {
       new Notice(`Error opening today's food log: ${error.message}`);
     }

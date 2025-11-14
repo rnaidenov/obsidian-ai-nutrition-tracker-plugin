@@ -4,18 +4,11 @@ export class ContentParser {
   extractFoodItemsFromContent(content: string): FoodItem[] {
     const items: FoodItem[] = [];
     
-    // Try simple layout first (most common - data-food, data-quantity, etc.)
-    const simpleRegex = /class="nutrition-food-entry-simple[^"]*"[^>]*data-food="([^"]*)"[^>]*data-quantity="([^"]*)"[^>]*data-calories="([^"]*)"[^>]*data-protein="([^"]*)"[^>]*data-carbs="([^"]*)"[^>]*data-fat="([^"]*)"/g;
+    // Extract food items using data-ntr-* attributes
+    const regex = /<div[^>]*data-ntr-food="([^"]*)"[^>]*data-ntr-quantity="([^"]*)"[^>]*data-ntr-calories="([\d.]+)"[^>]*data-ntr-protein="([\d.]+)"[^>]*data-ntr-carbs="([\d.]+)"[^>]*data-ntr-fat="([\d.]+)"[^>]*>/g;
     
-    // Try card layout (data-ntr-food, data-ntr-quantity, etc.)
-    const cardAttributeRegex = /<div[^>]*data-ntr-food="([^"]*)"[^>]*data-ntr-quantity="([^"]*)"[^>]*data-ntr-calories="([\d.]+)"[^>]*data-ntr-protein="([\d.]+)"[^>]*data-ntr-carbs="([\d.]+)"[^>]*data-ntr-fat="([\d.]+)"[^>]*>/g;
-    
-    // Extract from old HTML card layouts (fallback)
-    const htmlCardRegex = /<div style="background: linear-gradient\(135deg,[^"]+\)"[\s\S]*?<h3[^>]*>([^<]+)<\/h3>[\s\S]*?📏 ([^<]+)[\s\S]*?<div style="color: [^"]+; font-weight: bold; font-size: 14px;">([\d.]+)<\/div>[\s\S]*?<div style="color: [^"]+; font-weight: bold; font-size: 14px;">([\d.]+)g<\/div>[\s\S]*?<div style="color: [^"]+; font-weight: bold; font-size: 14px;">([\d.]+)g<\/div>[\s\S]*?<div style="color: [^"]+; font-weight: bold; font-size: 14px;">([\d.]+)g<\/div>/g;
-    
-    // Try simple layout first (most reliable for new entries)
     let match;
-    while ((match = simpleRegex.exec(content)) !== null) {
+    while ((match = regex.exec(content)) !== null) {
       items.push({
         food: match[1].replace(/&quot;/g, '"'),
         quantity: match[2].replace(/&quot;/g, '"'),
@@ -24,42 +17,6 @@ export class ContentParser {
         carbs: parseFloat(match[5]),
         fat: parseFloat(match[6])
       });
-    }
-    
-    // If no simple layout entries found, try card layout
-    if (items.length === 0) {
-      while ((match = cardAttributeRegex.exec(content)) !== null) {
-        // Extract all nutrition data from card data attributes
-        const food = match[1].replace(/&quot;/g, '"');
-        const quantity = match[2].replace(/&quot;/g, '"');
-        const calories = parseFloat(match[3]);
-        const protein = parseFloat(match[4]);
-        const carbs = parseFloat(match[5]);
-        const fat = parseFloat(match[6]);
-        
-        items.push({
-          food,
-          quantity,
-          calories,
-          protein,
-          carbs,
-          fat
-        });
-      }
-    }
-    
-    // If still no items found, try old HTML card pattern
-    if (items.length === 0) {
-      while ((match = htmlCardRegex.exec(content)) !== null) {
-        items.push({
-          food: match[1].trim(),
-          quantity: match[2].trim(),
-          calories: parseFloat(match[3]),
-          protein: parseFloat(match[4]),
-          carbs: parseFloat(match[5]),
-          fat: parseFloat(match[6])
-        });
-      }
     }
     
     return items;
@@ -108,29 +65,18 @@ export class ContentParser {
   }
 
   findCardPosition(content: string, escapedFood: string, escapedQuantity: string, calories: number): { success: boolean, startIndex: number, endIndex: number } {
-    // Look for cards with complete nutrition data
-    const startPattern = new RegExp(
+    const pattern = new RegExp(
       `<div[^>]*data-ntr-food="${escapedFood}"[^>]*data-ntr-quantity="${escapedQuantity}"[^>]*data-ntr-calories="${calories}"[^>]*data-ntr-protein="[^"]*"[^>]*data-ntr-carbs="[^"]*"[^>]*data-ntr-fat="[^"]*"[^>]*>`,
       'gi'
     );
     
-    const startMatch = startPattern.exec(content);
-    if (!startMatch) {
-      // Try legacy pattern without complete nutrition data
-      const legacyPattern = new RegExp(
-        `<div[^>]*data-ntr-food="${escapedFood}"[^>]*data-ntr-quantity="${escapedQuantity}"[^>]*data-ntr-calories="${calories}"[^>]*>`,
-        'gi'
-      );
-      const legacyMatch = legacyPattern.exec(content);
-      if (!legacyMatch) {
-        return { success: false, startIndex: -1, endIndex: -1 };
-      }
-      const cardBounds = this.findCardBounds(content, legacyMatch.index);
-      return { success: cardBounds.success, startIndex: legacyMatch.index, endIndex: cardBounds.endIndex };
+    const match = pattern.exec(content);
+    if (!match) {
+      return { success: false, startIndex: -1, endIndex: -1 };
     }
     
-    const cardBounds = this.findCardBounds(content, startMatch.index);
-    return { success: cardBounds.success, startIndex: startMatch.index, endIndex: cardBounds.endIndex };
+    const cardBounds = this.findCardBounds(content, match.index);
+    return { success: cardBounds.success, startIndex: match.index, endIndex: cardBounds.endIndex };
   }
 
   findCardBounds(content: string, startIndex: number): { success: boolean, endIndex: number } {
@@ -231,44 +177,16 @@ export class ContentParser {
     const escapedFood = itemToDelete.food.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/"/g, '&quot;');
     const escapedQuantity = itemToDelete.quantity.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/"/g, '&quot;');
     
-    const cardPattern = new RegExp(
+    const pattern = new RegExp(
       `<div[^>]*data-ntr-food="${escapedFood}"[^>]*data-ntr-quantity="${escapedQuantity}"[^>]*data-ntr-calories="${itemToDelete.calories}"[^>]*data-ntr-protein="${itemToDelete.protein}"[^>]*data-ntr-carbs="${itemToDelete.carbs}"[^>]*data-ntr-fat="${itemToDelete.fat}"[^>]*>`,
       'gi'
     );
     
-    let startMatch = cardPattern.exec(content);
-    if (!startMatch) {
-      // Try legacy card pattern without complete nutrition data
-      const legacyCardPattern = new RegExp(
-        `<div[^>]*data-ntr-food="${escapedFood}"[^>]*data-ntr-quantity="${escapedQuantity}"[^>]*data-ntr-calories="${itemToDelete.calories}"[^>]*>`,
-        'gi'
-      );
-      startMatch = legacyCardPattern.exec(content);
-    }
-    
-    if (!startMatch) {
-      // Try simple layout attributes (data-*)
-      const simplePattern = new RegExp(
-        `<div[^>]*data-food="${escapedFood}"[^>]*data-quantity="${escapedQuantity}"[^>]*data-calories="${itemToDelete.calories}"[^>]*>`,
-        'gi'
-      );
-      startMatch = simplePattern.exec(content);
-      
-      if (!startMatch) {
-        // Try alternative simple attribute order
-        const simplePattern2 = new RegExp(
-          `<div[^>]*data-calories="${itemToDelete.calories}"[^>]*data-food="${escapedFood}"[^>]*data-quantity="${escapedQuantity}"[^>]*>`,
-          'gi'
-        );
-        startMatch = simplePattern2.exec(content);
-      }
-    }
-    
-    if (!startMatch) {
+    const match = pattern.exec(content);
+    if (!match) {
       return { success: false, content };
     }
     
-    // Use the existing extractCompleteCard method which removes the card and returns the cleaned content
-    return this.extractCompleteCard(content, startMatch.index);
+    return this.extractCompleteCard(content, match.index);
   }
 } 

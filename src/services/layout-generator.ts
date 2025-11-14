@@ -39,8 +39,8 @@ export class LayoutGenerator {
         content += `      </div>\n`;
         content += `    </div>\n`;
       content += `    <div class="ntr-food-card-actions">\n`;
-      content += `      <button class="nutrition-edit-btn ntr-edit-btn" data-food="${item.food.replace(/"/g, '&quot;')}" data-quantity="${item.quantity.replace(/"/g, '&quot;')}" data-calories="${item.calories}" data-protein="${item.protein}" data-carbs="${item.carbs}" data-fat="${item.fat}" data-edit-context="${editContext}">✏️ Edit</button>\n`;
-      content += `      <button class="nutrition-delete-btn ntr-delete-btn" data-food="${item.food.replace(/"/g, '&quot;')}" data-quantity="${item.quantity.replace(/"/g, '&quot;')}" data-calories="${item.calories}" data-protein="${item.protein}" data-carbs="${item.carbs}" data-fat="${item.fat}" data-edit-context="${editContext}" data-entry-id="${entryId}">🗑️ Delete</button>\n`;
+      content += `      <button class="nutrition-edit-btn ntr-edit-btn" data-ntr-food="${item.food.replace(/"/g, '&quot;')}" data-ntr-quantity="${item.quantity.replace(/"/g, '&quot;')}" data-ntr-calories="${item.calories}" data-ntr-protein="${item.protein}" data-ntr-carbs="${item.carbs}" data-ntr-fat="${item.fat}" data-ntr-edit-context="${editContext}">✏️ Edit</button>\n`;
+      content += `      <button class="nutrition-delete-btn ntr-delete-btn" data-ntr-food="${item.food.replace(/"/g, '&quot;')}" data-ntr-quantity="${item.quantity.replace(/"/g, '&quot;')}" data-ntr-calories="${item.calories}" data-ntr-protein="${item.protein}" data-ntr-carbs="${item.carbs}" data-ntr-fat="${item.fat}" data-ntr-edit-context="${editContext}" data-ntr-entry-id="${entryId}">🗑️ Delete</button>\n`;
         content += `    </div>\n`;
         content += `  </div>\n`;
       
