@@ -1,7 +1,7 @@
 {
   "id": "ai-nutrition-tracker",
   "name": "AI Nutrition Tracker",
-  "version": "1.1.15",
+  "version": "1.1.16",
   "minAppVersion": "0.15.0",
   "description": "AI-powered nutrition tracking with food image analysis and daily logging.",
   "author": "rnaidenov",
