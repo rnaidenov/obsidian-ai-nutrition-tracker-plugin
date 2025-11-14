@@ -268,7 +268,7 @@ export class MealManager {
         await this.handleMealNameChange(oldMeal, updatedMeal, file);
         new Notice(`✅ Meal updated: "${oldMeal.name}" → "${updatedMeal.name}"`);
       } else {
-        new Notice(`⚠️ Meal not found in storage - this might be an orphaned meal note`);
+        new Notice("⚠️ meal not found in storage - this might be an orphaned meal note");
       }
       
     } catch (error) {
@@ -320,7 +320,7 @@ export class MealManager {
       }
       
       if (!mealFound) {
-        new Notice('⚠️ Could not find the meal containing this item');
+        new Notice('⚠️ could not find the meal containing this item');
       }
       
     } catch (error) {
@@ -372,7 +372,7 @@ export class MealManager {
       }
       
       if (!mealFound) {
-        new Notice('⚠️ Could not find the meal containing this item');
+        new Notice('⚠️ could not find the meal containing this item');
       }
       
     } catch (error) {

@@ -98,7 +98,7 @@ export function createFoodDescriptionInput(
   
   const foodDescSetting = new Setting(contentEl)
     .setName('Additional food description')
-    .setDesc('Add extra items or details (optional - will be processed with AI)')
+    .setDesc('Add extra items or details (optional - will be processed with ai)')
     .addTextArea(text => {
       text
         .setPlaceholder('Enter additional food description...')

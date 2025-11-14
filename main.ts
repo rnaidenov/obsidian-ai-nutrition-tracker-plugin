@@ -56,7 +56,7 @@ export default class NutritionTrackerPlugin extends Plugin {
 
     // Check if API key is configured
     if (!this.settings.openRouterApiKey) {
-      new Notice('Nutrition Tracker: Please configure your OpenRouter API key in settings');
+      new Notice('Nutrition Tracker: please configure your OpenRouter API key in settings');
     }
 
     // Set up event delegation for edit buttons
@@ -280,7 +280,7 @@ export default class NutritionTrackerPlugin extends Plugin {
         }
 
         if (!mealId) {
-          new Notice('❌ Error: Meal ID not found. Please try again or report this issue.');
+          new Notice('❌ error: meal id not found. Please try again or report this issue.');
           return;
         }
 
@@ -352,7 +352,7 @@ export default class NutritionTrackerPlugin extends Plugin {
         if (file instanceof TFile) {
           await this.app.workspace.getLeaf().openFile(file);
         } else {
-          new Notice(`No food log found for today. Use "Log food entry" to create one.`);
+          new Notice("No food log found for today. Use \"log food entry\" to create one.");
         }
     } catch (error) {
       new Notice(`Error opening today's food log: ${error.message}`);

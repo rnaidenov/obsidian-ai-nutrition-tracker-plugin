@@ -65,7 +65,7 @@ export class SettingsTab extends PluginSettingTab {
 
     new Setting(containerEl)
       .setName('OpenRouter API key')
-      .setDesc('Your OpenRouter API key for LLM processing. Get one at openrouter.ai')
+      .setDesc('Your OpenRouter API key for llm processing. Get one at OpenRouter.ai')
       .addText(text => {
         text
           .setPlaceholder('Enter your API key')
@@ -90,14 +90,14 @@ export class SettingsTab extends PluginSettingTab {
       });
 
     new Setting(containerEl)
-      .setName('LLM model')
-      .setDesc('The AI model to use for food analysis')
+      .setName('Llm model')
+      .setDesc('The ai model to use for food analysis')
       .addDropdown(dropdown => dropdown
-        .addOption('google/gemini-2.5-flash', 'Gemini 2.5 Flash (Fast & Smart - Recommended)')
-        .addOption('google/gemini-2.5-pro', 'Gemini 2.5 Pro (Most Capable)')
-        .addOption('anthropic/claude-4.0-sonnet', 'Claude 4 Sonnet')
-        .addOption('anthropic/claude-3.7-sonnet', 'Claude 3.7 Sonnet')
-        .addOption('openai/gpt-4o', 'GPT-4O')
+        .addOption('google/gemini-2.5-flash', 'Gemini 2.5 flash (fast & smart - recommended)')
+        .addOption('google/gemini-2.5-pro', 'Gemini 2.5 pro (most capable)')
+        .addOption('anthropic/claude-4.0-sonnet', 'Claude 4 sonnet')
+        .addOption('anthropic/claude-3.7-sonnet', 'Claude 3.7 sonnet')
+        .addOption('openai/gpt-4o', 'Gpt-4o')
         .setValue(this.plugin.settings.llmModel)
         .onChange(async (value) => {
           this.plugin.settings.llmModel = value;
@@ -250,7 +250,7 @@ export class SettingsTab extends PluginSettingTab {
       .addText(text => {
         new FolderSuggest(this.app, text.inputEl);
         text
-          .setPlaceholder('tracker/health/food/log')
+          .setPlaceholder('Tracker/health/food/log')
           .setValue(this.plugin.settings.logStoragePath)
           .onChange(async (value) => {
             this.plugin.settings.logStoragePath = normalizePath(value || 'tracker/health/food/log');
@@ -264,7 +264,7 @@ export class SettingsTab extends PluginSettingTab {
       .addText(text => {
         new FolderSuggest(this.app, text.inputEl);
         text
-          .setPlaceholder('tracker/health/food/meals')
+          .setPlaceholder('Tracker/health/food/meals')
           .setValue(this.plugin.settings.mealStoragePath)
           .onChange(async (value) => {
             this.plugin.settings.mealStoragePath = normalizePath(value || 'tracker/health/food/meals');
@@ -278,7 +278,7 @@ export class SettingsTab extends PluginSettingTab {
       .addText(text => {
         new FolderSuggest(this.app, text.inputEl);
         text
-          .setPlaceholder('tracker/health/food/log/images')
+          .setPlaceholder('Tracker/health/food/log/images')
           .setValue(this.plugin.settings.imageStoragePath)
           .onChange(async (value) => {
             this.plugin.settings.imageStoragePath = normalizePath(value || 'tracker/health/food/log/images');

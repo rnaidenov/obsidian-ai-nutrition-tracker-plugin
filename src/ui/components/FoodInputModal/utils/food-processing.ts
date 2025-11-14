@@ -82,7 +82,7 @@ export class FoodProcessor {
           new Notice(`${savedImagePaths.length} image(s) saved successfully`);
         } catch (error) {
           console.error('Error saving images:', error);
-          new Notice('Warning: Failed to save some images, but continuing with food processing');
+          new Notice('Warning: failed to save some images, but continuing with food processing');
         }
       }
 
@@ -93,7 +93,7 @@ export class FoodProcessor {
           new Notice(`✅ Meal "${mealName}" saved successfully`);
         } catch (error) {
           console.error('Error saving meal:', error);
-          new Notice('Warning: Failed to save meal, but continuing with food processing');
+          new Notice('Warning: failed to save meal, but continuing with food processing');
         }
       }
 
