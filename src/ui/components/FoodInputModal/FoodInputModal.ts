@@ -1,4 +1,4 @@
-import { App, Modal } from 'obsidian';
+import { App, Modal, Notice } from 'obsidian';
 import { PluginSettings } from '../../../types/settings';
 import { LLMService } from '../../../services/llm-service';
 import { FileService } from '../../../services/file-service';
@@ -241,8 +241,11 @@ export class FoodInputModal extends Modal {
     );
   }
 
-  private refresh() {
-    this.onOpen();
+  private refresh(): void {
+    this.onOpen().catch(error => {
+      console.error('Error refreshing modal:', error);
+      new Notice(`Error refreshing modal: ${error.message}`);
+    });
   }
 
   onClose() {

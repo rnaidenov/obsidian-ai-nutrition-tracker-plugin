@@ -185,7 +185,6 @@ export default class NutritionTrackerPlugin extends Plugin {
       if (cardElement) {
         cardElement.remove();
       }
-      
     } catch (error) {
       console.error('Error deleting food entry:', error);
       new Notice(`❌ Failed to delete ${food}: ${error.message}`);
@@ -254,7 +253,7 @@ export default class NutritionTrackerPlugin extends Plugin {
           const confirmDelete = confirm(`Are you sure you want to delete "${food} (${quantity})"?`);
           
           if (confirmDelete) {
-            this.deleteFoodEntry(food, quantity, calories, protein, carbs, fat, context, entryId);
+            void this.deleteFoodEntry(food, quantity, calories, protein, carbs, fat, context, entryId);
           }
           
         } catch (error) {

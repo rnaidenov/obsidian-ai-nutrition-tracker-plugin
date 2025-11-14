@@ -35,7 +35,7 @@ export class MealSuggest extends AbstractInputSuggest<Meal> {
   selectSuggestion(meal: Meal): void {
     this.setValue(meal.name);
     this.close();
-    this.onSelectCallback(meal.id);
+    void this.onSelectCallback(meal.id);
   }
 }
 
