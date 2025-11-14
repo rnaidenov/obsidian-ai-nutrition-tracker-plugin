@@ -47,7 +47,7 @@ export default class NutritionTrackerPlugin extends Plugin {
       id: 'open-todays-food-log',
       name: 'Open today\'s food log',
       callback: () => {
-        this.openTodaysFoodLog();
+        void this.openTodaysFoodLog();
       }
     });
 
