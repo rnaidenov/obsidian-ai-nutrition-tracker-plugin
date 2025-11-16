@@ -64,11 +64,11 @@ export class SettingsTab extends PluginSettingTab {
       .setHeading();
 
     new Setting(containerEl)
-      .setName('Openrouter api key')
-      .setDesc('Your openrouter api key for llm processing. Get one at openrouter.ai')
+      .setName('Openrouter API key')
+      .setDesc('Your openrouter API key for llm processing. Get one at openrouter.ai')
       .addText(text => {
         text
-          .setPlaceholder('Enter your api key')
+          .setPlaceholder('Enter your API key')
           .setValue(this.plugin.settings.openRouterApiKey)
           .onChange(async (value) => {
             this.plugin.settings.openRouterApiKey = value;
