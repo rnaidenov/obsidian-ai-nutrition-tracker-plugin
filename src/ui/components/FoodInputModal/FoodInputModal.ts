@@ -67,7 +67,14 @@ export class FoodInputModal extends Modal {
     this.editingContext = 'meal';
   }
 
-  async onOpen() {
+  onOpen(): void {
+    this.initializeAsync().catch(error => {
+      console.error('Error initializing modal:', error);
+      new Notice(`Error initializing modal: ${error.message}`);
+    });
+  }
+
+  private async initializeAsync(): Promise<void> {
     const { contentEl } = this;
     contentEl.empty();
 
@@ -242,7 +249,7 @@ export class FoodInputModal extends Modal {
   }
 
   private refresh(): void {
-    this.onOpen().catch(error => {
+    this.initializeAsync().catch(error => {
       console.error('Error refreshing modal:', error);
       new Notice(`Error refreshing modal: ${error.message}`);
     });
