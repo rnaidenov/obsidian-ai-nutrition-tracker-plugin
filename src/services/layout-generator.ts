@@ -1,4 +1,4 @@
-import { FoodItem, NutritionData } from '../types/nutrition';
+import { FoodItem, NutritionData, NutritionGoals } from '../types/nutrition';
 import { PluginSettings } from '../types/settings';
 import { ThemeUtils } from './theme-utils';
 import { ContentParser } from './content-parser';
@@ -120,7 +120,7 @@ ${nutritionRows}  <div class="ntr-overall-progress">
     return summary;
   }
 
-  generateModernProgressBars(totals: NutritionData, goals: any): string {
+  generateModernProgressBars(totals: NutritionData, goals: NutritionGoals): string {
     let content = '';
     
     const nutrients = [

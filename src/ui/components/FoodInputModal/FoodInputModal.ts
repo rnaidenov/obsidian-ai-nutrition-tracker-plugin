@@ -2,6 +2,7 @@ import { App, Modal, Notice } from 'obsidian';
 import { PluginSettings } from '../../../types/settings';
 import { LLMService } from '../../../services/llm-service';
 import { FileService } from '../../../services/file-service';
+import { FoodItem } from '../../../types/nutrition';
 import {
   createModalTitle,
   createEditingNotice,
@@ -24,7 +25,7 @@ export class FoodInputModal extends Modal {
   private processButton: HTMLButtonElement | null = null;
   private processingIndicator: HTMLElement | null = null;
   private errorMessageEl: HTMLElement | null = null;
-  private initialData: any = null;
+  private initialData: FoodItem | null = null;
   private editingContext: 'meal' | 'foodlog' = 'foodlog';
   private targetMealId: string | null = null;
   private onCloseCallback?: () => void;

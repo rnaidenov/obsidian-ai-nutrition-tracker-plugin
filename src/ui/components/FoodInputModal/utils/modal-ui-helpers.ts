@@ -2,7 +2,7 @@ import { Setting, App } from 'obsidian';
 import { Meal, FoodItem } from '../../../../types/nutrition';
 import { MealSuggest } from './MealSuggest';
 
-export function createModalTitle(contentEl: HTMLElement, initialData: any, editingContext: 'meal' | 'foodlog', targetMealId?: string) {
+export function createModalTitle(contentEl: HTMLElement, initialData: FoodItem | null, editingContext: 'meal' | 'foodlog', targetMealId?: string) {
   let title = 'Add food entry';
   if (initialData) {
     title = editingContext === 'meal' ? 'Edit meal item' : 'Edit food entry';
@@ -12,7 +12,7 @@ export function createModalTitle(contentEl: HTMLElement, initialData: any, editi
   contentEl.createEl('h2', { text: title });
 }
 
-export function createEditingNotice(contentEl: HTMLElement, initialData: any, editingContext: 'meal' | 'foodlog', targetMealId?: string) {
+export function createEditingNotice(contentEl: HTMLElement, initialData: FoodItem | null, editingContext: 'meal' | 'foodlog', targetMealId?: string) {
   // Show different notices based on the context
   let noticeText = '';
   
@@ -166,7 +166,7 @@ export function createSaveAsMealToggle(
 export function createProcessButton(
   contentEl: HTMLElement, 
   isProcessing: boolean, 
-  initialData: any, 
+  initialData: FoodItem | null, 
   editingContext: 'meal' | 'foodlog',
   onProcess: () => void
 ): HTMLButtonElement {

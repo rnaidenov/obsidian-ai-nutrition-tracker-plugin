@@ -1,4 +1,4 @@
-import { Meal } from '../../../../types/nutrition';
+import { FoodItem, Meal } from '../../../../types/nutrition';
 
 export class ButtonStateManager {
   constructor(
@@ -13,7 +13,7 @@ export class ButtonStateManager {
     saveAsMeal: boolean,
     mealName: string,
     isProcessing: boolean,
-    initialData?: any,
+    initialData?: FoodItem,
     editingContext?: 'meal' | 'foodlog',
     targetMealId?: string
   ): void {

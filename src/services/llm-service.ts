@@ -6,6 +6,11 @@ export interface LLMResponse {
   items: FoodItem[];
 }
 
+interface OpenRouterMessage {
+  role: 'system' | 'user' | 'assistant';
+  content: string | Array<{ type: string; text?: string; image_url?: { url: string } }>;
+}
+
 export class LLMService {
   constructor(private settings: PluginSettings) {}
 
@@ -118,8 +123,8 @@ Rules:
     `;
   }
 
-  private async buildMessages(prompt: string, images?: File[]): Promise<any[]> {
-    const messages: any[] = [
+  private async buildMessages(prompt: string, images?: File[]): Promise<OpenRouterMessage[]> {
+    const messages: OpenRouterMessage[] = [
       {
         role: 'system',
         content: 'You are a nutrition expert. Analyze food descriptions and return accurate nutrition data in JSON format. Always respond with valid JSON only.'
@@ -208,7 +213,7 @@ Rules:
     }
   }
 
-  private parseNumber(value: any, fieldName: string): number {
+  private parseNumber(value: unknown, fieldName: string): number {
     const num = typeof value === 'string' ? parseFloat(value) : Number(value);
     
     if (isNaN(num) || num < 0) {

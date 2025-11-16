@@ -144,15 +144,16 @@ export class FoodProcessor {
     }
   }
 
-  private handleError(error: any): { success: false; message: string } {
-    if (error.message.includes('API key')) {
+  private handleError(error: unknown): { success: false; message: string } {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    if (errorMessage.includes('API key')) {
       return { success: false, message: 'API Error: Please check your OpenRouter API key in settings' };
-    } else if (error.message.includes('quota') || error.message.includes('credits')) {
+    } else if (errorMessage.includes('quota') || errorMessage.includes('credits')) {
       return { success: false, message: 'API Error: Insufficient credits or quota exceeded' };
-    } else if (error.message.includes('network') || error.message.includes('fetch')) {
+    } else if (errorMessage.includes('network') || errorMessage.includes('fetch')) {
       return { success: false, message: 'Network Error: Please check your internet connection' };
     } else {
-      return { success: false, message: `Error processing food: ${error.message}` };
+      return { success: false, message: `Error processing food: ${errorMessage}` };
     }
   }
 
