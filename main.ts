@@ -1,5 +1,6 @@
 import { Plugin, TFile, Notice } from 'obsidian';
 import { FoodInputModal } from './src/ui/components/FoodInputModal/FoodInputModal';
+import { ConfirmModal } from './src/ui/components/ConfirmModal';
 import { SettingsTab } from './src/ui/settings/SettingsTab';
 import { PluginSettings, DEFAULT_SETTINGS } from './src/types/settings';
 import { LLMService } from './src/services/llm-service';
@@ -246,11 +247,18 @@ export default class NutritionTrackerPlugin extends Plugin {
           const context = target.getAttribute('data-ntr-edit-context') as 'meal' | 'foodlog' || 'foodlog';
           const entryId = target.getAttribute('data-ntr-entry-id') || '';
           
-          const confirmDelete = window.confirm(`Are you sure you want to delete "${food} (${quantity})"?`);
-          
-          if (confirmDelete) {
-            void this.deleteFoodEntry(food, quantity, calories, protein, carbs, fat, context, entryId);
-          }
+          new ConfirmModal(
+            this.app,
+            `Are you sure you want to delete "${food} (${quantity})"?`,
+            () => {
+              void this.deleteFoodEntry(food, quantity, calories, protein, carbs, fat, context, entryId);
+            },
+            {
+              confirmText: 'Delete',
+              cancelText: 'Cancel',
+              isDestructive: true
+            }
+          ).open();
           
         } catch (error) {
           console.error('💥 Error in delete handler:', error);
