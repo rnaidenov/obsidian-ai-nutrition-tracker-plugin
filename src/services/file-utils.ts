@@ -36,7 +36,7 @@ export class FileUtils {
   }
 
   generateMealId(): string {
-    return 'meal_' + Date.now().toString(36) + '_' + Math.random().toString(36).substr(2, 9);
+    return 'meal_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 11);
   }
 
   sanitizeMealName(name: string): string {
