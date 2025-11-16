@@ -64,11 +64,11 @@ export class SettingsTab extends PluginSettingTab {
       .setHeading();
 
     new Setting(containerEl)
-      .setName('OpenRouter API key')
-      .setDesc('Your OpenRouter API key for llm processing. Get one at OpenRouter.ai')
+      .setName('Openrouter api key')
+      .setDesc('Your openrouter api key for llm processing. Get one at openrouter.ai')
       .addText(text => {
         text
-          .setPlaceholder('Enter your API key')
+          .setPlaceholder('Enter your api key')
           .setValue(this.plugin.settings.openRouterApiKey)
           .onChange(async (value) => {
             this.plugin.settings.openRouterApiKey = value;
@@ -91,7 +91,7 @@ export class SettingsTab extends PluginSettingTab {
 
     new Setting(containerEl)
       .setName('Llm model')
-      .setDesc('The ai model to use for food analysis')
+      .setDesc('The AI model to use for food analysis')
       .addDropdown(dropdown => dropdown
         .addOption('google/gemini-2.5-flash', 'Gemini 2.5 flash (fast & smart - recommended)')
         .addOption('google/gemini-2.5-pro', 'Gemini 2.5 pro (most capable)')

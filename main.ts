@@ -56,7 +56,7 @@ export default class NutritionTrackerPlugin extends Plugin {
 
     // Check if API key is configured
     if (!this.settings.openRouterApiKey) {
-      new Notice('Nutrition Tracker: please configure your OpenRouter API key in settings');
+      new Notice('Nutrition Tracker: please configure your openrouter api key in settings');
     }
 
     // Set up event delegation for edit buttons
