@@ -41,7 +41,7 @@ export class ImageManager {
   createImageUploadButton(contentEl: HTMLElement, isProcessing: boolean, onSelectImages: () => void): void {
     const imageUploadSetting = new Setting(contentEl)
       .setName('Additional food images')
-      .setDesc('Upload additional images for ai analysis (optional)')
+      .setDesc('Upload additional images for AI analysis (optional)')
       .addButton(button => {
         button
           .setButtonText('Add images')
