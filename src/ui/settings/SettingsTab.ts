@@ -43,12 +43,12 @@ export class SettingsTab extends PluginSettingTab {
         cls: 'emoji-picker-button'
       });
 
-      button.addEventListener('click', async (e) => {
+      button.addEventListener('click', (e) => {
         e.preventDefault();
         const textInput = setting.controlEl.querySelector('input');
         if (textInput) {
           textInput.value = emoji;
-          await onChange(emoji);
+          void onChange(emoji);
         }
       });
     });

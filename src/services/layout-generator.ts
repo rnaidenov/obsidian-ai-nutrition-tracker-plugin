@@ -25,7 +25,7 @@ export class LayoutGenerator {
       
       const editContext = context || 'foodlog';
       
-        const entryId = `ntr-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`;
+        const entryId = `ntr-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
       content += `\n<div id="${entryId}" class="ntr-food-card" data-ntr-food="${item.food.replace(/"/g, '&quot;')}" data-ntr-quantity="${item.quantity.replace(/"/g, '&quot;')}" data-ntr-calories="${item.calories}" data-ntr-protein="${item.protein}" data-ntr-carbs="${item.carbs}" data-ntr-fat="${item.fat}">\n`;
       content += `  <div class="ntr-food-card-header">\n`;
       content += `    <div class="ntr-food-card-info">\n`;

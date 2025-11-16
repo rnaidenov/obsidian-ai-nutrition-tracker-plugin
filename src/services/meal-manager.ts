@@ -308,8 +308,8 @@ export class MealManager {
           const mealFile = this.vault.getAbstractFileByPath(mealFilePath);
           if (mealFile instanceof TFile) {
             // Small delay to ensure file write is complete
-            window.setTimeout(async () => {
-              await this.syncMealNoteToJSON(mealFile);
+            window.setTimeout(() => {
+              void this.syncMealNoteToJSON(mealFile);
             }, 100);
           }
           
@@ -360,8 +360,8 @@ export class MealManager {
           const mealFile = this.vault.getAbstractFileByPath(mealFilePath);
           if (mealFile instanceof TFile) {
             // Small delay to ensure file write is complete
-            window.setTimeout(async () => {
-              await this.syncMealNoteToJSON(mealFile);
+            window.setTimeout(() => {
+              void this.syncMealNoteToJSON(mealFile);
             }, 100);
           }
           
@@ -414,8 +414,8 @@ export class MealManager {
       const mealFilePath = normalizePath(`${this.settings.mealStoragePath}/${mealFileName}`);
       const mealFile = this.vault.getAbstractFileByPath(mealFilePath);
       if (mealFile instanceof TFile) {
-        window.setTimeout(async () => {
-          await this.syncMealNoteToJSON(mealFile);
+        window.setTimeout(() => {
+          void this.syncMealNoteToJSON(mealFile);
         }, 100);
       }
       

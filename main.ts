@@ -313,9 +313,10 @@ export default class NutritionTrackerPlugin extends Plugin {
             window.clearTimeout(this.mealSyncTimeouts.get(filePath));
           }
           
-          const timeout = window.setTimeout(async () => {
-            await this.fileService.syncMealNoteToJSON(file);
-            this.mealSyncTimeouts.delete(filePath);
+          const timeout = window.setTimeout(() => {
+            void this.fileService.syncMealNoteToJSON(file).then(() => {
+              this.mealSyncTimeouts.delete(filePath);
+            });
           }, 1000);
           
           this.mealSyncTimeouts.set(filePath, timeout);
