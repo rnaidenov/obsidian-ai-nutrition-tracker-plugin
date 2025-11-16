@@ -31,7 +31,7 @@ export class ConfirmModal extends Modal {
     modalEl.addClass('ntr-confirm-modal');
     
     const iconEl = contentEl.createDiv({ cls: 'ntr-confirm-icon' });
-    iconEl.innerHTML = this.isDestructive ? '🗑️' : '❓';
+    iconEl.textContent = this.isDestructive ? '🗑️' : '❓';
     
     contentEl.createEl('p', { 
       text: this.message,
