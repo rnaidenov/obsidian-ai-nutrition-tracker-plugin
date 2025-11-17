@@ -145,7 +145,7 @@ export class FoodProcessor {
   }
 
   private handleError(error: unknown): { success: false; message: string } {
-    const errorMessage = error instanceof Error ? error.message : String(error);
+    const errorMessage = error instanceof Error ? error.message : JSON.stringify(error);
     if (errorMessage.includes('API key')) {
       return { success: false, message: 'API Error: Please check your OpenRouter API key in settings' };
     } else if (errorMessage.includes('quota') || errorMessage.includes('credits')) {
