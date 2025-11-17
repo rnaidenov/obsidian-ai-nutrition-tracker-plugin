@@ -217,7 +217,7 @@ Rules:
     const num = typeof value === 'string' ? parseFloat(value) : Number(value);
     
     if (isNaN(num) || num < 0) {
-      throw new Error(`Invalid ${fieldName} value: ${value}`);
+      throw new Error(`Invalid ${fieldName} value: ${JSON.stringify(value)}`);
     }
     
     return num;
