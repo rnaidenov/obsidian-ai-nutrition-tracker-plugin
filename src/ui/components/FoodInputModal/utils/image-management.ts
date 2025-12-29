@@ -9,31 +9,41 @@ export class ImageManager {
     fileInput.type = 'file';
     fileInput.accept = 'image/*';
     fileInput.multiple = true;
-
+  
     const handleChange = (event: Event) => {
-      const target = event.target as HTMLInputElement;
-      if (target.files) {
-        const newImages = Array.from(target.files);
-
-        // Check file sizes (max 10MB per image)
-        const validImages = newImages.filter(file => {
-          if (file.size > 10 * 1024 * 1024) { // 10MB
-            new Notice(`${file.name} is too large. Please select images under 10MB.`);
-            return false;
+      try {
+        const target = event.target as HTMLInputElement;
+        if (target.files && target.files.length > 0) {
+          const newImages = Array.from(target.files);
+  
+          // Check file sizes (max 10MB per image)
+          const validImages = newImages.filter(file => {
+            if (file.size > 10 * 1024 * 1024) { // 10MB
+              new Notice(`${file.name} is too large. Please select images under 10MB.`);
+              return false;
+            }
+            return true;
+          });
+  
+          if (validImages.length > 0) {
+            this.selectedImages.push(...validImages);
+            onImagesSelected();
           }
-          return true;
-        });
-
-        this.selectedImages.push(...validImages);
-        onImagesSelected();
+        }
+      } catch (error) {
+        console.error('Error selecting images:', error);
+        new Notice('Error selecting images. Please try again.');
+      } finally {
+        // Clean up after a short delay to ensure all processing is complete
+        setTimeout(() => {
+          fileInput.removeEventListener('change', handleChange);
+          fileInput.remove();
+        }, 100);
       }
-
-      fileInput.removeEventListener('change', handleChange);
-      fileInput.remove();
     };
-
+  
     fileInput.addEventListener('change', handleChange);
-
+  
     // Trigger file selection
     fileInput.click();
   }
