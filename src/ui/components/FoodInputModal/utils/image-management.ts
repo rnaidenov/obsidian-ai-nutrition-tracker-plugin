@@ -9,7 +9,10 @@ export class ImageManager {
     fileInput.type = 'file';
     fileInput.accept = 'image/*';
     fileInput.multiple = true;
-  
+
+    fileInput.style.display = 'none';
+    document.body.appendChild(fileInput);
+
     const handleChange = (event: Event) => {
       try {
         const target = event.target as HTMLInputElement;
