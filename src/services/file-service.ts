@@ -6,7 +6,7 @@ import { ContentParser } from './content-parser';
 import { LayoutGenerator } from './layout-generator';
 import { FoodLogManager } from './food-log-manager';
 import { MealManager } from './meal-manager';
-import { MealStorage } from './meal/meal-storage';
+import { readMeals, writeMeals } from './meal/meal-storage';
 import { createMeal } from './meal/meal-operations';
 
 export class FileService {
@@ -15,7 +15,6 @@ export class FileService {
   private layoutGenerator: LayoutGenerator;
   private foodLogManager: FoodLogManager;
   private mealManager: MealManager;
-  private mealStorage: MealStorage;
 
   constructor(private app: App, private vault: Vault, private settings: PluginSettings) {
     this.fileUtils = new FileUtils(vault);
@@ -23,7 +22,6 @@ export class FileService {
     this.layoutGenerator = new LayoutGenerator(settings);
     this.foodLogManager = new FoodLogManager(vault, settings);
     this.mealManager = new MealManager(app, vault, settings);
-    this.mealStorage = new MealStorage(vault, settings);
   }
 
   // Food Log Operations - delegate to FoodLogManager
@@ -44,9 +42,9 @@ export class FileService {
     const mealId = this.fileUtils.generateMealId();
     const meal = createMeal(mealId, name, foodItems, servingUnit, description, images);
 
-    const meals = await this.mealStorage.readMeals();
+    const meals = await readMeals(this.vault, this.settings);
     meals.push(meal);
-    await this.mealStorage.writeMeals(meals);
+    await writeMeals(this.vault, this.settings, meals);
 
     await this.mealManager.createMealNote(meal);
 

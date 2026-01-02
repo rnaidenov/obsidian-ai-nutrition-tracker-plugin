@@ -1,26 +1,25 @@
-import { Notice } from 'obsidian';
-import { Meal } from '../../types/nutrition';
+import { Vault, Notice } from 'obsidian';
+import { PluginSettings } from '../../types/settings';
 import { migrateMealsToV2, isLegacyMeal } from './meal-operations';
-import { MealStorage } from './meal-storage';
+import { readMeals, writeMeals } from './meal-storage';
 
-export class MealMigration {
-  constructor(private storage: MealStorage) {}
+export async function migrateIfNeeded(
+  vault: Vault,
+  settings: PluginSettings
+): Promise<{ migrated: boolean; count: number }> {
+  const meals = await readMeals(vault, settings);
 
-  async migrateIfNeeded(): Promise<{ migrated: boolean; count: number }> {
-    const meals = await this.storage.readMeals();
+  const legacyMeals = meals.filter(isLegacyMeal);
 
-    const legacyMeals = meals.filter(isLegacyMeal);
-
-    if (legacyMeals.length === 0) {
-      return { migrated: false, count: 0 };
-    }
-
-    const migratedMeals = migrateMealsToV2(meals);
-
-    await this.storage.writeMeals(migratedMeals);
-
-    new Notice(`✅ Migrated ${legacyMeals.length} meal(s) to new format (normalized to 100g baseline)`);
-
-    return { migrated: true, count: legacyMeals.length };
+  if (legacyMeals.length === 0) {
+    return { migrated: false, count: 0 };
   }
+
+  const migratedMeals = migrateMealsToV2(meals);
+
+  await writeMeals(vault, settings, migratedMeals);
+
+  new Notice(`✅ Migrated ${legacyMeals.length} meal(s) to new format`);
+
+  return { migrated: true, count: legacyMeals.length };
 }

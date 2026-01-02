@@ -4,20 +4,18 @@ import { PluginSettings } from '../types/settings';
 import { FileUtils } from './file-utils';
 import { LayoutGenerator } from './layout-generator';
 import { ContentParser } from './content-parser';
-import { MealStorage } from './meal/meal-storage';
+import { readMeals, writeMeals } from './meal/meal-storage';
 import { migrateMealToV2, isLegacyMeal } from './meal/meal-operations';
 
 export class MealManager {
   private fileUtils: FileUtils;
   private layoutGenerator: LayoutGenerator;
   private contentParser: ContentParser;
-  private mealStorage: MealStorage;
 
   constructor(private app: App, private vault: Vault, private settings: PluginSettings) {
     this.fileUtils = new FileUtils(vault);
     this.layoutGenerator = new LayoutGenerator(settings);
     this.contentParser = new ContentParser();
-    this.mealStorage = new MealStorage(vault, settings);
   }
 
   private getMealsFilePath(): string {
@@ -69,12 +67,12 @@ export class MealManager {
 
   async getMeals(): Promise<Meal[]> {
     try {
-      const meals = await this.mealStorage.readMeals();
+      const meals = await readMeals(this.vault, this.settings);
 
       const needsMigration = meals.some(isLegacyMeal);
       if (needsMigration) {
         const migratedMeals = meals.map(migrateMealToV2);
-        await this.mealStorage.writeMeals(migratedMeals);
+        await writeMeals(this.vault, this.settings, migratedMeals);
         return migratedMeals;
       }
 

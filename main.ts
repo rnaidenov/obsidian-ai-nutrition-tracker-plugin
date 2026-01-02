@@ -6,8 +6,7 @@ import { PluginSettings, DEFAULT_SETTINGS } from './src/types/settings';
 import { LLMService } from './src/services/llm-service';
 import { FileService } from './src/services/file-service';
 import { applyEmojiPreferences } from './src/utils/apply-emoji-preferences';
-import { MealStorage } from './src/services/meal/meal-storage';
-import { MealMigration } from './src/services/meal/meal-migration';
+import { migrateIfNeeded } from './src/services/meal/meal-migration';
 
 export default class NutritionTrackerPlugin extends Plugin {
   settings: PluginSettings;
@@ -28,9 +27,7 @@ export default class NutritionTrackerPlugin extends Plugin {
     this.fileService = new FileService(this.app, this.app.vault, this.settings);
 
     // Run meal migration
-    const mealStorage = new MealStorage(this.app.vault, this.settings);
-    const migration = new MealMigration(mealStorage);
-    await migration.migrateIfNeeded();
+    await migrateIfNeeded(this.app.vault, this.settings);
 
     // Apply emoji preferences
     applyEmojiPreferences(this.settings.appearance);

@@ -2,54 +2,49 @@ import { Vault, TFile, normalizePath } from 'obsidian';
 import { Meal } from '../../types/nutrition';
 import { PluginSettings } from '../../types/settings';
 
-export class MealStorage {
-  constructor(private vault: Vault, private settings: PluginSettings) {}
+export function getMealsFilePath(settings: PluginSettings): string {
+  return normalizePath(`${settings.mealStoragePath}/meals.json`);
+}
 
-  getMealsFilePath(): string {
-    return normalizePath(`${this.settings.mealStoragePath}/meals.json`);
-  }
+export async function readMeals(vault: Vault, settings: PluginSettings): Promise<Meal[]> {
+  try {
+    const mealsPath = getMealsFilePath(settings);
+    const mealsFile = vault.getAbstractFileByPath(mealsPath);
 
-  async readMeals(): Promise<Meal[]> {
-    try {
-      const mealsPath = this.getMealsFilePath();
-      const mealsFile = this.vault.getAbstractFileByPath(mealsPath);
-      console.log("🚀 ~ MealStorage ~ readMeals ~ mealsFile:", mealsFile)
-
-      if (!mealsFile || !(mealsFile instanceof TFile)) {
-        return [];
-      }
-
-      const content = await this.vault.read(mealsFile);
-      const meals = JSON.parse(content);
-
-      if (!Array.isArray(meals)) {
-        return [];
-      }
-
-      return meals;
-    } catch (error) {
-      console.error('Error reading meals:', error);
+    if (!mealsFile || !(mealsFile instanceof TFile)) {
       return [];
     }
-  }
 
-  async writeMeals(meals: Meal[]): Promise<void> {
-    const mealsPath = this.getMealsFilePath();
-    const content = JSON.stringify(meals, null, 2);
-    const existingFile = this.vault.getAbstractFileByPath(mealsPath);
+    const content = await vault.read(mealsFile);
+    const meals = JSON.parse(content);
 
-    if (existingFile instanceof TFile) {
-      await this.vault.modify(existingFile, content);
-    } else {
-      await this.ensureDirectoryExists();
-      await this.vault.create(mealsPath, content);
+    if (!Array.isArray(meals)) {
+      return [];
     }
-  }
 
-  private async ensureDirectoryExists(): Promise<void> {
-    const exists = this.vault.getAbstractFileByPath(this.settings.mealStoragePath);
-    if (!exists) {
-      await this.vault.createFolder(this.settings.mealStoragePath);
-    }
+    return meals;
+  } catch (error) {
+    console.error('Error reading meals:', error);
+    return [];
+  }
+}
+
+export async function writeMeals(vault: Vault, settings: PluginSettings, meals: Meal[]): Promise<void> {
+  const mealsPath = getMealsFilePath(settings);
+  const content = JSON.stringify(meals, null, 2);
+  const existingFile = vault.getAbstractFileByPath(mealsPath);
+
+  if (existingFile instanceof TFile) {
+    await vault.modify(existingFile, content);
+  } else {
+    await ensureMealDirectoryExists(vault, settings);
+    await vault.create(mealsPath, content);
+  }
+}
+
+export async function ensureMealDirectoryExists(vault: Vault, settings: PluginSettings): Promise<void> {
+  const exists = vault.getAbstractFileByPath(settings.mealStoragePath);
+  if (!exists) {
+    await vault.createFolder(settings.mealStoragePath);
   }
 }
