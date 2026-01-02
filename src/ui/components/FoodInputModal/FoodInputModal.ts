@@ -216,7 +216,42 @@ export class FoodInputModal extends Modal {
 
   private handleMealServingsChange(mealId: string, servings: number) {
     this.mealServings.set(mealId, servings);
-    this.refresh();
+    // Update nutrition display without full refresh to prevent input defocus
+    this.updateMealNutritionDisplay(mealId, servings);
+  }
+
+  private updateMealNutritionDisplay(mealId: string, servings: number) {
+    const meal = this.mealManager.getSelectedMeals().find(m => m.id === mealId);
+    if (!meal) return;
+
+    // Find the nutrition text element for this meal
+    const selectedMealsContainer = this.contentEl.querySelector('.nutrition-tracker-selected-meals');
+    if (!selectedMealsContainer) return;
+
+    const mealDivs = selectedMealsContainer.querySelectorAll('.nutrition-tracker-selected-meal');
+    const mealIndex = this.mealManager.getSelectedMeals().findIndex(m => m.id === mealId);
+
+    if (mealIndex === -1 || mealIndex >= mealDivs.length) return;
+
+    const mealDiv = mealDivs[mealIndex];
+    const nutritionEl = mealDiv.querySelector('.nutrition-tracker-meal-nutrition');
+
+    if (nutritionEl) {
+      // Calculate scaled nutrition (same logic as in modal-ui-helpers.ts)
+      const totalCalories = meal.items.reduce((sum, item) => sum + item.calories, 0);
+      const totalProtein = meal.items.reduce((sum, item) => sum + item.protein, 0);
+      const totalCarbs = meal.items.reduce((sum, item) => sum + item.carbs, 0);
+      const totalFat = meal.items.reduce((sum, item) => sum + item.fat, 0);
+
+      const scaledNutrition = {
+        calories: Math.round(totalCalories * servings),
+        protein: Math.round(totalProtein * servings),
+        carbs: Math.round(totalCarbs * servings),
+        fat: Math.round(totalFat * servings)
+      };
+
+      nutritionEl.textContent = `Total: ${scaledNutrition.calories} kcal | P: ${scaledNutrition.protein}g | C: ${scaledNutrition.carbs}g | F: ${scaledNutrition.fat}g`;
+    }
   }
 
   private async handleProcessFood() {
