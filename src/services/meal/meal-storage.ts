@@ -6,6 +6,13 @@ export function getMealsFilePath(settings: PluginSettings): string {
   return normalizePath(`${settings.mealStoragePath}/meals.json`);
 }
 
+export async function ensureMealDirectoryExists(vault: Vault, settings: PluginSettings): Promise<void> {
+  const exists = vault.getAbstractFileByPath(settings.mealStoragePath);
+  if (!exists) {
+    await vault.createFolder(settings.mealStoragePath);
+  }
+}
+
 export async function readMeals(vault: Vault, settings: PluginSettings): Promise<Meal[]> {
   try {
     const mealsPath = getMealsFilePath(settings);
@@ -39,12 +46,5 @@ export async function writeMeals(vault: Vault, settings: PluginSettings, meals: 
   } else {
     await ensureMealDirectoryExists(vault, settings);
     await vault.create(mealsPath, content);
-  }
-}
-
-export async function ensureMealDirectoryExists(vault: Vault, settings: PluginSettings): Promise<void> {
-  const exists = vault.getAbstractFileByPath(settings.mealStoragePath);
-  if (!exists) {
-    await vault.createFolder(settings.mealStoragePath);
   }
 }

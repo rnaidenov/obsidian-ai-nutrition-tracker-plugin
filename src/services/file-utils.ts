@@ -46,6 +46,13 @@ export class FileUtils {
     return name.replace(/[^a-zA-Z0-9\s-]/g, '').replace(/\s+/g, '-').toLowerCase();
   }
 
+  convertFilenameToReadableName(filename: string): string {
+    return filename
+      .replace(/-/g, ' ')
+      .replace(/\b\w/g, (char) => char.toUpperCase())
+      .trim();
+  }
+
   isMealNote(file: TAbstractFile, mealStoragePath: string, logStoragePath: string): boolean {
     if (!(file instanceof TFile)) return false;
     

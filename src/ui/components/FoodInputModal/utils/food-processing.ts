@@ -1,17 +1,29 @@
-import { Notice, App, TFile } from 'obsidian';
+import { Notice, App, TFile, Vault } from 'obsidian';
 import { FoodItem, Meal, ServingUnit, ServingUnitType } from '../../../../types/nutrition';
 import { PluginSettings } from '../../../../types/settings';
 import { LLMService } from '../../../../services/llm-service';
-import { FileService } from '../../../../services/file-service';
-import { createMealPortionEntry } from '../../../../services/meal/meal-operations';
+import { FoodLogManager } from '../../../../services/food-log-manager';
+import { FileUtils } from '../../../../services/file-utils';
+import * as MealOps from '../../../../services/meal/manager';
+import { readMeals, writeMeals } from '../../../../services/meal/meal-storage';
+import { createMeal, createMealPortionEntry } from '../../../../services/meal/meal-operations';
 
 export class FoodProcessor {
   constructor(
+    private vault: Vault,
     private app: App,
     private settings: PluginSettings,
     private llmService: LLMService,
-    private fileService: FileService
+    private foodLogManager: FoodLogManager
   ) {}
+
+  private get mealDeps(): MealOps.MealDeps {
+    return {
+      vault: this.vault,
+      app: this.app,
+      settings: this.settings
+    };
+  }
 
   async processFood(
     selectedMeals: Meal[],
@@ -80,8 +92,9 @@ export class FoodProcessor {
       let savedImagePaths: string[] = [];
       if (images.length > 0) {
         try {
+          const fileUtils = new FileUtils(this.vault);
           savedImagePaths = await Promise.all(
-            images.map(image => this.fileService.saveImage(image))
+            images.map(image => fileUtils.saveImage(image, this.settings.imageStoragePath))
           );
           new Notice(`${savedImagePaths.length} image(s) saved successfully`);
         } catch (error) {
@@ -100,7 +113,16 @@ export class FoodProcessor {
             customUnit: servingUnitType === 'custom' ? customServingLabel : undefined,
           };
 
-          await this.fileService.saveMealV2(mealName, allFoodItems, servingUnit, description, savedImagePaths);
+          const fileUtils = new FileUtils(this.vault);
+          const mealId = fileUtils.generateMealId();
+          const meal = createMeal(mealId, mealName, allFoodItems, servingUnit, description, savedImagePaths);
+
+          const meals = await readMeals(this.vault, this.settings);
+          meals.push(meal);
+          await writeMeals(this.vault, this.settings, meals);
+
+          await MealOps.createMealNote(this.mealDeps, meal);
+
           new Notice(`✅ Meal "${mealName}" saved with ${servingUnit.label}`);
         } catch (error) {
           console.error('Error saving meal:', error);
@@ -114,18 +136,18 @@ export class FoodProcessor {
           // Update meal item
           const newItem = allFoodItems[0]; // Use first item for editing
           if (newItem) {
-            await this.fileService.updateMealItem(initialData, newItem);
+            await MealOps.updateMealItem(this.mealDeps, initialData, newItem);
             return { success: true, message: `✅ Meal item updated: ${newItem.food}` };
           }
         } else {
           // Update food log entry
-          await this.fileService.createOrUpdateFoodLog(allFoodItems, initialData);
+          await this.foodLogManager.createOrUpdateFoodLog(allFoodItems, initialData);
           return { success: true, message: `✅ Food log updated` };
         }
       } else if (targetMealId) {
         // Add items to specific meal
         try {
-          await this.fileService.addItemsToMeal(targetMealId, allFoodItems);
+          await MealOps.addItemsToMeal(this.mealDeps, targetMealId, allFoodItems);
           return { success: true, message: `✅ Items added to meal successfully` };
         } catch (error) {
           console.error('Error adding items to meal:', error);
@@ -133,7 +155,7 @@ export class FoodProcessor {
         }
       } else {
         // Create new entry
-        const result = await this.fileService.createOrUpdateFoodLog(allFoodItems);
+        const result = await this.foodLogManager.createOrUpdateFoodLog(allFoodItems);
         if (result.createdNewFile) {
           // Open the newly created food log file
           try {

@@ -1,7 +1,7 @@
-import { App, Modal, Notice } from 'obsidian';
+import { App, Modal, Notice, Vault } from 'obsidian';
 import { PluginSettings } from '../../../types/settings';
 import { LLMService } from '../../../services/llm-service';
-import { FileService } from '../../../services/file-service';
+import { FoodLogManager } from '../../../services/food-log-manager';
 import { FoodItem, ServingUnitType } from '../../../types/nutrition';
 import {
   createModalTitle,
@@ -42,20 +42,21 @@ export class FoodInputModal extends Modal {
   private buttonStateManager: ButtonStateManager;
 
   constructor(
-    app: App, 
+    app: App,
+    private vault: Vault,
     private settings: PluginSettings,
     private llmService: LLMService,
-    private fileService: FileService,
+    private foodLogManager: FoodLogManager,
     onCloseCallback?: () => void
   ) {
     super(app);
     this.modalEl.addClass('nutrition-tracker-modal');
     this.onCloseCallback = onCloseCallback;
-    
+
     // Initialize helper classes
-    this.mealManager = new MealManager(fileService);
+    this.mealManager = new MealManager(vault, app, settings);
     this.imageManager = new ImageManager();
-    this.foodProcessor = new FoodProcessor(this.app, settings, llmService, fileService);
+    this.foodProcessor = new FoodProcessor(vault, app, settings, llmService, foodLogManager);
     this.buttonStateManager = new ButtonStateManager(this.processButton, this.processingIndicator);
   }
 
