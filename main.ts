@@ -6,7 +6,7 @@ import { PluginSettings, DEFAULT_SETTINGS } from './src/types/settings';
 import { LLMService } from './src/services/llm-service';
 import { FileService } from './src/services/file-service';
 import { applyEmojiPreferences } from './src/utils/apply-emoji-preferences';
-import { migrateIfNeeded } from './src/services/meal/meal-migration';
+import { migrateIfNeeded } from './src/services/meal/migrate-if-needed';
 
 export default class NutritionTrackerPlugin extends Plugin {
   settings: PluginSettings;
@@ -31,7 +31,6 @@ export default class NutritionTrackerPlugin extends Plugin {
 
     // Apply emoji preferences
     applyEmojiPreferences(this.settings.appearance);
-
 
     // Add ribbon icon
     this.addRibbonIcon('apple', 'Log food', () => {
