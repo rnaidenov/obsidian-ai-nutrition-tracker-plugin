@@ -1,11 +1,13 @@
 import { TFile, Vault, TAbstractFile, App } from 'obsidian';
-import { FoodItem, Meal } from '../types/nutrition';
+import { FoodItem, Meal, ServingUnit } from '../types/nutrition';
 import { PluginSettings } from '../types/settings';
 import { FileUtils } from './file-utils';
 import { ContentParser } from './content-parser';
 import { LayoutGenerator } from './layout-generator';
 import { FoodLogManager } from './food-log-manager';
 import { MealManager } from './meal-manager';
+import { MealStorage } from './meal/meal-storage';
+import { createMeal } from './meal/meal-operations';
 
 export class FileService {
   private fileUtils: FileUtils;
@@ -13,13 +15,15 @@ export class FileService {
   private layoutGenerator: LayoutGenerator;
   private foodLogManager: FoodLogManager;
   private mealManager: MealManager;
-  
+  private mealStorage: MealStorage;
+
   constructor(private app: App, private vault: Vault, private settings: PluginSettings) {
     this.fileUtils = new FileUtils(vault);
     this.contentParser = new ContentParser();
     this.layoutGenerator = new LayoutGenerator(settings);
     this.foodLogManager = new FoodLogManager(vault, settings);
     this.mealManager = new MealManager(app, vault, settings);
+    this.mealStorage = new MealStorage(vault, settings);
   }
 
   // Food Log Operations - delegate to FoodLogManager
@@ -34,6 +38,19 @@ export class FileService {
   // Meal Operations - delegate to MealManager
   async saveMeal(name: string, foodItems: FoodItem[], description?: string, images?: string[]): Promise<Meal> {
     return this.mealManager.saveMeal(name, foodItems, description, images);
+  }
+
+  async saveMealV2(name: string, foodItems: FoodItem[], servingUnit: ServingUnit, description?: string, images?: string[]): Promise<Meal> {
+    const mealId = this.fileUtils.generateMealId();
+    const meal = createMeal(mealId, name, foodItems, servingUnit, description, images);
+
+    const meals = await this.mealStorage.readMeals();
+    meals.push(meal);
+    await this.mealStorage.writeMeals(meals);
+
+    await this.mealManager.createMealNote(meal);
+
+    return meal;
   }
 
   async getMeals(): Promise<Meal[]> {

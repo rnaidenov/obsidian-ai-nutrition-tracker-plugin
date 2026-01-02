@@ -1,6 +1,7 @@
 import { Setting, App } from 'obsidian';
-import { Meal, FoodItem } from '../../../../types/nutrition';
+import { Meal, FoodItem, ServingUnitType } from '../../../../types/nutrition';
 import { MealSuggest } from './MealSuggest';
+import { scaleNutrition, calculateTotalNutrition, calculateMealPortionNutrition } from '../../../../services/meal/meal-operations';
 
 export function createModalTitle(contentEl: HTMLElement, initialData: FoodItem | null, editingContext: 'meal' | 'foodlog', targetMealId?: string) {
   let title = 'Add food entry';
@@ -59,28 +60,55 @@ export function createMealSelectionDropdown(
 }
 
 export function createSelectedMealsDisplay(
-  contentEl: HTMLElement, 
-  selectedMeals: Meal[], 
-  onRemoveMeal: (index: number) => void
+  contentEl: HTMLElement,
+  selectedMeals: Meal[],
+  servings: Map<string, number>,
+  onRemoveMeal: (index: number) => void,
+  onServingsChange: (mealId: string, servings: number) => void
 ) {
   if (selectedMeals.length === 0) return;
-  
+
   const selectedMealsContainer = contentEl.createDiv('nutrition-tracker-selected-meals');
   selectedMealsContainer.createEl('h3', { text: 'Selected meals' });
-  
+
   selectedMeals.forEach((meal, index) => {
     const mealDiv = selectedMealsContainer.createDiv('nutrition-tracker-selected-meal');
     const mealInfo = mealDiv.createDiv('nutrition-tracker-meal-info');
-    
+
     mealInfo.createEl('strong', { text: meal.name });
+
+    if (meal.servingUnit) {
+      const unitText = `Saved as: ${meal.servingUnit.label}`;
+      mealInfo.createEl('p', { text: unitText, cls: 'nutrition-tracker-meal-unit' });
+    }
+
     const itemsText = meal.items.map((item: FoodItem) => `${item.quantity} ${item.food}`).join(', ');
     mealInfo.createEl('p', { text: itemsText, cls: 'nutrition-tracker-meal-items' });
-    
-    const totalCalories = meal.items.reduce((sum: number, item: FoodItem) => sum + item.calories, 0);
-    mealInfo.createEl('p', { text: `Total: ${totalCalories} kcal`, cls: 'nutrition-tracker-meal-calories' });
-    
-    // Remove button
-    const removeBtn = mealDiv.createEl('button', { 
+
+    const servingsDiv = mealDiv.createDiv('nutrition-tracker-servings-input');
+    new Setting(servingsDiv)
+      .setName('Number of servings')
+      .addText(text => {
+        text
+          .setPlaceholder('1')
+          .setValue((servings.get(meal.id) || 1).toString())
+          .onChange(value => {
+            const num = parseFloat(value) || 1;
+            onServingsChange(meal.id, num);
+          });
+
+        text.inputEl.setAttribute('type', 'number');
+        text.inputEl.setAttribute('min', '0.1');
+        text.inputEl.setAttribute('step', '0.5');
+      });
+
+    const currentServings = servings.get(meal.id) || 1;
+    const scaledNutrition = calculateMealPortionNutrition(meal, currentServings);
+
+    const nutritionText = `Total: ${scaledNutrition.calories} kcal | P: ${scaledNutrition.protein}g | C: ${scaledNutrition.carbs}g | F: ${scaledNutrition.fat}g`;
+    mealInfo.createEl('p', { text: nutritionText, cls: 'nutrition-tracker-meal-nutrition' });
+
+    const removeBtn = mealDiv.createEl('button', {
       text: '✕',
       cls: 'nutrition-tracker-remove-meal'
     });
@@ -124,9 +152,50 @@ export function createFoodDescriptionInput(
   return textareaEl;
 }
 
+export function createServingUnitSelector(
+  contentEl: HTMLElement,
+  currentUnit: ServingUnitType,
+  customUnitLabel: string,
+  onUnitChange: (unit: ServingUnitType) => void,
+  onCustomLabelChange: (label: string) => void
+) {
+  const setting = new Setting(contentEl)
+    .setName('Serving unit')
+    .setDesc('Choose how this meal will be portioned when used')
+    .addDropdown(dropdown => {
+      dropdown
+        .addOption('100g', 'Per 100g (weight-based)')
+        .addOption('piece', 'Per piece/item')
+        .addOption('serving', 'Per serving')
+        .addOption('custom', 'Custom unit')
+        .setValue(currentUnit)
+        .onChange(value => {
+          onUnitChange(value as ServingUnitType);
+        });
+    });
+
+  setting.settingEl.addClass('nutrition-tracker-serving-unit');
+
+  if (currentUnit === 'custom') {
+    const customSetting = new Setting(contentEl)
+      .setName('Custom unit name')
+      .setDesc('E.g., "bowl", "cup", "plate"')
+      .addText(text => {
+        text
+          .setPlaceholder('Enter unit name...')
+          .setValue(customUnitLabel)
+          .onChange(value => {
+            onCustomLabelChange(value);
+          });
+      });
+
+    customSetting.settingEl.addClass('nutrition-tracker-custom-unit');
+  }
+}
+
 export function createSaveAsMealToggle(
-  contentEl: HTMLElement, 
-  saveAsMeal: boolean, 
+  contentEl: HTMLElement,
+  saveAsMeal: boolean,
   mealName: string,
   onSaveAsMealChange: (value: boolean) => void,
   onMealNameChange: (value: string) => void
@@ -141,9 +210,9 @@ export function createSaveAsMealToggle(
           onSaveAsMealChange(value);
         });
     });
-  
+
   saveAsMealSetting.settingEl.addClass('nutrition-tracker-save-meal-setting');
-  
+
   if (saveAsMeal) {
     const mealNameSetting = new Setting(contentEl)
       .setName('Meal name')
@@ -155,10 +224,10 @@ export function createSaveAsMealToggle(
           .onChange(value => {
             onMealNameChange(value);
           });
-        
+
         text.inputEl.addClass('nutrition-tracker-meal-name-input');
       });
-    
+
     mealNameSetting.settingEl.addClass('nutrition-tracker-meal-name-setting');
   }
 }

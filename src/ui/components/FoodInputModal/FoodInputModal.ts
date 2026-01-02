@@ -2,7 +2,7 @@ import { App, Modal, Notice } from 'obsidian';
 import { PluginSettings } from '../../../types/settings';
 import { LLMService } from '../../../services/llm-service';
 import { FileService } from '../../../services/file-service';
-import { FoodItem } from '../../../types/nutrition';
+import { FoodItem, ServingUnitType } from '../../../types/nutrition';
 import {
   createModalTitle,
   createEditingNotice,
@@ -10,6 +10,7 @@ import {
   createSelectedMealsDisplay,
   createFoodDescriptionInput,
   createSaveAsMealToggle,
+  createServingUnitSelector,
   createProcessButton
 } from './utils/modal-ui-helpers';
 import { MealManager } from './utils/meal-management';
@@ -30,6 +31,10 @@ export class FoodInputModal extends Modal {
   private targetMealId: string | null = null;
   private onCloseCallback?: () => void;
   private foodDescriptionInput: HTMLTextAreaElement | null = null;
+
+  private selectedServingUnit: ServingUnitType = '100g';
+  private customServingLabel: string = '';
+  private mealServings: Map<string, number> = new Map();
 
   private mealManager: MealManager;
   private imageManager: ImageManager;
@@ -99,9 +104,11 @@ export class FoodInputModal extends Modal {
       );
       
       createSelectedMealsDisplay(
-        contentEl, 
-        this.mealManager.getSelectedMeals(), 
-        this.handleMealRemove.bind(this)
+        contentEl,
+        this.mealManager.getSelectedMeals(),
+        this.mealServings,
+        this.handleMealRemove.bind(this),
+        this.handleMealServingsChange.bind(this)
       );
     }
     
@@ -123,12 +130,22 @@ export class FoodInputModal extends Modal {
     // Only show save as meal toggle if we're NOT adding to a specific meal
     if (!this.targetMealId) {
       createSaveAsMealToggle(
-        contentEl, 
-        this.saveAsMeal, 
+        contentEl,
+        this.saveAsMeal,
         this.mealName,
         this.handleSaveAsMealChange.bind(this),
         this.handleMealNameChange.bind(this)
       );
+
+      if (this.saveAsMeal) {
+        createServingUnitSelector(
+          contentEl,
+          this.selectedServingUnit,
+          this.customServingLabel,
+          this.handleServingUnitChange.bind(this),
+          this.handleCustomLabelChange.bind(this)
+        );
+      }
     }
     
     // Create error message display
@@ -189,6 +206,20 @@ export class FoodInputModal extends Modal {
     this.updateButtonState();
   }
 
+  private handleServingUnitChange(unit: ServingUnitType) {
+    this.selectedServingUnit = unit;
+    this.refresh();
+  }
+
+  private handleCustomLabelChange(label: string) {
+    this.customServingLabel = label;
+  }
+
+  private handleMealServingsChange(mealId: string, servings: number) {
+    this.mealServings.set(mealId, servings);
+    this.refresh();
+  }
+
   private async handleProcessFood() {
     this.isProcessing = true;
     this.clearErrorMessage();
@@ -197,10 +228,13 @@ export class FoodInputModal extends Modal {
     try {
       const result = await this.foodProcessor.processFood(
         this.mealManager.getSelectedMeals(),
+        this.mealServings,
         this.description,
         this.imageManager.getSelectedImages(),
         this.saveAsMeal,
         this.mealName,
+        this.selectedServingUnit,
+        this.customServingLabel,
         this.initialData,
         this.editingContext,
         this.targetMealId

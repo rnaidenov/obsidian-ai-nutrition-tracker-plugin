@@ -33,7 +33,6 @@
   border: none;
   padding: 10px 0;
   display: flex;
-  flex-direction: column;
 }
 
 .nutrition-tracker-modal .setting-item-info {
@@ -230,8 +229,8 @@
 
 .nutrition-tracker-selected-meal {
   display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
+  flex-direction: column;
+  gap: 10px;
   padding: 12px;
   margin: 8px 0;
   background: var(--background-primary);
@@ -239,7 +238,31 @@
   border: 1px solid var(--background-modifier-border);
   transition: all 0.2s ease;
   position: relative;
-  overflow: hidden;
+}
+
+.nutrition-tracker-servings-input {
+  width: 100%;
+}
+
+.nutrition-tracker-servings-input .setting-item {
+  border: none;
+  padding: 0;
+}
+
+.nutrition-tracker-servings-input input {
+  width: 80px !important;
+}
+
+.nutrition-tracker-meal-unit {
+  font-size: 0.8em;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.nutrition-tracker-meal-nutrition {
+  font-size: 0.85em;
+  color: var(--text-accent);
+  font-weight: 500;
 }
 
 .nutrition-tracker-selected-meal:hover {

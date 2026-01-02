@@ -4,16 +4,20 @@ import { PluginSettings } from '../types/settings';
 import { FileUtils } from './file-utils';
 import { LayoutGenerator } from './layout-generator';
 import { ContentParser } from './content-parser';
+import { MealStorage } from './meal/meal-storage';
+import { migrateMealToV2, isLegacyMeal } from './meal/meal-operations';
 
 export class MealManager {
   private fileUtils: FileUtils;
   private layoutGenerator: LayoutGenerator;
   private contentParser: ContentParser;
+  private mealStorage: MealStorage;
 
   constructor(private app: App, private vault: Vault, private settings: PluginSettings) {
     this.fileUtils = new FileUtils(vault);
     this.layoutGenerator = new LayoutGenerator(settings);
     this.contentParser = new ContentParser();
+    this.mealStorage = new MealStorage(vault, settings);
   }
 
   private getMealsFilePath(): string {
@@ -65,20 +69,13 @@ export class MealManager {
 
   async getMeals(): Promise<Meal[]> {
     try {
-      const mealsPath = this.getMealsFilePath();
-      const mealsFile = this.vault.getAbstractFileByPath(mealsPath);
-      
-      if (!mealsFile || !(mealsFile instanceof TFile)) {
-        // File doesn't exist, return empty array
-        return [];
-      }
+      const meals = await this.mealStorage.readMeals();
 
-      const content = await this.vault.read(mealsFile);
-      const meals = JSON.parse(content);
-      
-      // Validate meals format
-      if (!Array.isArray(meals)) {
-        return [];
+      const needsMigration = meals.some(isLegacyMeal);
+      if (needsMigration) {
+        const migratedMeals = meals.map(migrateMealToV2);
+        await this.mealStorage.writeMeals(migratedMeals);
+        return migratedMeals;
       }
 
       return meals;
@@ -141,7 +138,7 @@ export class MealManager {
     }
   }
 
-  private async createMealNote(meal: Meal): Promise<{ createdNewFile: boolean; filePath: string }> {
+  async createMealNote(meal: Meal): Promise<{ createdNewFile: boolean; filePath: string }> {
     try {
       const sanitizedName = this.fileUtils.sanitizeMealName(meal.name);
       const filename = `${sanitizedName}.md`;

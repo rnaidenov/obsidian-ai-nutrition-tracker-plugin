@@ -1,8 +1,9 @@
 import { Notice, App, TFile } from 'obsidian';
-import { FoodItem, Meal } from '../../../../types/nutrition';
+import { FoodItem, Meal, ServingUnit, ServingUnitType } from '../../../../types/nutrition';
 import { PluginSettings } from '../../../../types/settings';
 import { LLMService } from '../../../../services/llm-service';
 import { FileService } from '../../../../services/file-service';
+import { createMealPortionEntry } from '../../../../services/meal/meal-operations';
 
 export class FoodProcessor {
   constructor(
@@ -14,10 +15,13 @@ export class FoodProcessor {
 
   async processFood(
     selectedMeals: Meal[],
+    mealServings: Map<string, number>,
     description: string,
     images: File[],
     saveAsMeal: boolean,
     mealName: string,
+    servingUnitType: ServingUnitType,
+    customServingLabel: string,
     initialData?: FoodItem,
     editingContext?: 'foodlog' | 'meal',
     targetMealId?: string
@@ -53,9 +57,9 @@ export class FoodProcessor {
       // Add selected meals (but not when adding to a specific meal to avoid duplication)
       if (hasSelectedMeals && !targetMealId) {
         selectedMeals.forEach(meal => {
-          // Create a consolidated meal entry instead of individual items
-          const consolidatedMealEntry = this.createConsolidatedMealEntry(meal);
-          allFoodItems.push(consolidatedMealEntry);
+          const servings = mealServings.get(meal.id) || 1;
+          const mealEntry = createMealPortionEntry(meal, servings);
+          allFoodItems.push(mealEntry);
         });
       }
       
@@ -89,8 +93,15 @@ export class FoodProcessor {
       // Save meal template if requested
       if (saveAsMeal && mealName.trim()) {
         try {
-          await this.fileService.saveMeal(mealName, allFoodItems, description, savedImagePaths);
-          new Notice(`✅ Meal "${mealName}" saved successfully`);
+          const servingUnit: ServingUnit = {
+            type: servingUnitType,
+            amount: servingUnitType === '100g' ? 100 : 1,
+            label: this.getServingUnitLabel(servingUnitType, customServingLabel),
+            customUnit: servingUnitType === 'custom' ? customServingLabel : undefined,
+          };
+
+          await this.fileService.saveMealV2(mealName, allFoodItems, servingUnit, description, savedImagePaths);
+          new Notice(`✅ Meal "${mealName}" saved with ${servingUnit.label}`);
         } catch (error) {
           console.error('Error saving meal:', error);
           new Notice('Warning: failed to save meal, but continuing with food processing');
@@ -157,34 +168,18 @@ export class FoodProcessor {
     }
   }
 
-  private createConsolidatedMealEntry(meal: Meal): FoodItem {
-    // Calculate totals from meal items
-    const totalCalories = meal.items.reduce((sum, item) => sum + item.calories, 0);
-    const totalProtein = meal.items.reduce((sum, item) => sum + item.protein, 0);
-    const totalCarbs = meal.items.reduce((sum, item) => sum + item.carbs, 0);
-    const totalFat = meal.items.reduce((sum, item) => sum + item.fat, 0);
-    
-    // Use the first item's emoji if available, otherwise use a meal emoji
-    const mealEmoji = meal.items.length > 0 && meal.items[0].emoji ? meal.items[0].emoji : '🍽️';
-    
-    // Create a brief description of the meal items
-    const itemCount = meal.items.length;
-    const itemsDescription = itemCount === 1 ? 
-      `${meal.items[0].food}` : 
-      `${itemCount} items: ${meal.items.slice(0, 3).map(item => item.food).join(', ')}${itemCount > 3 ? '...' : ''}`;
-    
-    const consolidatedItem: FoodItem = {
-      food: `${meal.name} (${itemsDescription})`,
-      quantity: "1 serving",
-      calories: totalCalories,
-      protein: totalProtein,
-      carbs: totalCarbs,
-      fat: totalFat,
-      emoji: mealEmoji,
-      timestamp: new Date().toISOString(),
-      mealId: meal.id // Link to the original meal
-    };
-    
-    return consolidatedItem;
+  private getServingUnitLabel(type: ServingUnitType, customLabel: string): string {
+    switch (type) {
+      case '100g':
+        return 'per 100g';
+      case 'piece':
+        return 'per piece';
+      case 'serving':
+        return 'per serving';
+      case 'custom':
+        return customLabel ? `per ${customLabel}` : 'per serving';
+      default:
+        return 'per serving';
+    }
   }
 } 
