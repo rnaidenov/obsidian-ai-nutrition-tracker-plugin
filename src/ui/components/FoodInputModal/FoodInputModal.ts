@@ -1,7 +1,6 @@
 import { App, Modal, Notice, Vault } from 'obsidian';
 import { PluginSettings } from '../../../types/settings';
 import { LLMService } from '../../../services/llm-service';
-import { FoodLogManager } from '../../../services/food-log-manager';
 import { FoodItem, ServingUnitType } from '../../../types/nutrition';
 import {
   createModalTitle,
@@ -46,7 +45,6 @@ export class FoodInputModal extends Modal {
     private vault: Vault,
     private settings: PluginSettings,
     private llmService: LLMService,
-    private foodLogManager: FoodLogManager,
     onCloseCallback?: () => void
   ) {
     super(app);
@@ -56,7 +54,7 @@ export class FoodInputModal extends Modal {
     // Initialize helper classes
     this.mealManager = new MealManager(vault, app, settings);
     this.imageManager = new ImageManager();
-    this.foodProcessor = new FoodProcessor(vault, app, settings, llmService, foodLogManager);
+    this.foodProcessor = new FoodProcessor(vault, app, settings, llmService);
     this.buttonStateManager = new ButtonStateManager(this.processButton, this.processingIndicator);
   }
 

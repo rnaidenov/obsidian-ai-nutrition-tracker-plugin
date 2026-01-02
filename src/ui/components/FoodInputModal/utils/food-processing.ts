@@ -2,7 +2,7 @@ import { Notice, App, TFile, Vault } from 'obsidian';
 import { FoodItem, Meal, ServingUnit, ServingUnitType } from '../../../../types/nutrition';
 import { PluginSettings } from '../../../../types/settings';
 import { LLMService } from '../../../../services/llm-service';
-import { FoodLogManager } from '../../../../services/food-log-manager';
+import * as FoodLogOps from '../../../../services/food-log/manager';
 import { FileUtils } from '../../../../services/file-utils';
 import * as MealOps from '../../../../services/meal/manager';
 import { readMeals, writeMeals } from '../../../../services/meal/meal-storage';
@@ -13,14 +13,20 @@ export class FoodProcessor {
     private vault: Vault,
     private app: App,
     private settings: PluginSettings,
-    private llmService: LLMService,
-    private foodLogManager: FoodLogManager
+    private llmService: LLMService
   ) {}
 
   private get mealDeps(): MealOps.MealDeps {
     return {
       vault: this.vault,
       app: this.app,
+      settings: this.settings
+    };
+  }
+
+  private get foodLogDeps(): FoodLogOps.FoodLogDeps {
+    return {
+      vault: this.vault,
       settings: this.settings
     };
   }
@@ -141,7 +147,7 @@ export class FoodProcessor {
           }
         } else {
           // Update food log entry
-          await this.foodLogManager.createOrUpdateFoodLog(allFoodItems, initialData);
+          await FoodLogOps.createOrUpdateFoodLog(this.foodLogDeps, allFoodItems, initialData);
           return { success: true, message: `✅ Food log updated` };
         }
       } else if (targetMealId) {
@@ -155,7 +161,7 @@ export class FoodProcessor {
         }
       } else {
         // Create new entry
-        const result = await this.foodLogManager.createOrUpdateFoodLog(allFoodItems);
+        const result = await FoodLogOps.createOrUpdateFoodLog(this.foodLogDeps, allFoodItems);
         if (result.createdNewFile) {
           // Open the newly created food log file
           try {

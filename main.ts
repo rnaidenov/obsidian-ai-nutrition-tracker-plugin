@@ -4,7 +4,7 @@ import { ConfirmModal } from './src/ui/components/ConfirmModal';
 import { SettingsTab } from './src/ui/settings/SettingsTab';
 import { PluginSettings, DEFAULT_SETTINGS } from './src/types/settings';
 import { LLMService } from './src/services/llm-service';
-import { FoodLogManager } from './src/services/food-log-manager';
+import * as FoodLogOps from './src/services/food-log/manager';
 import * as MealOps from './src/services/meal/manager';
 import { applyEmojiPreferences } from './src/utils/apply-emoji-preferences';
 import { migrateIfNeeded } from './src/services/meal/migrate-if-needed';
@@ -12,7 +12,6 @@ import { migrateIfNeeded } from './src/services/meal/migrate-if-needed';
 export default class NutritionTrackerPlugin extends Plugin {
   settings: PluginSettings;
   llmService: LLMService;
-  foodLogManager: FoodLogManager;
   private editButtonHandler: (event: Event) => void;
   private deleteButtonHandler: (event: Event) => void;
   private ctaButtonHandler: (event: Event) => void;
@@ -28,12 +27,18 @@ export default class NutritionTrackerPlugin extends Plugin {
     };
   }
 
+  private get foodLogDeps(): FoodLogOps.FoodLogDeps {
+    return {
+      vault: this.app.vault,
+      settings: this.settings
+    };
+  }
+
   async onload() {
     await this.loadSettings();
 
     // Initialize services
     this.llmService = new LLMService(this.settings);
-    this.foodLogManager = new FoodLogManager(this.app.vault, this.settings);
 
     // Run meal migration
     await migrateIfNeeded(this.app.vault, this.settings);
@@ -133,7 +138,6 @@ export default class NutritionTrackerPlugin extends Plugin {
       this.app.vault,
       this.settings,
       this.llmService,
-      this.foodLogManager,
       () => {
         this.currentModal = null;
       }
@@ -186,7 +190,7 @@ export default class NutritionTrackerPlugin extends Plugin {
         await MealOps.deleteMealItem(this.mealDeps, entryToDelete);
         new Notice(`🍽️ Deleted from meal: ${food} (${quantity})`);
       } else {
-        await this.foodLogManager.deleteFoodLogItem(entryToDelete);
+        await FoodLogOps.deleteFoodLogItem(this.foodLogDeps, entryToDelete);
         new Notice(`📝 Deleted from food log: ${food} (${quantity})`);
       }
       
@@ -341,18 +345,14 @@ export default class NutritionTrackerPlugin extends Plugin {
   async loadSettings() {
     const loadedData = await this.loadData();
     this.settings = Object.assign({}, DEFAULT_SETTINGS, loadedData);
-    
+
     if (!this.settings.mealStoragePath) {
       this.settings.mealStoragePath = 'tracker/health/food/meals';
       await this.saveSettings();
     }
-    
+
     if (this.llmService) {
       this.llmService = new LLMService(this.settings);
-    }
-
-    if (this.foodLogManager) {
-      this.foodLogManager = new FoodLogManager(this.app.vault, this.settings);
     }
   }
 
@@ -360,7 +360,6 @@ export default class NutritionTrackerPlugin extends Plugin {
     await this.saveData(this.settings);
 
     this.llmService = new LLMService(this.settings);
-    this.foodLogManager = new FoodLogManager(this.app.vault, this.settings);
 
     applyEmojiPreferences(this.settings.appearance);
   }
