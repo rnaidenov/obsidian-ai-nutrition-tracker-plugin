@@ -3,7 +3,7 @@ import { FoodInputModal } from './src/ui/components/FoodInputModal/FoodInputModa
 import { ConfirmModal } from './src/ui/components/ConfirmModal';
 import { SettingsTab } from './src/ui/settings/SettingsTab';
 import { PluginSettings, DEFAULT_SETTINGS } from './src/types/settings';
-import { LLMService } from './src/services/llm-service';
+import * as LLM from './src/services/llm';
 import * as FoodLogOps from './src/services/food-log/manager';
 import * as MealOps from './src/services/meal/manager';
 import { applyEmojiPreferences } from './src/utils/apply-emoji-preferences';
@@ -11,7 +11,6 @@ import { migrateIfNeeded } from './src/services/meal/migrate-if-needed';
 
 export default class NutritionTrackerPlugin extends Plugin {
   settings: PluginSettings;
-  llmService: LLMService;
   private editButtonHandler: (event: Event) => void;
   private deleteButtonHandler: (event: Event) => void;
   private ctaButtonHandler: (event: Event) => void;
@@ -34,11 +33,17 @@ export default class NutritionTrackerPlugin extends Plugin {
     };
   }
 
+  private get llmDeps(): LLM.LLMDeps {
+    return {
+      apiKey: this.settings.openRouterApiKey,
+      model: this.settings.llmModel,
+      useCustomModel: this.settings.useCustomModel,
+      customModelName: this.settings.customModelName
+    };
+  }
+
   async onload() {
     await this.loadSettings();
-
-    // Initialize services
-    this.llmService = new LLMService(this.settings);
 
     // Run meal migration
     await migrateIfNeeded(this.app.vault, this.settings);
@@ -137,7 +142,6 @@ export default class NutritionTrackerPlugin extends Plugin {
       this.app,
       this.app.vault,
       this.settings,
-      this.llmService,
       () => {
         this.currentModal = null;
       }
@@ -350,16 +354,10 @@ export default class NutritionTrackerPlugin extends Plugin {
       this.settings.mealStoragePath = 'tracker/health/food/meals';
       await this.saveSettings();
     }
-
-    if (this.llmService) {
-      this.llmService = new LLMService(this.settings);
-    }
   }
 
   async saveSettings() {
     await this.saveData(this.settings);
-
-    this.llmService = new LLMService(this.settings);
 
     applyEmojiPreferences(this.settings.appearance);
   }

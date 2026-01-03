@@ -1,7 +1,7 @@
 import { Notice, App, TFile, Vault } from 'obsidian';
 import { FoodItem, Meal, ServingUnit, ServingUnitType } from '../../../../types/nutrition';
 import { PluginSettings } from '../../../../types/settings';
-import { LLMService } from '../../../../services/llm-service';
+import * as LLM from '../../../../services/llm';
 import * as FoodLogOps from '../../../../services/food-log/manager';
 import { FileUtils } from '../../../../services/file-utils';
 import * as MealOps from '../../../../services/meal/manager';
@@ -12,8 +12,7 @@ export class FoodProcessor {
   constructor(
     private vault: Vault,
     private app: App,
-    private settings: PluginSettings,
-    private llmService: LLMService
+    private settings: PluginSettings
   ) {}
 
   private get mealDeps(): MealOps.MealDeps {
@@ -28,6 +27,15 @@ export class FoodProcessor {
     return {
       vault: this.vault,
       settings: this.settings
+    };
+  }
+
+  private get llmDeps(): LLM.LLMDeps {
+    return {
+      apiKey: this.settings.openRouterApiKey,
+      model: this.settings.llmModel,
+      useCustomModel: this.settings.useCustomModel,
+      customModelName: this.settings.customModelName
     };
   }
 
@@ -85,8 +93,8 @@ export class FoodProcessor {
       if (hasAdditionalInput) {
         const processingMessage = `🤖 Processing ${description ? 'description' : ''}${description && images.length > 0 ? ' and ' : ''}${images.length > 0 ? `${images.length} image(s)` : ''}...`;
         new Notice(processingMessage);
-        
-        const additionalItems = await this.llmService.processFood(description, images);
+
+        const additionalItems = await LLM.processFood(this.llmDeps, description, images);
         if (additionalItems.length === 0) {
           return { success: false, message: 'No food items could be processed' };
         }
