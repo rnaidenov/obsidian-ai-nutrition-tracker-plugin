@@ -2,8 +2,8 @@ import { TFile, Vault, Notice, TAbstractFile, App, normalizePath } from 'obsidia
 import { FoodItem, Meal } from '../../types/nutrition';
 import { PluginSettings } from '../../types/settings';
 import { FileUtils } from '../file-utils';
-import { LayoutGenerator } from '../layout-generator';
-import { ContentParser } from '../content-parser';
+import * as LayoutGenerator from '../layout-generator';
+import * as ContentParser from '../content-parser';
 import { readMeals, writeMeals, getMealsFilePath, ensureMealDirectoryExists } from './meal-storage';
 import { migrateMealToV2, isLegacyMeal } from './meal-operations';
 
@@ -177,12 +177,12 @@ function generateMealNoteContent(deps: MealDeps, meal: Meal): string {
     fat: totalFat
   };
 
-  const layoutGenerator = new LayoutGenerator(deps.settings);
+  const goals = deps.settings.nutritionGoals;
 
   let content = '';
   content += '## 🥗 Meal Items\n\n';
-  content += layoutGenerator.generateCardLayout(meal.items, 'meal', meal.id);
-  content += layoutGenerator.generateMealProgressSummaryWithId(totals, meal.id);
+  content += LayoutGenerator.generateCardLayout(meal.items, goals, 'meal', meal.id);
+  content += LayoutGenerator.generateMealProgressSummaryWithId(totals, goals, meal.id);
 
   return content;
 }
@@ -200,8 +200,7 @@ export async function syncMealNoteToJSON(deps: MealDeps, file: TFile): Promise<v
       return;
     }
 
-    const contentParser = new ContentParser();
-    const parsedMeal = contentParser.parseMealFromMarkdown(content);
+    const parsedMeal = ContentParser.parseMealFromMarkdown(content);
 
     if (!parsedMeal) {
       return;
@@ -433,8 +432,7 @@ export async function handleFileRename(deps: MealDeps, oldPath: string, newPath:
       return;
     }
 
-    const contentParser = new ContentParser();
-    const parsedMeal = contentParser.parseMealFromMarkdown(content);
+    const parsedMeal = ContentParser.parseMealFromMarkdown(content);
     if (!parsedMeal || !parsedMeal.id) {
       return;
     }
