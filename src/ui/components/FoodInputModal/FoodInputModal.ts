@@ -13,8 +13,8 @@ import {
 } from './utils/modal-ui-helpers';
 import { MealManager } from './utils/meal-management';
 import { ImageManager } from './utils/image-management';
-import { FoodProcessor } from './utils/food-processing';
-import { ButtonStateManager } from './utils/button-state';
+import { processFood } from './utils/food-processing';
+import { calculateButtonState, applyButtonState } from './utils/button-state';
 
 export class FoodInputModal extends Modal {
   private description: string = '';
@@ -36,8 +36,6 @@ export class FoodInputModal extends Modal {
 
   private mealManager: MealManager;
   private imageManager: ImageManager;
-  private foodProcessor: FoodProcessor;
-  private buttonStateManager: ButtonStateManager;
 
   constructor(
     app: App,
@@ -52,8 +50,6 @@ export class FoodInputModal extends Modal {
     // Initialize helper classes
     this.mealManager = new MealManager(vault, app, settings);
     this.imageManager = new ImageManager();
-    this.foodProcessor = new FoodProcessor(vault, app, settings);
-    this.buttonStateManager = new ButtonStateManager(this.processButton, this.processingIndicator);
   }
 
   setInitialData(data: { food: string, quantity: string, calories: number, protein: number, carbs: number, fat: number }) {
@@ -158,10 +154,7 @@ export class FoodInputModal extends Modal {
     );
     
     this.processingIndicator = contentEl.querySelector('.nutrition-tracker-processing-indicator');
-    
-    // Initialize button state manager with actual elements
-    this.buttonStateManager = new ButtonStateManager(this.processButton, this.processingIndicator);
-    
+
     // Update button state
     this.updateButtonState();
     
@@ -258,18 +251,25 @@ export class FoodInputModal extends Modal {
     this.updateButtonState();
 
     try {
-      const result = await this.foodProcessor.processFood(
-        this.mealManager.getSelectedMeals(),
-        this.mealServings,
-        this.description,
-        this.imageManager.getSelectedImages(),
-        this.saveAsMeal,
-        this.mealName,
-        this.selectedServingUnit,
-        this.customServingLabel,
-        this.initialData,
-        this.editingContext,
-        this.targetMealId
+      const result = await processFood(
+        {
+          vault: this.vault,
+          app: this.app,
+          settings: this.settings
+        },
+        {
+          selectedMeals: this.mealManager.getSelectedMeals(),
+          mealServings: this.mealServings,
+          description: this.description,
+          images: this.imageManager.getSelectedImages(),
+          saveAsMeal: this.saveAsMeal,
+          mealName: this.mealName,
+          servingUnitType: this.selectedServingUnit,
+          customServingLabel: this.customServingLabel,
+          initialData: this.initialData,
+          editingContext: this.editingContext,
+          targetMealId: this.targetMealId
+        }
       );
 
       if (result.success) {
@@ -302,16 +302,24 @@ export class FoodInputModal extends Modal {
   }
 
   private updateButtonState() {
-    this.buttonStateManager.updateButtonState(
-      this.description,
-      this.imageManager.getSelectedImages(),
-      this.mealManager.getSelectedMeals(),
-      this.saveAsMeal,
-      this.mealName,
-      this.isProcessing,
-      this.initialData,
-      this.editingContext,
-      this.targetMealId
+    const state = calculateButtonState({
+      description: this.description,
+      selectedImages: this.imageManager.getSelectedImages(),
+      selectedMeals: this.mealManager.getSelectedMeals(),
+      saveAsMeal: this.saveAsMeal,
+      mealName: this.mealName,
+      isProcessing: this.isProcessing,
+      initialData: this.initialData,
+      editingContext: this.editingContext,
+      targetMealId: this.targetMealId
+    });
+
+    applyButtonState(
+      {
+        processButton: this.processButton,
+        processingIndicator: this.processingIndicator
+      },
+      state
     );
   }
 

@@ -1,7 +1,7 @@
 import { TFile, Vault, Notice, normalizePath } from 'obsidian';
 import { FoodItem } from '../../types/nutrition';
 import { PluginSettings } from '../../types/settings';
-import { FileUtils } from '../file-utils';
+import * as FileUtils from '../file-utils';
 import * as LayoutGenerator from '../layout-generator';
 import * as ContentParser from '../content-parser';
 
@@ -15,12 +15,11 @@ export async function createOrUpdateFoodLog(
   foodItems: FoodItem[],
   replaceEntry?: { food: string; quantity: string; calories: number; protein: number; carbs: number; fat: number }
 ): Promise<{ createdNewFile: boolean; filePath: string }> {
-  const fileUtils = new FileUtils(deps.vault);
-  const today = fileUtils.getTodayString();
+  const today = FileUtils.getTodayString();
   const logPath = normalizePath(`${deps.settings.logStoragePath}/${today}.md`);
 
   try {
-    await fileUtils.ensureDirectoryExists(deps.settings.logStoragePath);
+    await FileUtils.ensureDirectoryExists({ vault: deps.vault }, deps.settings.logStoragePath);
 
     const existingFile = deps.vault.getAbstractFileByPath(logPath);
     let createdNewFile = false;
@@ -53,8 +52,7 @@ export async function deleteFoodLogItem(
   deps: FoodLogDeps,
   itemToDelete: { food: string; quantity: string; calories: number; protein: number; carbs: number; fat: number }
 ): Promise<void> {
-  const fileUtils = new FileUtils(deps.vault);
-  const today = fileUtils.getTodayString();
+  const today = FileUtils.getTodayString();
   const logPath = normalizePath(`${deps.settings.logStoragePath}/${today}.md`);
 
   try {
@@ -80,10 +78,9 @@ export async function deleteFoodLogItem(
 }
 
 async function createNewFoodLog(deps: FoodLogDeps, path: string, foodItems: FoodItem[]): Promise<void> {
-  const fileUtils = new FileUtils(deps.vault);
   const goals = deps.settings.nutritionGoals;
 
-  const today = fileUtils.getTodayString();
+  const today = FileUtils.getTodayString();
   const totals = ContentParser.calculateTotals(foodItems);
 
   let content = `# 🍽️ Food Log ${today}\n\n`;

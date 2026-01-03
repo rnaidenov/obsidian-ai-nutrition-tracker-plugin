@@ -1,7 +1,7 @@
 import { TFile, Vault, Notice, TAbstractFile, App, normalizePath } from 'obsidian';
 import { FoodItem, Meal } from '../../types/nutrition';
 import { PluginSettings } from '../../types/settings';
-import { FileUtils } from '../file-utils';
+import * as FileUtils from '../file-utils';
 import * as LayoutGenerator from '../layout-generator';
 import * as ContentParser from '../content-parser';
 import { readMeals, writeMeals, getMealsFilePath, ensureMealDirectoryExists } from './meal-storage';
@@ -14,10 +14,8 @@ export interface MealDeps {
 }
 
 export async function saveMeal(deps: MealDeps, name: string, foodItems: FoodItem[], description?: string, images?: string[]): Promise<Meal> {
-  const fileUtils = new FileUtils(deps.vault);
-
   const meal: Meal = {
-    id: fileUtils.generateMealId(),
+    id: FileUtils.generateMealId(),
     name: name.trim(),
     items: foodItems.map(item => {
       const { mealId: _, ...itemWithoutMealId } = item;
@@ -112,8 +110,7 @@ export async function getMealById(deps: MealDeps, mealId: string): Promise<Meal 
 
 export async function createMealNote(deps: MealDeps, meal: Meal): Promise<{ createdNewFile: boolean; filePath: string }> {
   try {
-    const fileUtils = new FileUtils(deps.vault);
-    const sanitizedName = fileUtils.sanitizeMealName(meal.name);
+    const sanitizedName = FileUtils.sanitizeMealName(meal.name);
     const filename = `${sanitizedName}.md`;
     const notePath = normalizePath(`${deps.settings.mealStoragePath}/${filename}`);
 
@@ -150,8 +147,7 @@ async function updateMealNote(deps: MealDeps, oldMeal: Meal, newMeal: Meal): Pro
 
 async function deleteMealNote(deps: MealDeps, meal: Meal): Promise<void> {
   try {
-    const fileUtils = new FileUtils(deps.vault);
-    const sanitizedName = fileUtils.sanitizeMealName(meal.name);
+    const sanitizedName = FileUtils.sanitizeMealName(meal.name);
     const filename = `${sanitizedName}.md`;
     const notePath = normalizePath(`${deps.settings.mealStoragePath}/${filename}`);
 
@@ -188,8 +184,7 @@ function generateMealNoteContent(deps: MealDeps, meal: Meal): string {
 }
 
 export function isMealNote(deps: MealDeps, file: TAbstractFile): boolean {
-  const fileUtils = new FileUtils(deps.vault);
-  return fileUtils.isMealNote(file, deps.settings.mealStoragePath, deps.settings.logStoragePath);
+  return FileUtils.isMealNote(file, deps.settings.mealStoragePath, deps.settings.logStoragePath);
 }
 
 export async function syncMealNoteToJSON(deps: MealDeps, file: TFile): Promise<void> {
@@ -207,8 +202,7 @@ export async function syncMealNoteToJSON(deps: MealDeps, file: TFile): Promise<v
     }
 
     const filename = file.path.split('/').pop()?.replace('.md', '') || '';
-    const fileUtils = new FileUtils(deps.vault);
-    const mealName = fileUtils.convertFilenameToReadableName(filename);
+    const mealName = FileUtils.convertFilenameToReadableName(filename);
 
     const meals = await getMeals(deps);
     const mealIndex = meals.findIndex(m => m.id === parsedMeal.id);
@@ -266,8 +260,7 @@ export async function updateMealItem(deps: MealDeps, originalItem: { food: strin
 
         await createMealNote(deps, meal);
 
-        const fileUtils = new FileUtils(deps.vault);
-        const mealFileName = fileUtils.sanitizeMealName(meal.name) + '.md';
+        const mealFileName = FileUtils.sanitizeMealName(meal.name) + '.md';
         const mealFilePath = normalizePath(`${deps.settings.mealStoragePath}/${mealFileName}`);
         const mealFile = deps.vault.getAbstractFileByPath(mealFilePath);
         if (mealFile instanceof TFile) {
@@ -312,8 +305,7 @@ export async function deleteMealItem(deps: MealDeps, itemToDelete: { food: strin
 
         await createMealNote(deps, meal);
 
-        const fileUtils = new FileUtils(deps.vault);
-        const mealFileName = fileUtils.sanitizeMealName(meal.name) + '.md';
+        const mealFileName = FileUtils.sanitizeMealName(meal.name) + '.md';
         const mealFilePath = normalizePath(`${deps.settings.mealStoragePath}/${mealFileName}`);
         const mealFile = deps.vault.getAbstractFileByPath(mealFilePath);
         if (mealFile instanceof TFile) {
@@ -361,8 +353,7 @@ export async function addItemsToMeal(deps: MealDeps, mealId: string, items: Food
 
     await createMealNote(deps, meal);
 
-    const fileUtils = new FileUtils(deps.vault);
-    const mealFileName = fileUtils.sanitizeMealName(meal.name) + '.md';
+    const mealFileName = FileUtils.sanitizeMealName(meal.name) + '.md';
     const mealFilePath = normalizePath(`${deps.settings.mealStoragePath}/${mealFileName}`);
     const mealFile = deps.vault.getAbstractFileByPath(mealFilePath);
     if (mealFile instanceof TFile) {
@@ -381,12 +372,11 @@ export async function addItemsToMeal(deps: MealDeps, mealId: string, items: Food
 
 async function handleMealNameChange(deps: MealDeps, oldMeal: Meal, newMeal: Meal, currentFile: TFile): Promise<void> {
   try {
-    const fileUtils = new FileUtils(deps.vault);
-    const oldSanitizedName = fileUtils.sanitizeMealName(oldMeal.name);
+    const oldSanitizedName = FileUtils.sanitizeMealName(oldMeal.name);
     const oldFilename = `${oldSanitizedName}.md`;
     const oldNotePath = normalizePath(`${deps.settings.mealStoragePath}/${oldFilename}`);
 
-    const newSanitizedName = fileUtils.sanitizeMealName(newMeal.name);
+    const newSanitizedName = FileUtils.sanitizeMealName(newMeal.name);
     const newFilename = `${newSanitizedName}.md`;
     const newNotePath = normalizePath(`${deps.settings.mealStoragePath}/${newFilename}`);
 
@@ -443,8 +433,7 @@ export async function handleFileRename(deps: MealDeps, oldPath: string, newPath:
     if (mealIndex >= 0) {
       const oldMeal = meals[mealIndex];
 
-      const fileUtils = new FileUtils(deps.vault);
-      const newMealName = fileUtils.convertFilenameToReadableName(newFilename);
+      const newMealName = FileUtils.convertFilenameToReadableName(newFilename);
 
       if (oldMeal.name === newMealName) {
         return;
