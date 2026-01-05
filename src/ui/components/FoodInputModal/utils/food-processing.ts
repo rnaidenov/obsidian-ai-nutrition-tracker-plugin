@@ -1,19 +1,12 @@
-import { Notice, App, TFile, Vault } from 'obsidian';
+import { Notice, TFile } from 'obsidian';
 import { FoodItem, Meal, ServingUnit, ServingUnitType } from '../../../../types/nutrition';
-import { PluginSettings } from '../../../../types/settings';
-import * as LLM from '../../../../services/llm';
-import * as FoodLogOps from '../../../../services/food-log/manager';
-import * as FileUtils from '../../../../services/file-utils';
-import * as MealOps from '../../../../services/meal/manager';
-import { readMeals, writeMeals } from '../../../../services/meal/meal-storage';
-import { createMeal, createMealPortionEntry } from '../../../../services/meal/meal-operations';
-
-// Dependencies interface
-export interface FoodProcessingDeps {
-  vault: Vault;
-  app: App;
-  settings: PluginSettings;
-}
+import { PluginContext } from '../../../../types/plugin-context';
+import * as LLM from '../../../../utils/llm';
+import * as FoodLogOps from '../../../../utils/food-log/manager';
+import * as FileUtils from '../../../../utils/file';
+import * as MealOps from '../../../../utils/meal/manager';
+import { readMeals, writeMeals } from '../../../../utils/meal/meal-storage';
+import { createMeal, createMealPortionEntry } from '../../../../utils/meal/meal-operations';
 
 // Parameters interface
 export interface FoodProcessingParams {
@@ -38,7 +31,7 @@ export interface FoodProcessingResult {
 
 // Main food processing function
 export async function processFood(
-  deps: FoodProcessingDeps,
+  ctx: PluginContext,
   params: FoodProcessingParams
 ): Promise<FoodProcessingResult> {
   const {
@@ -76,7 +69,7 @@ export async function processFood(
       return { success: false, message: 'Please enter a meal name' };
     }
 
-    if (images.length > 0 && !deps.settings.openRouterApiKey) {
+    if (images.length > 0 && !ctx.settings.openRouterApiKey) {
       return { success: false, message: 'OpenRouter API key not configured. Please check plugin settings.' };
     }
 
@@ -97,14 +90,7 @@ export async function processFood(
       const processingMessage = `🤖 Processing ${description ? 'description' : ''}${description && images.length > 0 ? ' and ' : ''}${images.length > 0 ? `${images.length} image(s)` : ''}...`;
       new Notice(processingMessage);
 
-      const llmDeps: LLM.LLMDeps = {
-        apiKey: deps.settings.openRouterApiKey,
-        model: deps.settings.llmModel,
-        useCustomModel: deps.settings.useCustomModel,
-        customModelName: deps.settings.customModelName
-      };
-
-      const additionalItems = await LLM.processFood(llmDeps, description, images);
+      const additionalItems = await LLM.processFood(ctx, description, images);
       if (additionalItems.length === 0) {
         return { success: false, message: 'No food items could be processed' };
       }
@@ -117,7 +103,7 @@ export async function processFood(
     if (images.length > 0) {
       try {
         savedImagePaths = await Promise.all(
-          images.map(image => FileUtils.saveImage({ vault: deps.vault }, image, deps.settings.imageStoragePath))
+          images.map(image => FileUtils.saveImage(ctx, image, ctx.settings.imageStoragePath))
         );
         new Notice(`${savedImagePaths.length} image(s) saved successfully`);
       } catch (error) {
@@ -139,16 +125,11 @@ export async function processFood(
         const mealId = FileUtils.generateMealId();
         const meal = createMeal(mealId, mealName, allFoodItems, servingUnit, description, savedImagePaths);
 
-        const meals = await readMeals(deps.vault, deps.settings);
+        const meals = await readMeals(ctx.vault, ctx.settings);
         meals.push(meal);
-        await writeMeals(deps.vault, deps.settings, meals);
+        await writeMeals(ctx.vault, ctx.settings, meals);
 
-        const mealDeps: MealOps.MealDeps = {
-          vault: deps.vault,
-          app: deps.app,
-          settings: deps.settings
-        };
-        await MealOps.createMealNote(mealDeps, meal);
+        await MealOps.createMealNote(ctx, meal);
 
         new Notice(`✅ Meal "${mealName}" saved with ${servingUnit.label}`);
       } catch (error) {
@@ -159,37 +140,22 @@ export async function processFood(
 
     // Handle editing vs creating
     if (initialData) {
-      const mealDeps: MealOps.MealDeps = {
-        vault: deps.vault,
-        app: deps.app,
-        settings: deps.settings
-      };
-      const foodLogDeps: FoodLogOps.FoodLogDeps = {
-        vault: deps.vault,
-        settings: deps.settings
-      };
-
       if (editingContext === 'meal') {
         // Update meal item
         const newItem = allFoodItems[0]; // Use first item for editing
         if (newItem) {
-          await MealOps.updateMealItem(mealDeps, initialData, newItem);
+          await MealOps.updateMealItem(ctx, initialData, newItem);
           return { success: true, message: `✅ Meal item updated: ${newItem.food}` };
         }
       } else {
         // Update food log entry
-        await FoodLogOps.createOrUpdateFoodLog(foodLogDeps, allFoodItems, initialData);
+        await FoodLogOps.createOrUpdateFoodLog(ctx, allFoodItems, initialData);
         return { success: true, message: `✅ Food log updated` };
       }
     } else if (targetMealId) {
       // Add items to specific meal
       try {
-        const mealDeps: MealOps.MealDeps = {
-          vault: deps.vault,
-          app: deps.app,
-          settings: deps.settings
-        };
-        await MealOps.addItemsToMeal(mealDeps, targetMealId, allFoodItems);
+        await MealOps.addItemsToMeal(ctx, targetMealId, allFoodItems);
         return { success: true, message: `✅ Items added to meal successfully` };
       } catch (error) {
         console.error('Error adding items to meal:', error);
@@ -197,17 +163,13 @@ export async function processFood(
       }
     } else {
       // Create new entry
-      const foodLogDeps: FoodLogOps.FoodLogDeps = {
-        vault: deps.vault,
-        settings: deps.settings
-      };
-      const result = await FoodLogOps.createOrUpdateFoodLog(foodLogDeps, allFoodItems);
+      const result = await FoodLogOps.createOrUpdateFoodLog(ctx, allFoodItems);
       if (result.createdNewFile) {
         // Open the newly created food log file
         try {
-          const file = deps.app.vault.getAbstractFileByPath(result.filePath);
+          const file = ctx.app.vault.getAbstractFileByPath(result.filePath);
           if (file instanceof TFile) {
-            await deps.app.workspace.getLeaf().openFile(file);
+            await ctx.app.workspace.getLeaf().openFile(file);
           }
         } catch (error) {
           console.error('Error opening newly created food log:', error);

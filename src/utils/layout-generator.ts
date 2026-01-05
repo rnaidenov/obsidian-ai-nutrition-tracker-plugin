@@ -1,6 +1,6 @@
-import { FoodItem, NutritionData, NutritionGoals } from '../../types/nutrition';
-import * as ThemeUtils from '../theme-utils';
-import * as ContentParser from '../content-parser';
+import { FoodItem, NutritionData, NutritionGoals } from '../types/nutrition';
+import * as ThemeUtils from './theme';
+import * as ContentParser from './content-parser';
 
 export type IdGenerator = (prefix: string) => string;
 

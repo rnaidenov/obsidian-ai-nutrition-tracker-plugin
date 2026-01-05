@@ -1,19 +1,13 @@
-import { TFile, Vault, Notice, TAbstractFile, App, normalizePath } from 'obsidian';
+import { TFile, Notice, TAbstractFile, normalizePath } from 'obsidian';
 import { FoodItem, Meal } from '../../types/nutrition';
-import { PluginSettings } from '../../types/settings';
-import * as FileUtils from '../file-utils';
+import { PluginContext } from '../../types/plugin-context';
+import * as FileUtils from '../file';
 import * as LayoutGenerator from '../layout-generator';
 import * as ContentParser from '../content-parser';
-import { readMeals, writeMeals, getMealsFilePath, ensureMealDirectoryExists } from './meal-storage';
+import { readMeals, writeMeals } from './meal-storage';
 import { migrateMealToV2, isLegacyMeal } from './meal-operations';
 
-export interface MealDeps {
-  vault: Vault;
-  app: App;
-  settings: PluginSettings;
-}
-
-export async function saveMeal(deps: MealDeps, name: string, foodItems: FoodItem[], description?: string, images?: string[]): Promise<Meal> {
+export async function saveMeal(ctx: PluginContext, name: string, foodItems: FoodItem[], description?: string, images?: string[]): Promise<Meal> {
   const meal: Meal = {
     id: FileUtils.generateMealId(),
     name: name.trim(),
@@ -28,17 +22,17 @@ export async function saveMeal(deps: MealDeps, name: string, foodItems: FoodItem
   };
 
   try {
-    const meals = await getMeals(deps);
+    const meals = await getMeals(ctx);
     meals.push(meal);
-    await writeMeals(deps.vault, deps.settings, meals);
+    await writeMeals(ctx.vault, ctx.settings, meals);
 
-    const noteResult = await createMealNote(deps, meal);
+    const noteResult = await createMealNote(ctx, meal);
 
     if (noteResult.createdNewFile) {
       try {
-        const file = deps.vault.getAbstractFileByPath(noteResult.filePath);
+        const file = ctx.vault.getAbstractFileByPath(noteResult.filePath);
         if (file instanceof TFile) {
-          await deps.app.workspace.getLeaf().openFile(file);
+          await ctx.app.workspace.getLeaf().openFile(file);
         }
       } catch (error) {
         console.error('Error opening newly created meal note:', error);
@@ -53,14 +47,14 @@ export async function saveMeal(deps: MealDeps, name: string, foodItems: FoodItem
   }
 }
 
-export async function getMeals(deps: MealDeps): Promise<Meal[]> {
+export async function getMeals(ctx: PluginContext): Promise<Meal[]> {
   try {
-    const meals = await readMeals(deps.vault, deps.settings);
+    const meals = await readMeals(ctx.vault, ctx.settings);
 
     const needsMigration = meals.some(isLegacyMeal);
     if (needsMigration) {
       const migratedMeals = meals.map(migrateMealToV2);
-      await writeMeals(deps.vault, deps.settings, migratedMeals);
+      await writeMeals(ctx.vault, ctx.settings, migratedMeals);
       return migratedMeals;
     }
 
@@ -70,9 +64,9 @@ export async function getMeals(deps: MealDeps): Promise<Meal[]> {
   }
 }
 
-export async function updateMeal(deps: MealDeps, mealId: string, updates: Partial<Meal>): Promise<void> {
+export async function updateMeal(ctx: PluginContext, mealId: string, updates: Partial<Meal>): Promise<void> {
   try {
-    const meals = await getMeals(deps);
+    const meals = await getMeals(ctx);
     const mealIndex = meals.findIndex(m => m.id === mealId);
 
     if (mealIndex === -1) {
@@ -88,9 +82,9 @@ export async function updateMeal(deps: MealDeps, mealId: string, updates: Partia
 
     meals[mealIndex] = updatedMeal;
 
-    await writeMeals(deps.vault, deps.settings, meals);
+    await writeMeals(ctx.vault, ctx.settings, meals);
 
-    await updateMealNote(deps, oldMeal, updatedMeal);
+    await updateMealNote(ctx, oldMeal, updatedMeal);
 
     new Notice(`✅ Meal "${updatedMeal.name}" updated successfully`);
   } catch (error) {
@@ -98,9 +92,9 @@ export async function updateMeal(deps: MealDeps, mealId: string, updates: Partia
   }
 }
 
-export async function getMealById(deps: MealDeps, mealId: string): Promise<Meal | null> {
+export async function getMealById(ctx: PluginContext, mealId: string): Promise<Meal | null> {
   try {
-    const meals = await getMeals(deps);
+    const meals = await getMeals(ctx);
     return meals.find(m => m.id === mealId) || null;
   } catch (_error) {
     return null;
@@ -108,21 +102,21 @@ export async function getMealById(deps: MealDeps, mealId: string): Promise<Meal 
 }
 
 
-export async function createMealNote(deps: MealDeps, meal: Meal): Promise<{ createdNewFile: boolean; filePath: string }> {
+export async function createMealNote(ctx: PluginContext, meal: Meal): Promise<{ createdNewFile: boolean; filePath: string }> {
   try {
     const sanitizedName = FileUtils.sanitizeMealName(meal.name);
     const filename = `${sanitizedName}.md`;
-    const notePath = normalizePath(`${deps.settings.mealStoragePath}/${filename}`);
+    const notePath = normalizePath(`${ctx.settings.mealStoragePath}/${filename}`);
 
-    const content = generateMealNoteContent(deps, meal);
+    const content = generateMealNoteContent(ctx, meal);
 
-    const existingFile = deps.vault.getAbstractFileByPath(notePath);
+    const existingFile = ctx.vault.getAbstractFileByPath(notePath);
     let createdNewFile = false;
 
     if (existingFile && existingFile instanceof TFile) {
-      await deps.vault.modify(existingFile, content);
+      await ctx.vault.modify(existingFile, content);
     } else {
-      await deps.vault.create(notePath, content)
+      await ctx.vault.create(notePath, content)
       createdNewFile = true;
     }
 
@@ -133,34 +127,34 @@ export async function createMealNote(deps: MealDeps, meal: Meal): Promise<{ crea
   }
 }
 
-async function updateMealNote(deps: MealDeps, oldMeal: Meal, newMeal: Meal): Promise<void> {
+async function updateMealNote(ctx: PluginContext, oldMeal: Meal, newMeal: Meal): Promise<void> {
   try {
     if (oldMeal.name !== newMeal.name) {
-      await deleteMealNote(deps, oldMeal);
+      await deleteMealNote(ctx, oldMeal);
     }
 
-    await createMealNote(deps, newMeal);
+    await createMealNote(ctx, newMeal);
   } catch (error) {
     new Notice(`Warning: Failed to update meal note: ${error.message}`);
   }
 }
 
-async function deleteMealNote(deps: MealDeps, meal: Meal): Promise<void> {
+async function deleteMealNote(ctx: PluginContext, meal: Meal): Promise<void> {
   try {
     const sanitizedName = FileUtils.sanitizeMealName(meal.name);
     const filename = `${sanitizedName}.md`;
-    const notePath = normalizePath(`${deps.settings.mealStoragePath}/${filename}`);
+    const notePath = normalizePath(`${ctx.settings.mealStoragePath}/${filename}`);
 
-    const existingFile = deps.vault.getAbstractFileByPath(notePath);
+    const existingFile = ctx.vault.getAbstractFileByPath(notePath);
     if (existingFile instanceof TFile) {
-      await deps.app.fileManager.trashFile(existingFile);
+      await ctx.app.fileManager.trashFile(existingFile);
     }
   } catch (error) {
     new Notice(`Warning: Failed to delete meal note: ${error.message}`);
   }
 }
 
-function generateMealNoteContent(deps: MealDeps, meal: Meal): string {
+function generateMealNoteContent(ctx: PluginContext, meal: Meal): string {
   const totalCalories = meal.items.reduce((sum, item) => sum + item.calories, 0);
   const totalProtein = meal.items.reduce((sum, item) => sum + item.protein, 0);
   const totalCarbs = meal.items.reduce((sum, item) => sum + item.carbs, 0);
@@ -173,7 +167,7 @@ function generateMealNoteContent(deps: MealDeps, meal: Meal): string {
     fat: totalFat
   };
 
-  const goals = deps.settings.nutritionGoals;
+  const goals = ctx.settings.nutritionGoals;
 
   let content = '';
   content += '## 🥗 Meal Items\n\n';
@@ -183,13 +177,13 @@ function generateMealNoteContent(deps: MealDeps, meal: Meal): string {
   return content;
 }
 
-export function isMealNote(deps: MealDeps, file: TAbstractFile): boolean {
-  return FileUtils.isMealNote(file, deps.settings.mealStoragePath, deps.settings.logStoragePath);
+export function isMealNote(ctx: PluginContext, file: TAbstractFile): boolean {
+  return FileUtils.isMealNote(file, ctx.settings.mealStoragePath, ctx.settings.logStoragePath);
 }
 
-export async function syncMealNoteToJSON(deps: MealDeps, file: TFile): Promise<void> {
+export async function syncMealNoteToJSON(ctx: PluginContext, file: TFile): Promise<void> {
   try {
-    const content = await deps.vault.read(file);
+    const content = await ctx.vault.read(file);
 
     if (!content.includes('data-meal-id="')) {
       return;
@@ -204,7 +198,7 @@ export async function syncMealNoteToJSON(deps: MealDeps, file: TFile): Promise<v
     const filename = file.path.split('/').pop()?.replace('.md', '') || '';
     const mealName = FileUtils.convertFilenameToReadableName(filename);
 
-    const meals = await getMeals(deps);
+    const meals = await getMeals(ctx);
     const mealIndex = meals.findIndex(m => m.id === parsedMeal.id);
 
     if (mealIndex >= 0) {
@@ -221,13 +215,13 @@ export async function syncMealNoteToJSON(deps: MealDeps, file: TFile): Promise<v
       };
 
       meals[mealIndex] = updatedMeal;
-      await writeMeals(deps.vault, deps.settings, meals);
+      await writeMeals(ctx.vault, ctx.settings, meals);
 
       if (!nameChanged) {
         return;
       }
 
-      await handleMealNameChange(deps, oldMeal, updatedMeal, file);
+      await handleMealNameChange(ctx, oldMeal, updatedMeal, file);
       new Notice(`✅ Meal updated: "${oldMeal.name}" → "${updatedMeal.name}"`);
     } else {
       new Notice("⚠️ meal not found in storage - this might be an orphaned meal note");
@@ -239,9 +233,9 @@ export async function syncMealNoteToJSON(deps: MealDeps, file: TFile): Promise<v
   }
 }
 
-export async function updateMealItem(deps: MealDeps, originalItem: { food: string, quantity: string, calories: number, protein: number, carbs: number, fat: number }, newItem: FoodItem): Promise<void> {
+export async function updateMealItem(ctx: PluginContext, originalItem: { food: string, quantity: string, calories: number, protein: number, carbs: number, fat: number }, newItem: FoodItem): Promise<void> {
   try {
-    const meals = await getMeals(deps);
+    const meals = await getMeals(ctx);
     let mealFound = false;
 
     for (const meal of meals) {
@@ -256,16 +250,16 @@ export async function updateMealItem(deps: MealDeps, originalItem: { food: strin
         meal.items[itemIndex] = itemWithoutMealData;
         meal.updatedAt = new Date().toISOString();
 
-        await writeMeals(deps.vault, deps.settings, meals);
+        await writeMeals(ctx.vault, ctx.settings, meals);
 
-        await createMealNote(deps, meal);
+        await createMealNote(ctx, meal);
 
         const mealFileName = FileUtils.sanitizeMealName(meal.name) + '.md';
-        const mealFilePath = normalizePath(`${deps.settings.mealStoragePath}/${mealFileName}`);
-        const mealFile = deps.vault.getAbstractFileByPath(mealFilePath);
+        const mealFilePath = normalizePath(`${ctx.settings.mealStoragePath}/${mealFileName}`);
+        const mealFile = ctx.vault.getAbstractFileByPath(mealFilePath);
         if (mealFile instanceof TFile) {
           window.setTimeout(() => {
-            void syncMealNoteToJSON(deps, mealFile);
+            void syncMealNoteToJSON(ctx, mealFile);
           }, 100);
         }
 
@@ -285,9 +279,9 @@ export async function updateMealItem(deps: MealDeps, originalItem: { food: strin
   }
 }
 
-export async function deleteMealItem(deps: MealDeps, itemToDelete: { food: string, quantity: string, calories: number, protein: number, carbs: number, fat: number }): Promise<void> {
+export async function deleteMealItem(ctx: PluginContext, itemToDelete: { food: string, quantity: string, calories: number, protein: number, carbs: number, fat: number }): Promise<void> {
   try {
-    const meals = await getMeals(deps);
+    const meals = await getMeals(ctx);
     let mealFound = false;
 
     for (const meal of meals) {
@@ -301,16 +295,16 @@ export async function deleteMealItem(deps: MealDeps, itemToDelete: { food: strin
         meal.items.splice(itemIndex, 1);
         meal.updatedAt = new Date().toISOString();
 
-        await writeMeals(deps.vault, deps.settings, meals);
+        await writeMeals(ctx.vault, ctx.settings, meals);
 
-        await createMealNote(deps, meal);
+        await createMealNote(ctx, meal);
 
         const mealFileName = FileUtils.sanitizeMealName(meal.name) + '.md';
-        const mealFilePath = normalizePath(`${deps.settings.mealStoragePath}/${mealFileName}`);
-        const mealFile = deps.vault.getAbstractFileByPath(mealFilePath);
+        const mealFilePath = normalizePath(`${ctx.settings.mealStoragePath}/${mealFileName}`);
+        const mealFile = ctx.vault.getAbstractFileByPath(mealFilePath);
         if (mealFile instanceof TFile) {
           window.setTimeout(() => {
-            void syncMealNoteToJSON(deps, mealFile);
+            void syncMealNoteToJSON(ctx, mealFile);
           }, 100);
         }
 
@@ -330,9 +324,9 @@ export async function deleteMealItem(deps: MealDeps, itemToDelete: { food: strin
   }
 }
 
-export async function addItemsToMeal(deps: MealDeps, mealId: string, items: FoodItem[]): Promise<void> {
+export async function addItemsToMeal(ctx: PluginContext, mealId: string, items: FoodItem[]): Promise<void> {
   try {
-    const meals = await getMeals(deps);
+    const meals = await getMeals(ctx);
     const mealIndex = meals.findIndex(m => m.id === mealId);
 
     if (mealIndex === -1) {
@@ -349,16 +343,16 @@ export async function addItemsToMeal(deps: MealDeps, mealId: string, items: Food
     meal.items.push(...cleanItems);
     meal.updatedAt = new Date().toISOString();
 
-    await writeMeals(deps.vault, deps.settings, meals);
+    await writeMeals(ctx.vault, ctx.settings, meals);
 
-    await createMealNote(deps, meal);
+    await createMealNote(ctx, meal);
 
     const mealFileName = FileUtils.sanitizeMealName(meal.name) + '.md';
-    const mealFilePath = normalizePath(`${deps.settings.mealStoragePath}/${mealFileName}`);
-    const mealFile = deps.vault.getAbstractFileByPath(mealFilePath);
+    const mealFilePath = normalizePath(`${ctx.settings.mealStoragePath}/${mealFileName}`);
+    const mealFile = ctx.vault.getAbstractFileByPath(mealFilePath);
     if (mealFile instanceof TFile) {
       window.setTimeout(() => {
-        void syncMealNoteToJSON(deps, mealFile);
+        void syncMealNoteToJSON(ctx, mealFile);
       }, 100);
     }
 
@@ -370,32 +364,32 @@ export async function addItemsToMeal(deps: MealDeps, mealId: string, items: Food
   }
 }
 
-async function handleMealNameChange(deps: MealDeps, oldMeal: Meal, newMeal: Meal, currentFile: TFile): Promise<void> {
+async function handleMealNameChange(ctx: PluginContext, oldMeal: Meal, newMeal: Meal, currentFile: TFile): Promise<void> {
   try {
     const oldSanitizedName = FileUtils.sanitizeMealName(oldMeal.name);
     const oldFilename = `${oldSanitizedName}.md`;
-    const oldNotePath = normalizePath(`${deps.settings.mealStoragePath}/${oldFilename}`);
+    const oldNotePath = normalizePath(`${ctx.settings.mealStoragePath}/${oldFilename}`);
 
     const newSanitizedName = FileUtils.sanitizeMealName(newMeal.name);
     const newFilename = `${newSanitizedName}.md`;
-    const newNotePath = normalizePath(`${deps.settings.mealStoragePath}/${newFilename}`);
+    const newNotePath = normalizePath(`${ctx.settings.mealStoragePath}/${newFilename}`);
 
     if (currentFile.path !== newNotePath) {
-      const existingNewFile = deps.vault.getAbstractFileByPath(newNotePath);
+      const existingNewFile = ctx.vault.getAbstractFileByPath(newNotePath);
       if (existingNewFile && existingNewFile !== currentFile) {
         if (existingNewFile instanceof TFile) {
-          await deps.app.fileManager.trashFile(existingNewFile);
+          await ctx.app.fileManager.trashFile(existingNewFile);
         }
       }
 
-      await deps.vault.rename(currentFile, newNotePath);
+      await ctx.vault.rename(currentFile, newNotePath);
 
     }
 
     if (oldNotePath !== currentFile.path) {
-      const oldFile = deps.vault.getAbstractFileByPath(oldNotePath);
+      const oldFile = ctx.vault.getAbstractFileByPath(oldNotePath);
       if (oldFile instanceof TFile && oldFile !== currentFile) {
-        await deps.app.fileManager.trashFile(oldFile);
+        await ctx.app.fileManager.trashFile(oldFile);
       }
     }
 
@@ -404,20 +398,20 @@ async function handleMealNameChange(deps: MealDeps, oldMeal: Meal, newMeal: Meal
   }
 }
 
-export async function handleFileRename(deps: MealDeps, oldPath: string, newPath: string): Promise<void> {
+export async function handleFileRename(ctx: PluginContext, oldPath: string, newPath: string): Promise<void> {
   try {
     const newFilename = newPath.split('/').pop()?.replace('.md', '') || '';
 
-    if (!newPath.startsWith(deps.settings.mealStoragePath) || !oldPath.startsWith(deps.settings.mealStoragePath)) {
+    if (!newPath.startsWith(ctx.settings.mealStoragePath) || !oldPath.startsWith(ctx.settings.mealStoragePath)) {
       return;
     }
 
-    const file = deps.vault.getAbstractFileByPath(newPath);
+    const file = ctx.vault.getAbstractFileByPath(newPath);
     if (!(file instanceof TFile)) {
       return;
     }
 
-    const content = await deps.vault.read(file);
+    const content = await ctx.vault.read(file);
     if (!content.includes('data-meal-id="')) {
       return;
     }
@@ -427,7 +421,7 @@ export async function handleFileRename(deps: MealDeps, oldPath: string, newPath:
       return;
     }
 
-    const meals = await getMeals(deps);
+    const meals = await getMeals(ctx);
     const mealIndex = meals.findIndex(m => m.id === parsedMeal.id);
 
     if (mealIndex >= 0) {
@@ -446,9 +440,9 @@ export async function handleFileRename(deps: MealDeps, oldPath: string, newPath:
       };
 
       meals[mealIndex] = updatedMeal;
-      await writeMeals(deps.vault, deps.settings, meals);
+      await writeMeals(ctx.vault, ctx.settings, meals);
 
-      await createMealNote(deps, updatedMeal);
+      await createMealNote(ctx, updatedMeal);
     }
 
   } catch (error) {

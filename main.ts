@@ -3,11 +3,11 @@ import { FoodInputModal } from './src/ui/components/FoodInputModal/FoodInputModa
 import { ConfirmModal } from './src/ui/components/ConfirmModal';
 import { SettingsTab } from './src/ui/settings/SettingsTab';
 import { PluginSettings, DEFAULT_SETTINGS } from './src/types/settings';
-import * as LLM from './src/services/llm';
-import * as FoodLogOps from './src/services/food-log/manager';
-import * as MealOps from './src/services/meal/manager';
+import { PluginContext } from './src/types/plugin-context';
+import * as FoodLogOps from './src/utils/food-log/manager';
+import * as MealOps from './src/utils/meal/manager';
 import { applyEmojiPreferences } from './src/utils/apply-emoji-preferences';
-import { migrateIfNeeded } from './src/services/meal/migrate-if-needed';
+import { migrateIfNeeded } from './src/utils/meal/migrate-if-needed';
 
 export default class NutritionTrackerPlugin extends Plugin {
   settings: PluginSettings;
@@ -18,27 +18,11 @@ export default class NutritionTrackerPlugin extends Plugin {
   private isDeleteInProgress: boolean = false;
   private currentModal: FoodInputModal | null = null;
 
-  private get mealDeps(): MealOps.MealDeps {
+  private get ctx(): PluginContext {
     return {
       vault: this.app.vault,
       app: this.app,
       settings: this.settings
-    };
-  }
-
-  private get foodLogDeps(): FoodLogOps.FoodLogDeps {
-    return {
-      vault: this.app.vault,
-      settings: this.settings
-    };
-  }
-
-  private get llmDeps(): LLM.LLMDeps {
-    return {
-      apiKey: this.settings.openRouterApiKey,
-      model: this.settings.llmModel,
-      useCustomModel: this.settings.useCustomModel,
-      customModelName: this.settings.customModelName
     };
   }
 
@@ -92,7 +76,7 @@ export default class NutritionTrackerPlugin extends Plugin {
     this.registerEvent(
       this.app.vault.on('rename', async (file, oldPath) => {
         if (file instanceof TFile) {
-          await MealOps.handleFileRename(this.mealDeps, oldPath, file.path);
+          await MealOps.handleFileRename(this.ctx, oldPath, file.path);
         }
       })
     );
@@ -191,10 +175,10 @@ export default class NutritionTrackerPlugin extends Plugin {
     
     try {
       if (context === 'meal') {
-        await MealOps.deleteMealItem(this.mealDeps, entryToDelete);
+        await MealOps.deleteMealItem(this.ctx, entryToDelete);
         new Notice(`🍽️ Deleted from meal: ${food} (${quantity})`);
       } else {
-        await FoodLogOps.deleteFoodLogItem(this.foodLogDeps, entryToDelete);
+        await FoodLogOps.deleteFoodLogItem(this.ctx, entryToDelete);
         new Notice(`📝 Deleted from food log: ${food} (${quantity})`);
       }
       
@@ -325,7 +309,7 @@ export default class NutritionTrackerPlugin extends Plugin {
   private setupMealNoteSyncHandler() {
     this.registerEvent(
       this.app.vault.on('modify', (file) => {
-        const isMealNote = MealOps.isMealNote(this.mealDeps, file);
+        const isMealNote = MealOps.isMealNote(this.ctx, file);
 
         if (isMealNote && file instanceof TFile) {
           const filePath = file.path;
@@ -335,7 +319,7 @@ export default class NutritionTrackerPlugin extends Plugin {
           }
 
           const timeout = window.setTimeout(() => {
-            void MealOps.syncMealNoteToJSON(this.mealDeps, file).then(() => {
+            void MealOps.syncMealNoteToJSON(this.ctx, file).then(() => {
               this.mealSyncTimeouts.delete(filePath);
             });
           }, 1000);

@@ -1,27 +1,23 @@
 import { FoodItem } from '../../types/nutrition';
+import { PluginContext } from '../../types/plugin-context';
 import * as PromptBuilder from './prompt-builder';
 import * as ResponseParser from './response-parser';
 import * as ImageUtils from './image-utils';
 import * as OpenRouterClient from './openrouter-client';
 
-export interface LLMDeps {
-  apiKey: string;
-  model: string;
-  useCustomModel: boolean;
-  customModelName: string;
-}
-
 export async function processFood(
-  deps: LLMDeps,
+  ctx: PluginContext,
   description: string,
   images?: File[]
 ): Promise<FoodItem[]> {
+  const { openRouterApiKey, llmModel, useCustomModel, customModelName } = ctx.settings;
+
   // 1. Validation
-  if (!deps.apiKey) {
+  if (!openRouterApiKey) {
     throw new Error('OpenRouter API key not configured. Please set it in plugin settings.');
   }
 
-  if (deps.useCustomModel && !deps.customModelName.trim()) {
+  if (useCustomModel && !customModelName.trim()) {
     throw new Error('Custom model is enabled but no model name is specified. Please set a custom model name in plugin settings.');
   }
 
@@ -29,9 +25,9 @@ export async function processFood(
     // 2. Build prompt (pure)
     const prompt = PromptBuilder.buildNutritionPrompt(description);
     const model = PromptBuilder.getEffectiveModel(
-      deps.useCustomModel,
-      deps.customModelName,
-      deps.model
+      useCustomModel,
+      customModelName,
+      llmModel
     );
 
     // 3. Process images (I/O)
@@ -50,7 +46,7 @@ export async function processFood(
 
     // 5. API call (I/O)
     const response = await OpenRouterClient.sendOpenRouterRequest({
-      apiKey: deps.apiKey,
+      apiKey: openRouterApiKey,
       model,
       messages,
       maxTokens: 1000,

@@ -1,28 +1,24 @@
 import { TFile, Vault, TAbstractFile, normalizePath } from 'obsidian';
-
-// Dependencies interface
-export interface FileUtilsDeps {
-  vault: Vault;
-}
+import { PluginContext } from '../types/plugin-context';
 
 // I/O operations (require vault dependency)
 export async function ensureDirectoryExists(
-  deps: FileUtilsDeps,
+  ctx: PluginContext,
   path: string
 ): Promise<void> {
-  const exists = deps.vault.getAbstractFileByPath(path);
+  const exists = ctx.vault.getAbstractFileByPath(path);
   if (!exists) {
-    await deps.vault.createFolder(path);
+    await ctx.vault.createFolder(path);
   }
 }
 
 export async function saveImage(
-  deps: FileUtilsDeps,
+  ctx: PluginContext,
   imageFile: File,
   imageStoragePath: string
 ): Promise<string> {
   try {
-    await ensureDirectoryExists(deps, imageStoragePath);
+    await ensureDirectoryExists(ctx, imageStoragePath);
 
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
     const extension = imageFile.name.split('.').pop() || 'jpg';
@@ -31,7 +27,7 @@ export async function saveImage(
 
     // Convert File to ArrayBuffer
     const arrayBuffer = await imageFile.arrayBuffer();
-    await deps.vault.createBinary(imagePath, arrayBuffer);
+    await ctx.vault.createBinary(imagePath, arrayBuffer);
 
     return imagePath;
   } catch (error) {

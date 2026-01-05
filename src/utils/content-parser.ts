@@ -1,4 +1,4 @@
-import { FoodItem, NutritionData, Meal } from '../../types/nutrition';
+import { FoodItem, NutritionData, Meal } from '../types/nutrition';
 
 export function extractFoodItemsFromContent(content: string): FoodItem[] {
   const items: FoodItem[] = [];

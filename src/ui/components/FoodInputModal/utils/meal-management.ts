@@ -1,7 +1,8 @@
 import { Vault, App } from 'obsidian';
 import { Meal } from '../../../../types/nutrition';
 import { PluginSettings } from '../../../../types/settings';
-import * as MealOps from '../../../../services/meal/manager';
+import { PluginContext } from '../../../../types/plugin-context';
+import * as MealOps from '../../../../utils/meal/manager';
 
 export class MealManager {
   private availableMeals: Meal[] = [];
@@ -13,7 +14,7 @@ export class MealManager {
     private settings: PluginSettings
   ) {}
 
-  private get mealDeps(): MealOps.MealDeps {
+  private get ctx(): PluginContext {
     return {
       vault: this.vault,
       app: this.app,
@@ -23,7 +24,7 @@ export class MealManager {
 
   async loadMeals(): Promise<void> {
     try {
-      this.availableMeals = await MealOps.getMeals(this.mealDeps);
+      this.availableMeals = await MealOps.getMeals(this.ctx);
     } catch (error) {
       console.error('Error loading meals:', error);
       this.availableMeals = [];
@@ -31,7 +32,7 @@ export class MealManager {
   }
 
   async addMeal(mealId: string): Promise<void> {
-    const meal = await MealOps.getMealById(this.mealDeps, mealId);
+    const meal = await MealOps.getMealById(this.ctx, mealId);
     if (meal && !this.selectedMeals.find(m => m.id === meal.id)) {
       this.selectedMeals.push(meal);
     }

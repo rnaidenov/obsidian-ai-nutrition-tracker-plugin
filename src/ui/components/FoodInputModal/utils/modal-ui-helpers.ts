@@ -1,7 +1,7 @@
 import { Setting, App } from 'obsidian';
 import { Meal, FoodItem, ServingUnitType } from '../../../../types/nutrition';
 import { MealSuggest } from './MealSuggest';
-import { scaleNutrition, calculateTotalNutrition, calculateMealPortionNutrition } from '../../../../services/meal/meal-operations';
+import { scaleNutrition, calculateTotalNutrition, calculateMealPortionNutrition } from '../../../../utils/meal/meal-operations';
 
 export function createModalTitle(contentEl: HTMLElement, initialData: FoodItem | null, editingContext: 'meal' | 'foodlog', targetMealId?: string) {
   let title = 'Add food entry';
