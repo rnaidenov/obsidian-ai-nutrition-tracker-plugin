@@ -95,12 +95,11 @@ export function generateCTAButtons(
   return buttonHtml;
 }
 
-export function generateDailySummary(
+function generateProgressSummary(
   totals: NutritionData,
-  goals: NutritionGoals
+  goals: NutritionGoals,
+  options: { title: string; mealId?: string }
 ): string {
-  let summary = '';
-
   const overallProgress = Math.round((
     ContentParser.calculatePercentage(totals.calories, goals.calories) +
     ContentParser.calculatePercentage(totals.protein, goals.protein) +
@@ -109,21 +108,24 @@ export function generateDailySummary(
   ) / 4);
 
   const nutritionRows = generateModernProgressBars(totals, goals);
+  const mealIdAttr = options.mealId ? ` data-meal-id="${options.mealId}"` : '';
 
-  summary += `<div class="ntr-summary-card">
-  <h3 class="ntr-summary-title">🎯 Totals vs Goals</h3>
-  <div class="ntr-summary-divider"></div>
-${nutritionRows}  <div class="ntr-overall-progress">
-    <div class="ntr-overall-progress-border">
-      <div class="ntr-overall-progress-inner">
-        <h3 class="ntr-overall-progress-title">${ThemeUtils.getOverallStatusEmoji(overallProgress)} Overall Progress: ${overallProgress}%</h3>
-      </div>
-    </div>
-  </div>
-</div>
+  return `<div class="ntr-summary-card"${mealIdAttr}>
+<h3 class="ntr-summary-title">${options.title}</h3>
+<div class="ntr-summary-divider"></div>
+${nutritionRows}<div class="ntr-overall-progress">
+<div class="ntr-overall-progress-border">
+<div class="ntr-overall-progress-inner">
+<h3 class="ntr-overall-progress-title">${ThemeUtils.getOverallStatusEmoji(overallProgress)} Overall Progress: ${overallProgress}%</h3>
+</div></div></div></div>
 `;
+}
 
-  return summary;
+export function generateDailySummary(
+  totals: NutritionData,
+  goals: NutritionGoals
+): string {
+  return generateProgressSummary(totals, goals, { title: '🎯 Totals vs Goals' });
 }
 
 export function generateModernProgressBars(
@@ -168,24 +170,5 @@ export function generateMealProgressSummaryWithId(
   goals: NutritionGoals,
   mealId: string
 ): string {
-  const overallProgress = Math.round((
-    ContentParser.calculatePercentage(totals.calories, goals.calories) +
-    ContentParser.calculatePercentage(totals.protein, goals.protein) +
-    ContentParser.calculatePercentage(totals.carbs, goals.carbs) +
-    ContentParser.calculatePercentage(totals.fat, goals.fat)
-  ) / 4);
-
-  const nutritionRows = generateModernProgressBars(totals, goals);
-
-  const summary = `<div class="ntr-summary-card" data-meal-id="${mealId}">
-<h3 class="ntr-summary-title">🎯 Meal vs Goals</h3>
-<div class="ntr-summary-divider"></div>
-${nutritionRows}<div class="ntr-overall-progress">
-<div class="ntr-overall-progress-border">
-<div class="ntr-overall-progress-inner">
-<h3 class="ntr-overall-progress-title">${ThemeUtils.getOverallStatusEmoji(overallProgress)} Overall Progress: ${overallProgress}%</h3>
-</div></div></div></div>
-`;
-
-  return summary;
+  return generateProgressSummary(totals, goals, { title: '🎯 Meal vs Goals', mealId });
 }

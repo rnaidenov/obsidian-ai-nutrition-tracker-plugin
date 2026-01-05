@@ -5,7 +5,7 @@ import * as FileUtils from '../file';
 import * as LayoutGenerator from '../layout-generator';
 import * as ContentParser from '../content-parser';
 import { readMeals, writeMeals } from './meal-storage';
-import { migrateMealToV2, isLegacyMeal } from './meal-operations';
+import { migrateMealToV2, isLegacyMeal, calculateTotalNutrition } from './meal-operations';
 
 export async function saveMeal(ctx: PluginContext, name: string, foodItems: FoodItem[], description?: string, images?: string[]): Promise<Meal> {
   const meal: Meal = {
@@ -155,17 +155,7 @@ async function deleteMealNote(ctx: PluginContext, meal: Meal): Promise<void> {
 }
 
 function generateMealNoteContent(ctx: PluginContext, meal: Meal): string {
-  const totalCalories = meal.items.reduce((sum, item) => sum + item.calories, 0);
-  const totalProtein = meal.items.reduce((sum, item) => sum + item.protein, 0);
-  const totalCarbs = meal.items.reduce((sum, item) => sum + item.carbs, 0);
-  const totalFat = meal.items.reduce((sum, item) => sum + item.fat, 0);
-
-  const totals = {
-    calories: totalCalories,
-    protein: totalProtein,
-    carbs: totalCarbs,
-    fat: totalFat
-  };
+  const totals = calculateTotalNutrition(meal.items);
 
   const goals = ctx.settings.nutritionGoals;
 

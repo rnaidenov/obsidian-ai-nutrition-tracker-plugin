@@ -1,6 +1,7 @@
 import { App, Modal, Notice, Vault } from 'obsidian';
 import { PluginSettings } from '../../../types/settings';
-import { FoodItem, ServingUnitType } from '../../../types/nutrition';
+import { FoodItem, Meal, ServingUnitType } from '../../../types/nutrition';
+import { PluginContext } from '../../../types/plugin-context';
 import {
   createModalTitle,
   createEditingNotice,
@@ -11,10 +12,10 @@ import {
   createServingUnitSelector,
   createProcessButton
 } from './utils/modal-ui-helpers';
-import { MealManager } from './utils/meal-management';
-import { ImageManager } from './utils/image-management';
+import * as MealOps from '../../../utils/meal/manager';
+import { calculateTotalNutrition, scaleNutrition } from '../../../utils/meal/meal-operations';
+import * as ImageManagement from './utils/image-management';
 import { processFood } from './utils/food-processing';
-import { calculateButtonState, applyButtonState } from './utils/button-state';
 
 export class FoodInputModal extends Modal {
   private description: string = '';
@@ -34,8 +35,13 @@ export class FoodInputModal extends Modal {
   private customServingLabel: string = '';
   private mealServings: Map<string, number> = new Map();
 
-  private mealManager: MealManager;
-  private imageManager: ImageManager;
+  private availableMeals: Meal[] = [];
+  private selectedMeals: Meal[] = [];
+  private selectedImages: File[] = [];
+
+  private get ctx(): PluginContext {
+    return { vault: this.vault, app: this.app, settings: this.settings };
+  }
 
   constructor(
     app: App,
@@ -46,10 +52,6 @@ export class FoodInputModal extends Modal {
     super(app);
     this.modalEl.addClass('nutrition-tracker-modal');
     this.onCloseCallback = onCloseCallback;
-
-    // Initialize helper classes
-    this.mealManager = new MealManager(vault, app, settings);
-    this.imageManager = new ImageManager();
   }
 
   setInitialData(data: { food: string, quantity: string, calories: number, protein: number, carbs: number, fat: number }) {
@@ -78,7 +80,7 @@ export class FoodInputModal extends Modal {
     contentEl.empty();
 
     // Load meals
-    await this.mealManager.loadMeals();
+    this.availableMeals = await MealOps.getMeals(this.ctx);
 
     // Note: We deliberately DON'T pre-select the target meal when targetMealId is set
     // because that would cause duplication - we only want to add NEW items to the meal
@@ -86,39 +88,44 @@ export class FoodInputModal extends Modal {
     // Create UI components
     createModalTitle(contentEl, this.initialData, this.editingContext, this.targetMealId);
     createEditingNotice(contentEl, this.initialData, this.editingContext, this.targetMealId);
-    
+
     // Only show meal selection dropdown if we're NOT adding to a specific meal
     if (!this.targetMealId) {
       createMealSelectionDropdown(
         this.app,
-        contentEl, 
-        this.mealManager.getAvailableMeals(), 
+        contentEl,
+        this.availableMeals,
         this.handleMealSelect.bind(this)
       );
-      
+
       createSelectedMealsDisplay(
         contentEl,
-        this.mealManager.getSelectedMeals(),
+        this.selectedMeals,
         this.mealServings,
         this.handleMealRemove.bind(this),
         this.handleMealServingsChange.bind(this)
       );
     }
-    
+
     this.foodDescriptionInput = createFoodDescriptionInput(
-      contentEl, 
-      this.description, 
+      contentEl,
+      this.description,
       this.handleDescriptionChange.bind(this),
       this.handleProcessFood.bind(this)
     );
-    
-    this.imageManager.createImageUploadButton(
-      contentEl, 
-      this.isProcessing, 
+
+    ImageManagement.createImageUploadButton(
+      contentEl,
+      this.isProcessing,
       this.handleImageSelection.bind(this)
     );
-    
-    this.imageManager.createImagePreview(contentEl, this.refresh.bind(this));
+
+    ImageManagement.createImagePreview(
+      contentEl,
+      this.selectedImages,
+      this.handleImageRemove.bind(this),
+      this.handleImagesClear.bind(this)
+    );
     
     // Only show save as meal toggle if we're NOT adding to a specific meal
     if (!this.targetMealId) {
@@ -168,13 +175,18 @@ export class FoodInputModal extends Modal {
   }
 
   private async handleMealSelect(mealId: string) {
-    await this.mealManager.addMeal(mealId);
-    this.refresh();
+    const meal = await MealOps.getMealById(this.ctx, mealId);
+    if (meal && !this.selectedMeals.find(m => m.id === meal.id)) {
+      this.selectedMeals = [...this.selectedMeals, meal];
+      this.refresh();
+    }
   }
 
   private handleMealRemove(index: number) {
-    this.mealManager.removeMeal(index);
-    this.refresh();
+    if (index >= 0 && index < this.selectedMeals.length) {
+      this.selectedMeals = this.selectedMeals.filter((_, i) => i !== index);
+      this.refresh();
+    }
   }
 
   private handleDescriptionChange(value: string) {
@@ -183,7 +195,20 @@ export class FoodInputModal extends Modal {
   }
 
   private handleImageSelection() {
-    this.imageManager.selectImages(this.refresh.bind(this));
+    ImageManagement.selectImages((files: File[]) => {
+      this.selectedImages = ImageManagement.addImages(this.selectedImages, files);
+      this.refresh();
+    });
+  }
+
+  private handleImageRemove(index: number) {
+    this.selectedImages = ImageManagement.removeImage(this.selectedImages, index);
+    this.refresh();
+  }
+
+  private handleImagesClear() {
+    this.selectedImages = [];
+    this.refresh();
   }
 
   private handleSaveAsMealChange(value: boolean) {
@@ -212,7 +237,7 @@ export class FoodInputModal extends Modal {
   }
 
   private updateMealNutritionDisplay(mealId: string, servings: number) {
-    const meal = this.mealManager.getSelectedMeals().find(m => m.id === mealId);
+    const meal = this.selectedMeals.find(m => m.id === mealId);
     if (!meal) return;
 
     // Find the nutrition text element for this meal
@@ -220,7 +245,7 @@ export class FoodInputModal extends Modal {
     if (!selectedMealsContainer) return;
 
     const mealDivs = selectedMealsContainer.querySelectorAll('.nutrition-tracker-selected-meal');
-    const mealIndex = this.mealManager.getSelectedMeals().findIndex(m => m.id === mealId);
+    const mealIndex = this.selectedMeals.findIndex(m => m.id === mealId);
 
     if (mealIndex === -1 || mealIndex >= mealDivs.length) return;
 
@@ -228,20 +253,10 @@ export class FoodInputModal extends Modal {
     const nutritionEl = mealDiv.querySelector('.nutrition-tracker-meal-nutrition');
 
     if (nutritionEl) {
-      // Calculate scaled nutrition (same logic as in modal-ui-helpers.ts)
-      const totalCalories = meal.items.reduce((sum, item) => sum + item.calories, 0);
-      const totalProtein = meal.items.reduce((sum, item) => sum + item.protein, 0);
-      const totalCarbs = meal.items.reduce((sum, item) => sum + item.carbs, 0);
-      const totalFat = meal.items.reduce((sum, item) => sum + item.fat, 0);
+      const totalNutrition = calculateTotalNutrition(meal.items);
+      const scaled = scaleNutrition(totalNutrition, servings);
 
-      const scaledNutrition = {
-        calories: Math.round(totalCalories * servings),
-        protein: Math.round(totalProtein * servings),
-        carbs: Math.round(totalCarbs * servings),
-        fat: Math.round(totalFat * servings)
-      };
-
-      nutritionEl.textContent = `Total: ${scaledNutrition.calories} kcal | P: ${scaledNutrition.protein}g | C: ${scaledNutrition.carbs}g | F: ${scaledNutrition.fat}g`;
+      nutritionEl.textContent = `Total: ${scaled.calories} kcal | P: ${scaled.protein}g | C: ${scaled.carbs}g | F: ${scaled.fat}g`;
     }
   }
 
@@ -252,16 +267,12 @@ export class FoodInputModal extends Modal {
 
     try {
       const result = await processFood(
+        this.ctx,
         {
-          vault: this.vault,
-          app: this.app,
-          settings: this.settings
-        },
-        {
-          selectedMeals: this.mealManager.getSelectedMeals(),
+          selectedMeals: this.selectedMeals,
           mealServings: this.mealServings,
           description: this.description,
-          images: this.imageManager.getSelectedImages(),
+          images: this.selectedImages,
           saveAsMeal: this.saveAsMeal,
           mealName: this.mealName,
           servingUnitType: this.selectedServingUnit,
@@ -302,25 +313,40 @@ export class FoodInputModal extends Modal {
   }
 
   private updateButtonState() {
-    const state = calculateButtonState({
-      description: this.description,
-      selectedImages: this.imageManager.getSelectedImages(),
-      selectedMeals: this.mealManager.getSelectedMeals(),
-      saveAsMeal: this.saveAsMeal,
-      mealName: this.mealName,
-      isProcessing: this.isProcessing,
-      initialData: this.initialData,
-      editingContext: this.editingContext,
-      targetMealId: this.targetMealId
-    });
+    const hasDescription = this.description.trim().length > 0;
+    const hasImages = this.selectedImages.length > 0;
+    const hasSelectedMeals = this.selectedMeals.length > 0;
+    const hasMealName = this.saveAsMeal ? this.mealName.trim().length > 0 : true;
 
-    applyButtonState(
-      {
-        processButton: this.processButton,
-        processingIndicator: this.processingIndicator
-      },
-      state
-    );
+    let isEnabled = false;
+    if (this.targetMealId) {
+      isEnabled = !this.isProcessing && (hasDescription || hasImages);
+    } else {
+      isEnabled = !this.isProcessing && (hasSelectedMeals || hasDescription || hasImages) && hasMealName;
+    }
+
+    let text = 'Process food';
+    if (this.initialData) {
+      text = this.editingContext === 'meal' ? 'Update meal item' : 'Update food';
+    } else if (this.targetMealId) {
+      text = 'Add to meal';
+    }
+    if (this.isProcessing) {
+      text = 'Processing...';
+    }
+
+    if (this.processButton) {
+      this.processButton.disabled = !isEnabled;
+      this.processButton.textContent = text;
+    }
+
+    if (this.processingIndicator) {
+      if (this.isProcessing) {
+        this.processingIndicator.classList.add('visible');
+      } else {
+        this.processingIndicator.classList.remove('visible');
+      }
+    }
   }
 
   private refresh(): void {
