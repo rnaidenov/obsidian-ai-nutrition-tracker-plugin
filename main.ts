@@ -3,32 +3,38 @@ import { FoodInputModal } from './src/ui/components/FoodInputModal/FoodInputModa
 import { ConfirmModal } from './src/ui/components/ConfirmModal';
 import { SettingsTab } from './src/ui/settings/SettingsTab';
 import { PluginSettings, DEFAULT_SETTINGS } from './src/types/settings';
-import { LLMService } from './src/services/llm-service';
-import { FileService } from './src/services/file-service';
+import { PluginContext } from './src/types/plugin-context';
+import * as FoodLogOps from './src/utils/food-log/manager';
+import * as MealOps from './src/utils/meal/manager';
 import { applyEmojiPreferences } from './src/utils/apply-emoji-preferences';
+import { migrateIfNeeded } from './src/utils/meal/migrate-if-needed';
 
 export default class NutritionTrackerPlugin extends Plugin {
   settings: PluginSettings;
-  llmService: LLMService;
-  fileService: FileService;
   private editButtonHandler: (event: Event) => void;
   private deleteButtonHandler: (event: Event) => void;
   private ctaButtonHandler: (event: Event) => void;
   private mealSyncTimeouts: Map<string, number> = new Map();
   private isDeleteInProgress: boolean = false;
-  private currentModal: FoodInputModal | null = null; 
+  private currentModal: FoodInputModal | null = null;
+
+  private get ctx(): PluginContext {
+    return {
+      vault: this.app.vault,
+      app: this.app,
+      settings: this.settings
+    };
+  }
 
   async onload() {
     await this.loadSettings();
-    
-    // Initialize services
-    this.llmService = new LLMService(this.settings);
-    this.fileService = new FileService(this.app, this.app.vault, this.settings);
-    
+
+    // Run meal migration
+    await migrateIfNeeded(this.app.vault, this.settings);
+
     // Apply emoji preferences
     applyEmojiPreferences(this.settings.appearance);
 
-   
     // Add ribbon icon
     this.addRibbonIcon('apple', 'Log food', () => {
       this.openFoodInputModal();
@@ -70,7 +76,7 @@ export default class NutritionTrackerPlugin extends Plugin {
     this.registerEvent(
       this.app.vault.on('rename', async (file, oldPath) => {
         if (file instanceof TFile) {
-          await this.fileService.handleFileRename(oldPath, file.path);
+          await MealOps.handleFileRename(this.ctx, oldPath, file.path);
         }
       })
     );
@@ -115,12 +121,11 @@ export default class NutritionTrackerPlugin extends Plugin {
 
   private createAndOpenModal(setupFn?: (modal: FoodInputModal) => void) {
     this.ensureModalClosed();
-    
+
     this.currentModal = new FoodInputModal(
-      this.app, 
-      this.settings, 
-      this.llmService, 
-      this.fileService,
+      this.app,
+      this.app.vault,
+      this.settings,
       () => {
         this.currentModal = null;
       }
@@ -170,10 +175,10 @@ export default class NutritionTrackerPlugin extends Plugin {
     
     try {
       if (context === 'meal') {
-        await this.fileService.deleteMealItem(entryToDelete);
+        await MealOps.deleteMealItem(this.ctx, entryToDelete);
         new Notice(`🍽️ Deleted from meal: ${food} (${quantity})`);
       } else {
-        await this.fileService.deleteFoodLogItem(entryToDelete);
+        await FoodLogOps.deleteFoodLogItem(this.ctx, entryToDelete);
         new Notice(`📝 Deleted from food log: ${food} (${quantity})`);
       }
       
@@ -304,21 +309,21 @@ export default class NutritionTrackerPlugin extends Plugin {
   private setupMealNoteSyncHandler() {
     this.registerEvent(
       this.app.vault.on('modify', (file) => {
-        const isMealNote = this.fileService.isMealNote(file);
-        
+        const isMealNote = MealOps.isMealNote(this.ctx, file);
+
         if (isMealNote && file instanceof TFile) {
           const filePath = file.path;
-          
+
           if (this.mealSyncTimeouts.has(filePath)) {
             window.clearTimeout(this.mealSyncTimeouts.get(filePath));
           }
-          
+
           const timeout = window.setTimeout(() => {
-            void this.fileService.syncMealNoteToJSON(file).then(() => {
+            void MealOps.syncMealNoteToJSON(this.ctx, file).then(() => {
               this.mealSyncTimeouts.delete(filePath);
             });
           }, 1000);
-          
+
           this.mealSyncTimeouts.set(filePath, timeout);
         }
       })
@@ -328,27 +333,16 @@ export default class NutritionTrackerPlugin extends Plugin {
   async loadSettings() {
     const loadedData = await this.loadData();
     this.settings = Object.assign({}, DEFAULT_SETTINGS, loadedData);
-    
+
     if (!this.settings.mealStoragePath) {
       this.settings.mealStoragePath = 'tracker/health/food/meals';
       await this.saveSettings();
-    }
-    
-    if (this.llmService) {
-      this.llmService = new LLMService(this.settings);
-    }
-
-    if (this.fileService) {
-      this.fileService = new FileService(this.app, this.app.vault, this.settings);
     }
   }
 
   async saveSettings() {
     await this.saveData(this.settings);
-    
-    this.llmService = new LLMService(this.settings);
-    this.fileService = new FileService(this.app, this.app.vault, this.settings);
-    
+
     applyEmojiPreferences(this.settings.appearance);
   }
 

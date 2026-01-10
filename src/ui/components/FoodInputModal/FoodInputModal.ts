@@ -1,8 +1,7 @@
-import { App, Modal, Notice } from 'obsidian';
+import { App, Modal, Notice, Vault } from 'obsidian';
 import { PluginSettings } from '../../../types/settings';
-import { LLMService } from '../../../services/llm-service';
-import { FileService } from '../../../services/file-service';
-import { FoodItem } from '../../../types/nutrition';
+import { FoodItem, Meal, ServingUnitType } from '../../../types/nutrition';
+import { PluginContext } from '../../../types/plugin-context';
 import {
   createModalTitle,
   createEditingNotice,
@@ -10,12 +9,13 @@ import {
   createSelectedMealsDisplay,
   createFoodDescriptionInput,
   createSaveAsMealToggle,
+  createServingUnitSelector,
   createProcessButton
 } from './utils/modal-ui-helpers';
-import { MealManager } from './utils/meal-management';
-import { ImageManager } from './utils/image-management';
-import { FoodProcessor } from './utils/food-processing';
-import { ButtonStateManager } from './utils/button-state';
+import * as MealOps from '../../../utils/meal/manager';
+import { calculateTotalNutrition, scaleNutrition } from '../../../utils/meal/meal-operations';
+import * as ImageManagement from './utils/image-management';
+import { processFood } from './utils/food-processing';
 
 export class FoodInputModal extends Modal {
   private description: string = '';
@@ -31,27 +31,27 @@ export class FoodInputModal extends Modal {
   private onCloseCallback?: () => void;
   private foodDescriptionInput: HTMLTextAreaElement | null = null;
 
-  private mealManager: MealManager;
-  private imageManager: ImageManager;
-  private foodProcessor: FoodProcessor;
-  private buttonStateManager: ButtonStateManager;
+  private selectedServingUnit: ServingUnitType = '100g';
+  private customServingLabel: string = '';
+  private mealServings: Map<string, number> = new Map();
+
+  private availableMeals: Meal[] = [];
+  private selectedMeals: Meal[] = [];
+  private selectedImages: File[] = [];
+
+  private get ctx(): PluginContext {
+    return { vault: this.vault, app: this.app, settings: this.settings };
+  }
 
   constructor(
-    app: App, 
+    app: App,
+    private vault: Vault,
     private settings: PluginSettings,
-    private llmService: LLMService,
-    private fileService: FileService,
     onCloseCallback?: () => void
   ) {
     super(app);
     this.modalEl.addClass('nutrition-tracker-modal');
     this.onCloseCallback = onCloseCallback;
-    
-    // Initialize helper classes
-    this.mealManager = new MealManager(fileService);
-    this.imageManager = new ImageManager();
-    this.foodProcessor = new FoodProcessor(this.app, settings, llmService, fileService);
-    this.buttonStateManager = new ButtonStateManager(this.processButton, this.processingIndicator);
   }
 
   setInitialData(data: { food: string, quantity: string, calories: number, protein: number, carbs: number, fat: number }) {
@@ -80,7 +80,7 @@ export class FoodInputModal extends Modal {
     contentEl.empty();
 
     // Load meals
-    await this.mealManager.loadMeals();
+    this.availableMeals = await MealOps.getMeals(this.ctx);
 
     // Note: We deliberately DON'T pre-select the target meal when targetMealId is set
     // because that would cause duplication - we only want to add NEW items to the meal
@@ -88,47 +88,64 @@ export class FoodInputModal extends Modal {
     // Create UI components
     createModalTitle(contentEl, this.initialData, this.editingContext, this.targetMealId);
     createEditingNotice(contentEl, this.initialData, this.editingContext, this.targetMealId);
-    
+
     // Only show meal selection dropdown if we're NOT adding to a specific meal
     if (!this.targetMealId) {
       createMealSelectionDropdown(
         this.app,
-        contentEl, 
-        this.mealManager.getAvailableMeals(), 
+        contentEl,
+        this.availableMeals,
         this.handleMealSelect.bind(this)
       );
-      
+
       createSelectedMealsDisplay(
-        contentEl, 
-        this.mealManager.getSelectedMeals(), 
-        this.handleMealRemove.bind(this)
+        contentEl,
+        this.selectedMeals,
+        this.mealServings,
+        this.handleMealRemove.bind(this),
+        this.handleMealServingsChange.bind(this)
       );
     }
-    
+
     this.foodDescriptionInput = createFoodDescriptionInput(
-      contentEl, 
-      this.description, 
+      contentEl,
+      this.description,
       this.handleDescriptionChange.bind(this),
       this.handleProcessFood.bind(this)
     );
-    
-    this.imageManager.createImageUploadButton(
-      contentEl, 
-      this.isProcessing, 
+
+    ImageManagement.createImageUploadButton(
+      contentEl,
+      this.isProcessing,
       this.handleImageSelection.bind(this)
     );
-    
-    this.imageManager.createImagePreview(contentEl, this.refresh.bind(this));
+
+    ImageManagement.createImagePreview(
+      contentEl,
+      this.selectedImages,
+      this.handleImageRemove.bind(this),
+      this.handleImagesClear.bind(this)
+    );
     
     // Only show save as meal toggle if we're NOT adding to a specific meal
     if (!this.targetMealId) {
       createSaveAsMealToggle(
-        contentEl, 
-        this.saveAsMeal, 
+        contentEl,
+        this.saveAsMeal,
         this.mealName,
         this.handleSaveAsMealChange.bind(this),
         this.handleMealNameChange.bind(this)
       );
+
+      if (this.saveAsMeal) {
+        createServingUnitSelector(
+          contentEl,
+          this.selectedServingUnit,
+          this.customServingLabel,
+          this.handleServingUnitChange.bind(this),
+          this.handleCustomLabelChange.bind(this)
+        );
+      }
     }
     
     // Create error message display
@@ -144,10 +161,7 @@ export class FoodInputModal extends Modal {
     );
     
     this.processingIndicator = contentEl.querySelector('.nutrition-tracker-processing-indicator');
-    
-    // Initialize button state manager with actual elements
-    this.buttonStateManager = new ButtonStateManager(this.processButton, this.processingIndicator);
-    
+
     // Update button state
     this.updateButtonState();
     
@@ -161,13 +175,18 @@ export class FoodInputModal extends Modal {
   }
 
   private async handleMealSelect(mealId: string) {
-    await this.mealManager.addMeal(mealId);
-    this.refresh();
+    const meal = await MealOps.getMealById(this.ctx, mealId);
+    if (meal && !this.selectedMeals.find(m => m.id === meal.id)) {
+      this.selectedMeals = [...this.selectedMeals, meal];
+      this.refresh();
+    }
   }
 
   private handleMealRemove(index: number) {
-    this.mealManager.removeMeal(index);
-    this.refresh();
+    if (index >= 0 && index < this.selectedMeals.length) {
+      this.selectedMeals = this.selectedMeals.filter((_, i) => i !== index);
+      this.refresh();
+    }
   }
 
   private handleDescriptionChange(value: string) {
@@ -176,7 +195,20 @@ export class FoodInputModal extends Modal {
   }
 
   private handleImageSelection() {
-    this.imageManager.selectImages(this.refresh.bind(this));
+    ImageManagement.selectImages((files: File[]) => {
+      this.selectedImages = ImageManagement.addImages(this.selectedImages, files);
+      this.refresh();
+    });
+  }
+
+  private handleImageRemove(index: number) {
+    this.selectedImages = ImageManagement.removeImage(this.selectedImages, index);
+    this.refresh();
+  }
+
+  private handleImagesClear() {
+    this.selectedImages = [];
+    this.refresh();
   }
 
   private handleSaveAsMealChange(value: boolean) {
@@ -189,21 +221,66 @@ export class FoodInputModal extends Modal {
     this.updateButtonState();
   }
 
+  private handleServingUnitChange(unit: ServingUnitType) {
+    this.selectedServingUnit = unit;
+    this.refresh();
+  }
+
+  private handleCustomLabelChange(label: string) {
+    this.customServingLabel = label;
+  }
+
+  private handleMealServingsChange(mealId: string, servings: number) {
+    this.mealServings.set(mealId, servings);
+    // Update nutrition display without full refresh to prevent input defocus
+    this.updateMealNutritionDisplay(mealId, servings);
+  }
+
+  private updateMealNutritionDisplay(mealId: string, servings: number) {
+    const meal = this.selectedMeals.find(m => m.id === mealId);
+    if (!meal) return;
+
+    // Find the nutrition text element for this meal
+    const selectedMealsContainer = this.contentEl.querySelector('.nutrition-tracker-selected-meals');
+    if (!selectedMealsContainer) return;
+
+    const mealDivs = selectedMealsContainer.querySelectorAll('.nutrition-tracker-selected-meal');
+    const mealIndex = this.selectedMeals.findIndex(m => m.id === mealId);
+
+    if (mealIndex === -1 || mealIndex >= mealDivs.length) return;
+
+    const mealDiv = mealDivs[mealIndex];
+    const nutritionEl = mealDiv.querySelector('.nutrition-tracker-meal-nutrition');
+
+    if (nutritionEl) {
+      const totalNutrition = calculateTotalNutrition(meal.items);
+      const scaled = scaleNutrition(totalNutrition, servings);
+
+      nutritionEl.textContent = `Total: ${scaled.calories} kcal | P: ${scaled.protein}g | C: ${scaled.carbs}g | F: ${scaled.fat}g`;
+    }
+  }
+
   private async handleProcessFood() {
     this.isProcessing = true;
     this.clearErrorMessage();
     this.updateButtonState();
 
     try {
-      const result = await this.foodProcessor.processFood(
-        this.mealManager.getSelectedMeals(),
-        this.description,
-        this.imageManager.getSelectedImages(),
-        this.saveAsMeal,
-        this.mealName,
-        this.initialData,
-        this.editingContext,
-        this.targetMealId
+      const result = await processFood(
+        this.ctx,
+        {
+          selectedMeals: this.selectedMeals,
+          mealServings: this.mealServings,
+          description: this.description,
+          images: this.selectedImages,
+          saveAsMeal: this.saveAsMeal,
+          mealName: this.mealName,
+          servingUnitType: this.selectedServingUnit,
+          customServingLabel: this.customServingLabel,
+          initialData: this.initialData,
+          editingContext: this.editingContext,
+          targetMealId: this.targetMealId
+        }
       );
 
       if (result.success) {
@@ -236,17 +313,40 @@ export class FoodInputModal extends Modal {
   }
 
   private updateButtonState() {
-    this.buttonStateManager.updateButtonState(
-      this.description,
-      this.imageManager.getSelectedImages(),
-      this.mealManager.getSelectedMeals(),
-      this.saveAsMeal,
-      this.mealName,
-      this.isProcessing,
-      this.initialData,
-      this.editingContext,
-      this.targetMealId
-    );
+    const hasDescription = this.description.trim().length > 0;
+    const hasImages = this.selectedImages.length > 0;
+    const hasSelectedMeals = this.selectedMeals.length > 0;
+    const hasMealName = this.saveAsMeal ? this.mealName.trim().length > 0 : true;
+
+    let isEnabled = false;
+    if (this.targetMealId) {
+      isEnabled = !this.isProcessing && (hasDescription || hasImages);
+    } else {
+      isEnabled = !this.isProcessing && (hasSelectedMeals || hasDescription || hasImages) && hasMealName;
+    }
+
+    let text = 'Process food';
+    if (this.initialData) {
+      text = this.editingContext === 'meal' ? 'Update meal item' : 'Update food';
+    } else if (this.targetMealId) {
+      text = 'Add to meal';
+    }
+    if (this.isProcessing) {
+      text = 'Processing...';
+    }
+
+    if (this.processButton) {
+      this.processButton.disabled = !isEnabled;
+      this.processButton.textContent = text;
+    }
+
+    if (this.processingIndicator) {
+      if (this.isProcessing) {
+        this.processingIndicator.classList.add('visible');
+      } else {
+        this.processingIndicator.classList.remove('visible');
+      }
+    }
   }
 
   private refresh(): void {

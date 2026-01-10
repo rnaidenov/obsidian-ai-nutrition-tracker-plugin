@@ -19,6 +19,15 @@ export interface FoodItem {
   mealId?: string; // Reference to saved meal if this item is from a meal
 }
 
+export type ServingUnitType = '100g' | 'piece' | 'serving' | 'custom';
+
+export interface ServingUnit {
+  type: ServingUnitType;
+  amount: number;
+  label: string;
+  customUnit?: string;
+}
+
 export interface Meal {
   id: string;
   name: string;
@@ -27,6 +36,9 @@ export interface Meal {
   images?: string[]; // Paths to saved images
   createdAt: string;
   updatedAt: string;
+  servingUnit?: ServingUnit;
+  baselineNutrition?: NutritionData;
+  version?: number;
 }
 
 export interface NutritionGoals {
