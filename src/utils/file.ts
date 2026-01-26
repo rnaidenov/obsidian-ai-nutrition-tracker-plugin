@@ -1,5 +1,6 @@
 import { TFile, Vault, TAbstractFile, normalizePath } from 'obsidian';
 import { PluginContext } from '../types/plugin-context';
+import { MealCategory, MEAL_CATEGORIES } from '../types/nutrition';
 
 // I/O operations (require vault dependency)
 export async function ensureDirectoryExists(
@@ -87,4 +88,31 @@ export function convertFilenameToReadableName(filename: string): string {
     .replace(/-/g, ' ')
     .replace(/\b\w/g, (char) => char.toUpperCase())
     .trim();
+}
+
+export function formatTimestamp(date: Date): string {
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+  return `${hours}:${minutes}`;
+}
+
+export function parseDateString(dateString: string): Date | null {
+  const match = dateString.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!match) return null;
+  return new Date(parseInt(match[1]), parseInt(match[2]) - 1, parseInt(match[3]));
+}
+
+export function suggestMealCategory(timestamp: string): MealCategory {
+  const hours = parseInt(timestamp.split(':')[0]);
+
+  for (const category of MEAL_CATEGORIES) {
+    if (category.defaultTimeRange) {
+      const { start, end } = category.defaultTimeRange;
+      if (hours >= start && hours < end) {
+        return category.id;
+      }
+    }
+  }
+
+  return 'snacks'; // Default fallback
 }

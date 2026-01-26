@@ -1,5 +1,5 @@
 import { Notice, TFile } from 'obsidian';
-import { FoodItem, Meal, ServingUnit, ServingUnitType } from '../../../../types/nutrition';
+import { FoodItem, Meal, ServingUnit, ServingUnitType, MealCategory } from '../../../../types/nutrition';
 import { PluginContext } from '../../../../types/plugin-context';
 import * as LLM from '../../../../utils/llm';
 import * as FoodLogOps from '../../../../utils/food-log/manager';
@@ -21,6 +21,9 @@ export interface FoodProcessingParams {
   initialData?: FoodItem;
   editingContext?: 'foodlog' | 'meal';
   targetMealId?: string;
+  selectedDate?: string;
+  selectedTime?: string;
+  selectedCategory?: MealCategory;
 }
 
 // Result interface
@@ -45,7 +48,10 @@ export async function processFood(
     customServingLabel,
     initialData,
     editingContext,
-    targetMealId
+    targetMealId,
+    selectedDate,
+    selectedTime,
+    selectedCategory
   } = params;
 
   try {
@@ -81,6 +87,15 @@ export async function processFood(
       selectedMeals.forEach(meal => {
         const servings = mealServings.get(meal.id) || 1;
         const mealEntry = createMealPortionEntry(meal, servings);
+
+        // Add timestamp and category if provided
+        if (selectedTime) {
+          mealEntry.timestamp = selectedTime;
+        }
+        if (selectedCategory) {
+          mealEntry.mealCategory = selectedCategory;
+        }
+
         allFoodItems.push(mealEntry);
       });
     }
@@ -94,6 +109,16 @@ export async function processFood(
       if (additionalItems.length === 0) {
         return { success: false, message: 'No food items could be processed' };
       }
+
+      // Add timestamp and category to each item
+      additionalItems.forEach(item => {
+        if (selectedTime) {
+          item.timestamp = selectedTime;
+        }
+        if (selectedCategory) {
+          item.mealCategory = selectedCategory;
+        }
+      });
 
       allFoodItems.push(...additionalItems);
     }
@@ -149,7 +174,7 @@ export async function processFood(
         }
       } else {
         // Update food log entry
-        await FoodLogOps.createOrUpdateFoodLog(ctx, allFoodItems, initialData);
+        await FoodLogOps.createOrUpdateFoodLog(ctx, allFoodItems, initialData, selectedDate);
         return { success: true, message: `✅ Food log updated` };
       }
     } else if (targetMealId) {
@@ -163,7 +188,7 @@ export async function processFood(
       }
     } else {
       // Create new entry
-      const result = await FoodLogOps.createOrUpdateFoodLog(ctx, allFoodItems);
+      const result = await FoodLogOps.createOrUpdateFoodLog(ctx, allFoodItems, undefined, selectedDate);
       if (result.createdNewFile) {
         // Open the newly created food log file
         try {

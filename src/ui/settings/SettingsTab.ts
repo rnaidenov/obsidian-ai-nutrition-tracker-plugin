@@ -1,6 +1,7 @@
-import { App, PluginSettingTab, Setting, normalizePath } from 'obsidian';
+import { App, PluginSettingTab, Setting, normalizePath, Notice } from 'obsidian';
 import NutritionTrackerPlugin from '../../../main';
 import { FolderSuggest } from './FolderSuggest';
+import * as TemplateManager from '../../utils/template/manager';
 
 export class SettingsTab extends PluginSettingTab {
   plugin: NutritionTrackerPlugin;
@@ -54,7 +55,7 @@ export class SettingsTab extends PluginSettingTab {
     });
   }
 
-  display(): void {
+  async display(): Promise<void> {
     const { containerEl } = this;
     containerEl.empty();
     
@@ -285,5 +286,118 @@ export class SettingsTab extends PluginSettingTab {
             await this.plugin.saveSettings();
           });
       });
+
+    // Templates Section
+    new Setting(containerEl).setName('Templates').setHeading();
+
+    new Setting(containerEl)
+      .setName('Use custom templates')
+      .setDesc('Enable custom template system for food logs. When disabled, uses classic HTML layout.')
+      .addToggle(toggle => toggle
+        .setValue(this.plugin.settings.useCustomTemplates)
+        .onChange(async (value) => {
+          this.plugin.settings.useCustomTemplates = value;
+          await this.plugin.saveSettings();
+          await this.display();
+        }));
+
+    if (this.plugin.settings.useCustomTemplates) {
+      new Setting(containerEl)
+        .setName('Templates folder')
+        .setDesc('Location for template files')
+        .addText(text => {
+          new FolderSuggest(this.app, text.inputEl);
+          text
+            .setPlaceholder('tracker/health/food/templates')
+            .setValue(this.plugin.settings.templatesPath)
+            .onChange(async (value) => {
+              this.plugin.settings.templatesPath = normalizePath(
+                value || 'tracker/health/food/templates'
+              );
+              await this.plugin.saveSettings();
+            });
+        });
+
+      new Setting(containerEl)
+        .setName('Setup templates')
+        .setDesc('Create default template files in the templates folder')
+        .addButton(button => button
+          .setButtonText('Create default templates')
+          .onClick(async () => {
+            try {
+              await TemplateManager.createDefaultTemplates(this.plugin.ctx);
+              new Notice('✅ Default templates created successfully');
+              await this.display();
+            } catch (error) {
+              new Notice(`❌ Error creating templates: ${error.message}`);
+            }
+          }));
+
+      const templateNames = await TemplateManager.listTemplates(this.plugin.ctx);
+
+      const templateSetting = new Setting(containerEl)
+        .setName('Default template')
+        .setDesc('Template to use for new food logs');
+
+      if (templateNames.length > 0) {
+        templateSetting.addDropdown(dropdown => {
+          templateNames.forEach(name => {
+            dropdown.addOption(name, name);
+          });
+
+          dropdown
+            .setValue(this.plugin.settings.defaultTemplate)
+            .onChange(async (value) => {
+              this.plugin.settings.defaultTemplate = value;
+              await this.plugin.saveSettings();
+            });
+        });
+      } else {
+        templateSetting.setDesc('No templates found. Use "Setup templates" button.');
+      }
+
+      new Setting(containerEl)
+        .setName('Enable YAML frontmatter')
+        .setDesc('Add nutrition data to YAML frontmatter for Dataview queries')
+        .addToggle(toggle => toggle
+          .setValue(this.plugin.settings.enableYAMLFrontmatter)
+          .onChange(async (value) => {
+            this.plugin.settings.enableYAMLFrontmatter = value;
+            await this.plugin.saveSettings();
+          }));
+    }
+
+    // Meal Categories Section
+    new Setting(containerEl).setName('Meal Categories').setHeading();
+
+    new Setting(containerEl)
+      .setName('Show meal categories')
+      .setDesc('Display meal category selector in food input modal')
+      .addToggle(toggle => toggle
+        .setValue(this.plugin.settings.showMealCategories)
+        .onChange(async (value) => {
+          this.plugin.settings.showMealCategories = value;
+          await this.plugin.saveSettings();
+        }));
+
+    new Setting(containerEl)
+      .setName('Group by category')
+      .setDesc('Organize food logs by meal categories (breakfast, lunch, etc.)')
+      .addToggle(toggle => toggle
+        .setValue(this.plugin.settings.groupByCategory)
+        .onChange(async (value) => {
+          this.plugin.settings.groupByCategory = value;
+          await this.plugin.saveSettings();
+        }));
+
+    new Setting(containerEl)
+      .setName('Show timestamps')
+      .setDesc('Display time of day for each food entry')
+      .addToggle(toggle => toggle
+        .setValue(this.plugin.settings.showTimestamps)
+        .onChange(async (value) => {
+          this.plugin.settings.showTimestamps = value;
+          await this.plugin.saveSettings();
+        }));
   }
 } 

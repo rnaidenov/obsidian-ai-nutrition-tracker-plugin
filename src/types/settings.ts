@@ -17,6 +17,17 @@ export interface PluginSettings {
   mealStoragePath: string;
   imageStoragePath: string;
   appearance: AppearanceSettings;
+
+  // Template settings
+  templatesPath: string;
+  useCustomTemplates: boolean;
+  defaultTemplate: string;
+  enableYAMLFrontmatter: boolean;
+
+  // Meal category settings
+  showMealCategories: boolean;
+  groupByCategory: boolean;
+  showTimestamps: boolean;
 }
 
 export const DEFAULT_SETTINGS: PluginSettings = {
@@ -38,5 +49,16 @@ export const DEFAULT_SETTINGS: PluginSettings = {
     proteinEmoji: '🥩',
     carbsEmoji: '🍚',
     fatEmoji: '🥑'
-  }
+  },
+
+  // Template settings
+  templatesPath: 'tracker/health/food/templates',
+  useCustomTemplates: false,
+  defaultTemplate: 'classic-html',
+  enableYAMLFrontmatter: false,
+
+  // Meal category settings
+  showMealCategories: true,
+  groupByCategory: true,
+  showTimestamps: true
 }; 

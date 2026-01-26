@@ -1,6 +1,6 @@
 import { App, Modal, Notice, Vault } from 'obsidian';
 import { PluginSettings } from '../../../types/settings';
-import { FoodItem, Meal, ServingUnitType } from '../../../types/nutrition';
+import { FoodItem, Meal, ServingUnitType, MealCategory } from '../../../types/nutrition';
 import { PluginContext } from '../../../types/plugin-context';
 import {
   createModalTitle,
@@ -10,12 +10,16 @@ import {
   createFoodDescriptionInput,
   createSaveAsMealToggle,
   createServingUnitSelector,
-  createProcessButton
+  createProcessButton,
+  createDatePicker,
+  createTimePicker,
+  createMealCategoryDropdown
 } from './utils/modal-ui-helpers';
 import * as MealOps from '../../../utils/meal/manager';
 import { calculateTotalNutrition, scaleNutrition } from '../../../utils/meal/meal-operations';
 import * as ImageManagement from './utils/image-management';
 import { processFood } from './utils/food-processing';
+import * as FileUtils from '../../../utils/file';
 
 export class FoodInputModal extends Modal {
   private description: string = '';
@@ -38,6 +42,11 @@ export class FoodInputModal extends Modal {
   private availableMeals: Meal[] = [];
   private selectedMeals: Meal[] = [];
   private selectedImages: File[] = [];
+
+  // New fields for date, time, and category selection
+  private selectedDate: string = FileUtils.getTodayString();
+  private selectedTime: string = FileUtils.formatTimestamp(new Date());
+  private selectedCategory: MealCategory = 'breakfast';
 
   private get ctx(): PluginContext {
     return { vault: this.vault, app: this.app, settings: this.settings };
@@ -88,6 +97,35 @@ export class FoodInputModal extends Modal {
     // Create UI components
     createModalTitle(contentEl, this.initialData, this.editingContext, this.targetMealId);
     createEditingNotice(contentEl, this.initialData, this.editingContext, this.targetMealId);
+
+    // Show date/time/category pickers only for food logs (not when editing meals)
+    if (this.editingContext === 'foodlog') {
+      // Date picker (disabled when editing existing entries)
+      createDatePicker(
+        contentEl,
+        this.selectedDate,
+        this.handleDateChange.bind(this),
+        !!this.initialData  // Disable when editing
+      );
+
+      // Time picker
+      createTimePicker(
+        contentEl,
+        this.selectedTime,
+        this.handleTimeChange.bind(this)
+      );
+
+      // Meal category dropdown (only if enabled in settings)
+      if (this.settings.showMealCategories) {
+        const suggestedCategory = FileUtils.suggestMealCategory(this.selectedTime);
+        createMealCategoryDropdown(
+          contentEl,
+          this.selectedCategory,
+          suggestedCategory,
+          this.handleCategoryChange.bind(this)
+        );
+      }
+    }
 
     // Only show meal selection dropdown if we're NOT adding to a specific meal
     if (!this.targetMealId) {
@@ -236,6 +274,27 @@ export class FoodInputModal extends Modal {
     this.updateMealNutritionDisplay(mealId, servings);
   }
 
+  private handleDateChange(value: string) {
+    this.selectedDate = value;
+  }
+
+  private handleTimeChange(value: string) {
+    this.selectedTime = value;
+
+    // Update suggested category based on time
+    if (this.settings.showMealCategories) {
+      const suggestedCategory = FileUtils.suggestMealCategory(value);
+      this.selectedCategory = suggestedCategory;
+
+      // Refresh to update category dropdown
+      this.refresh();
+    }
+  }
+
+  private handleCategoryChange(value: MealCategory) {
+    this.selectedCategory = value;
+  }
+
   private updateMealNutritionDisplay(mealId: string, servings: number) {
     const meal = this.selectedMeals.find(m => m.id === mealId);
     if (!meal) return;
@@ -279,7 +338,10 @@ export class FoodInputModal extends Modal {
           customServingLabel: this.customServingLabel,
           initialData: this.initialData,
           editingContext: this.editingContext,
-          targetMealId: this.targetMealId
+          targetMealId: this.targetMealId,
+          selectedDate: this.selectedDate,
+          selectedTime: this.selectedTime,
+          selectedCategory: this.selectedCategory
         }
       );
 

@@ -1,4 +1,4 @@
-import { FoodItem, NutritionData, NutritionGoals } from '../types/nutrition';
+import { FoodItem, NutritionData, NutritionGoals, MEAL_CATEGORIES } from '../types/nutrition';
 import * as ThemeUtils from './theme';
 import * as ContentParser from './content-parser';
 
@@ -36,6 +36,12 @@ export function generateCardLayout(
     content += `        <div class="ntr-food-card-quantity">📏 ${item.quantity}</div>\n`;
     if (timeStr) {
       content += `        <div class="ntr-food-card-timestamp">🕐 ${timeStr}</div>\n`;
+    }
+    if (item.mealCategory) {
+      const categoryInfo = MEAL_CATEGORIES.find(c => c.id === item.mealCategory);
+      if (categoryInfo) {
+        content += `        <span class="ntr-category-badge">${categoryInfo.emoji} ${categoryInfo.label}</span>\n`;
+      }
     }
     content += `      </div>\n`;
     content += `    </div>\n`;

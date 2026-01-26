@@ -2163,4 +2163,62 @@
 .theme-dark .ntr-confirm-btn-primary:hover {
   background: linear-gradient(135deg, rgba(99, 102, 241, 0.95), rgba(79, 70, 229, 0.9));
   box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+/* Date, Time, and Category Picker Styles */
+.nutrition-tracker-date-picker,
+.nutrition-tracker-time-picker,
+.nutrition-tracker-category-picker {
+  margin-bottom: 15px;
+}
+
+.nutrition-tracker-label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 5px;
+  color: var(--text-normal);
+}
+
+.nutrition-tracker-date-input,
+.nutrition-tracker-time-input {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 5px;
+  background: var(--background-primary);
+  color: var(--text-normal);
+  font-size: 14px;
+}
+
+.nutrition-tracker-category-select {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 5px;
+  background: var(--background-primary);
+  color: var(--text-normal);
+  font-size: 14px;
+}
+
+/* Category badge in food cards */
+.ntr-category-badge {
+  display: inline-block;
+  padding: 3px 8px;
+  margin-top: 5px;
+  border-radius: 12px;
+  background: var(--interactive-accent);
+  color: var(--text-on-accent);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+/* Category subtotals */
+.ntr-category-subtotal {
+  padding: 10px;
+  margin: 15px 0;
+  border-left: 3px solid var(--interactive-accent);
+  background: var(--background-secondary);
+  border-radius: 5px;
+  font-size: 13px;
+  color: var(--text-muted);
 } 

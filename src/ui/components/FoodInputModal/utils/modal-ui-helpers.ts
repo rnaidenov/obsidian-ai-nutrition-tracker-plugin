@@ -1,7 +1,8 @@
 import { Setting, App } from 'obsidian';
-import { Meal, FoodItem, ServingUnitType } from '../../../../types/nutrition';
+import { Meal, FoodItem, ServingUnitType, MealCategory, MEAL_CATEGORIES } from '../../../../types/nutrition';
 import { MealSuggest } from './MealSuggest';
 import { scaleNutrition, calculateTotalNutrition, calculateMealPortionNutrition } from '../../../../utils/meal/meal-operations';
+import * as FileUtils from '../../../../utils/file';
 
 export function createModalTitle(contentEl: HTMLElement, initialData: FoodItem | null, editingContext: 'meal' | 'foodlog', targetMealId?: string) {
   let title = 'Add food entry';
@@ -266,4 +267,94 @@ export function createProcessButton(
   });
   
   return processButton;
+}
+
+export function createDatePicker(
+  contentEl: HTMLElement,
+  currentDate: string,
+  onChange: (value: string) => void,
+  disabled: boolean = false
+): HTMLInputElement {
+  const container = contentEl.createDiv('nutrition-tracker-date-picker');
+
+  const label = container.createEl('label', {
+    text: '📅 Log date:',
+    cls: 'nutrition-tracker-label'
+  });
+
+  const input = container.createEl('input', {
+    type: 'date',
+    cls: 'nutrition-tracker-date-input'
+  });
+
+  input.value = currentDate;
+  input.max = FileUtils.getTodayString();
+  input.disabled = disabled;
+
+  input.addEventListener('change', (e) => {
+    onChange((e.target as HTMLInputElement).value);
+  });
+
+  return input;
+}
+
+export function createTimePicker(
+  contentEl: HTMLElement,
+  currentTime: string,
+  onChange: (value: string) => void
+): HTMLInputElement {
+  const container = contentEl.createDiv('nutrition-tracker-time-picker');
+
+  const label = container.createEl('label', {
+    text: '🕐 Time:',
+    cls: 'nutrition-tracker-label'
+  });
+
+  const input = container.createEl('input', {
+    type: 'time',
+    cls: 'nutrition-tracker-time-input'
+  });
+
+  input.value = currentTime;
+
+  input.addEventListener('change', (e) => {
+    onChange((e.target as HTMLInputElement).value);
+  });
+
+  return input;
+}
+
+export function createMealCategoryDropdown(
+  contentEl: HTMLElement,
+  currentCategory: MealCategory | undefined,
+  suggestedCategory: MealCategory,
+  onChange: (value: MealCategory) => void
+): HTMLSelectElement {
+  const container = contentEl.createDiv('nutrition-tracker-category-picker');
+
+  const label = container.createEl('label', {
+    text: '🍽️ Meal category:',
+    cls: 'nutrition-tracker-label'
+  });
+
+  const select = container.createEl('select', {
+    cls: 'nutrition-tracker-category-select'
+  });
+
+  MEAL_CATEGORIES.forEach(category => {
+    const option = select.createEl('option', {
+      value: category.id,
+      text: `${category.emoji} ${category.label}`
+    });
+
+    if (category.id === (currentCategory || suggestedCategory)) {
+      option.selected = true;
+    }
+  });
+
+  select.addEventListener('change', (e) => {
+    onChange((e.target as HTMLSelectElement).value as MealCategory);
+  });
+
+  return select;
 } 
