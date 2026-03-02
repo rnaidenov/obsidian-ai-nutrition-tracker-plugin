@@ -7,6 +7,7 @@ import { PluginContext } from './src/types/plugin-context';
 import * as FoodLogOps from './src/utils/food-log/manager';
 import * as MealOps from './src/utils/meal/manager';
 import { applyEmojiPreferences } from './src/utils/apply-emoji-preferences';
+import { getTodayString } from './src/utils/file';
 import { migrateIfNeeded } from './src/utils/meal/migrate-if-needed';
 
 export default class NutritionTrackerPlugin extends Plugin {
@@ -347,7 +348,7 @@ export default class NutritionTrackerPlugin extends Plugin {
   }
 
   private async openTodaysFoodLog() {
-    const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
+    const today = getTodayString();
     const logPath = `${this.settings.logStoragePath}/${today}.md`;
     
     try {
