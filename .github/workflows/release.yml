@@ -37,24 +37,41 @@ jobs:
           npm version ${{ github.event.inputs.version }} --no-git-tag-version
           NEW_VERSION=$(node -p "require('./package.json').version")
           echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
-          
+
           # Update manifest.json
           sed -i 's/"version": ".*"/"version": "'$NEW_VERSION'"/' manifest.json
-          
-          # Commit and tag
-          git add package.json manifest.json
-          git commit -m "Bump version to $NEW_VERSION"
-          git tag -a "v$NEW_VERSION" -m "Release v$NEW_VERSION"
-          git push origin HEAD
-          git push origin "v$NEW_VERSION"
 
-      - name: Update manifest version (if tag push)
+          # Update versions.json (plugin version -> minAppVersion)
+          MIN_APP_VERSION=$(node -p "require('./manifest.json').minAppVersion")
+          node -e "
+            const fs = require('fs');
+            const versions = JSON.parse(fs.readFileSync('versions.json', 'utf8'));
+            versions['$NEW_VERSION'] = '$MIN_APP_VERSION';
+            fs.writeFileSync('versions.json', JSON.stringify(versions, null, 2) + '\n');
+          "
+
+          # Commit and tag — bare semver, no "v" prefix, so it matches manifest.json's
+          # version exactly (Obsidian requires the two to match).
+          git add package.json manifest.json versions.json
+          git commit -m "Bump version to $NEW_VERSION"
+          git tag -a "$NEW_VERSION" -m "Release $NEW_VERSION"
+          git push origin HEAD
+          git push origin "$NEW_VERSION"
+
+      - name: Verify tag matches package.json version (if tag push)
         if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
         run: |
           tag="${GITHUB_REF#refs/tags/}"
+          pkg_version=$(node -p "require('./package.json').version")
+
+          if [ "$tag" != "$pkg_version" ]; then
+            echo "::error::Tag '$tag' does not match package.json version '$pkg_version'. Bump and commit the version (and versions.json) before tagging, or use the workflow_dispatch release instead."
+            exit 1
+          fi
+
           echo "Updating manifest.json version to $tag"
           sed -i 's/"version": ".*"/"version": "'$tag'"/' manifest.json
-          
+
       - name: Build plugin
         run: |
           npm install

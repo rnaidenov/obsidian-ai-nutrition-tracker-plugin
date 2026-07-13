@@ -109,6 +109,18 @@ Your data lives in your vault, in plain JSON — the rendered notes are a view, 
 - 📊 Visual progress tracking
 - 📁 Automatic file organization
 
+## 📦 Releasing (maintainers)
+
+`release.yml` builds the plugin and publishes a **draft** GitHub release — it's not published as a draft by accident, that's deliberate. Obsidian's community-plugin update mechanism only picks up published releases, so a draft is a safety net: it gives you a chance to sanity-check the build before real users get it.
+
+Before publishing a draft release:
+1. Download the draft's `main.js`, `manifest.json`, and `styles.css`
+2. Drop them into a test vault's `.obsidian/plugins/ai-nutrition-tracker/` folder
+3. Reload Obsidian and run through the core flows for ~5 minutes: log a food entry, edit it, delete it, save a meal, edit a meal item — and if you're testing a vault that has pre-3.0 data, confirm the migration ran cleanly and backups exist under `{log folder}/.data/backup-*.md`
+4. Only then publish the release
+
+To cut a release: either push a bare-semver tag (e.g. `3.0.0`, no `v` prefix — it must match `package.json`'s version exactly, or the workflow fails fast) after bumping the version yourself, or trigger the workflow manually from the Actions tab and let it bump the version for you.
+
 ---
 
 *Transform your nutrition tracking experience - no more tedious logging, just natural descriptions and beautiful results.* 
