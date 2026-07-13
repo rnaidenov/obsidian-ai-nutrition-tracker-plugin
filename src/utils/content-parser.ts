@@ -1,25 +1,4 @@
-import { FoodItem, NutritionData, Meal } from '../types/nutrition';
-
-export function extractFoodItemsFromContent(content: string): FoodItem[] {
-  const items: FoodItem[] = [];
-
-  // Extract food items using data-ntr-* attributes
-  const regex = /<div[^>]*data-ntr-food="([^"]*)"[^>]*data-ntr-quantity="([^"]*)"[^>]*data-ntr-calories="([\d.]+)"[^>]*data-ntr-protein="([\d.]+)"[^>]*data-ntr-carbs="([\d.]+)"[^>]*data-ntr-fat="([\d.]+)"[^>]*>/g;
-
-  let match;
-  while ((match = regex.exec(content)) !== null) {
-    items.push({
-      food: match[1].replace(/&quot;/g, '"'),
-      quantity: match[2].replace(/&quot;/g, '"'),
-      calories: parseFloat(match[3]),
-      protein: parseFloat(match[4]),
-      carbs: parseFloat(match[5]),
-      fat: parseFloat(match[6])
-    });
-  }
-
-  return items;
-}
+import { FoodItem, NutritionData } from '../types/nutrition';
 
 export function calculateTotals(foodItems: FoodItem[]): NutritionData {
   return foodItems.reduce((totals, item) => ({
@@ -33,34 +12,6 @@ export function calculateTotals(foodItems: FoodItem[]): NutritionData {
 export function calculatePercentage(current: number, goal: number): number {
   if (goal === 0) return 0;
   return Math.round((current / goal) * 100);
-}
-
-export function parseMealFromMarkdown(content: string): Partial<Meal> | null {
-  try {
-    // Extract meal ID from HTML data attribute
-    const mealIdMatch = content.match(/data-meal-id="([^"]+)"/);
-    if (!mealIdMatch) {
-      return null;
-    }
-
-    const mealId = mealIdMatch[1];
-
-    // Extract description (if exists)
-    const descriptionMatch = content.match(/## 📝 Description\n([\s\S]+?)\n\n/);
-    const description = descriptionMatch ? descriptionMatch[1].trim() : undefined;
-
-    // Extract food items from card layout
-    const foodItems = extractFoodItemsFromContent(content);
-
-    return {
-      id: mealId,
-      items: foodItems,
-      description
-    };
-  } catch (error) {
-    console.error('Error parsing meal from markdown:', error);
-    return null;
-  }
 }
 
 // The generated region (cards + progress summary) is wrapped in these markers so a full

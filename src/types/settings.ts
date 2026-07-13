@@ -17,6 +17,12 @@ export interface PluginSettings {
   mealStoragePath: string;
   imageStoragePath: string;
   appearance: AppearanceSettings;
+  // Deliberately absent from DEFAULT_SETTINGS below. loadSettings() merges saved data
+  // over the defaults, so if this had a default, every pre-3.0 vault (whose saved
+  // data.json predates this field) would silently inherit "already migrated" and skip
+  // the v2->v3 migration. Leaving it unset lets the migration itself decide, then persist
+  // 3 afterwards for both fresh and upgraded vaults.
+  dataVersion?: number;
 }
 
 export const DEFAULT_SETTINGS: PluginSettings = {

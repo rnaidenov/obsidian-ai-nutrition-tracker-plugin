@@ -9,6 +9,7 @@ import * as MealOps from './src/utils/meal/manager';
 import { applyEmojiPreferences } from './src/utils/apply-emoji-preferences';
 import { getTodayString } from './src/utils/file';
 import { migrateIfNeeded } from './src/utils/meal/migrate-if-needed';
+import { migrateFoodLogsToV3 } from './src/utils/food-log/migrate-to-v3';
 
 export default class NutritionTrackerPlugin extends Plugin {
   settings: PluginSettings;
@@ -31,8 +32,9 @@ export default class NutritionTrackerPlugin extends Plugin {
     // Run meal migration
     await migrateIfNeeded(this.app.vault, this.settings);
 
-    // Apply emoji preferences
-    applyEmojiPreferences(this.settings.appearance);
+    // Run one-time v2 -> v3 food log migration (JSON store + marker-based notes)
+    await migrateFoodLogsToV3(this.app.vault, this.settings);
+    await this.saveSettings(); // persists dataVersion and applies emoji preferences
 
     // Add ribbon icon
     this.addRibbonIcon('apple', 'Log food', () => {

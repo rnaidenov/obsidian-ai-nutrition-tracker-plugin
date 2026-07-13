@@ -33,6 +33,7 @@ export function createFakeVault(initialFiles: Record<string, string> = {}) {
       if (content !== undefined) files.set(newPath, content);
     }),
     createBinary: jest.fn(async (path: string) => new TFile(path)),
+    getFiles: jest.fn(() => [...files.keys()].map(path => new TFile(path))),
   };
 
   return { vault, files, folders };
