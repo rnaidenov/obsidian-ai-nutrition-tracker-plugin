@@ -1,0 +1,293 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`generateCTAButtons snapshots foodlog CTA 1`] = `"<div class="nutrition-add-cta-container"><button id="nutrition-add-cta-test-0" class="nutrition-add-cta-btn" data-context="foodlog">➕ Add More Items to Food Log</button></div>"`;
+
+exports[`generateCTAButtons snapshots meal CTA includes data-meal-id 1`] = `"<div class="nutrition-add-cta-container"><button id="nutrition-add-cta-test-0" class="nutrition-add-cta-btn" data-context="meal" data-meal-id="meal-123">➕ Add More Items to Meal</button></div>"`;
+
+exports[`generateCardLayout snapshots (deterministic idGenerator injected) empty item list still renders the CTA button when a context is given 1`] = `"<div class="nutrition-add-cta-container"><button id="nutrition-add-cta-test-0" class="nutrition-add-cta-btn" data-context="foodlog">➕ Add More Items to Food Log</button></div>"`;
+
+exports[`generateCardLayout snapshots (deterministic idGenerator injected) foodlog context 1`] = `
+"
+<div id="ntr-test-0" class="ntr-food-card" data-ntr-food="Grilled chicken" data-ntr-quantity="150g" data-ntr-calories="250" data-ntr-protein="40" data-ntr-carbs="0" data-ntr-fat="8">
+  <div class="ntr-food-card-header">
+    <div class="ntr-food-card-info">
+      <span class="ntr-food-card-emoji">🍽️</span>
+      <div class="ntr-food-card-text">
+        <h3 class="ntr-food-card-title">Grilled chicken</h3>
+        <div class="ntr-food-card-quantity">📏 150g</div>
+      </div>
+    </div>
+    <div class="ntr-food-card-actions">
+      <button class="nutrition-edit-btn ntr-edit-btn" data-ntr-food="Grilled chicken" data-ntr-quantity="150g" data-ntr-calories="250" data-ntr-protein="40" data-ntr-carbs="0" data-ntr-fat="8" data-ntr-edit-context="foodlog">✏️ Edit</button>
+      <button class="nutrition-delete-btn ntr-delete-btn" data-ntr-food="Grilled chicken" data-ntr-quantity="150g" data-ntr-calories="250" data-ntr-protein="40" data-ntr-carbs="0" data-ntr-fat="8" data-ntr-edit-context="foodlog" data-ntr-entry-id="ntr-test-0">🗑️ Delete</button>
+    </div>
+  </div>
+  <div class="ntr-stats-grid">
+    <div class="ntr-stat-card ntr-stat-card-calories">
+      <div class="ntr-stat-emoji ntr-stat-emoji-calories"></div>
+      <div class="ntr-stat-value">250</div>
+      <div class="ntr-stat-label">kcal</div>
+    </div>
+    <div class="ntr-stat-card ntr-stat-card-protein">
+      <div class="ntr-stat-emoji ntr-stat-emoji-protein"></div>
+      <div class="ntr-stat-value">40g</div>
+      <div class="ntr-stat-label">protein</div>
+    </div>
+    <div class="ntr-stat-card ntr-stat-card-carbs">
+      <div class="ntr-stat-emoji ntr-stat-emoji-carbs"></div>
+      <div class="ntr-stat-value">0g</div>
+      <div class="ntr-stat-label">carbs</div>
+    </div>
+    <div class="ntr-stat-card ntr-stat-card-fat">
+      <div class="ntr-stat-emoji ntr-stat-emoji-fat"></div>
+      <div class="ntr-stat-value">8g</div>
+      <div class="ntr-stat-label">fat</div>
+    </div>
+  </div>
+</div>
+
+
+<div id="ntr-test-1" class="ntr-food-card" data-ntr-food="Brown rice" data-ntr-quantity="100g" data-ntr-calories="130" data-ntr-protein="3" data-ntr-carbs="28" data-ntr-fat="1">
+  <div class="ntr-food-card-header">
+    <div class="ntr-food-card-info">
+      <span class="ntr-food-card-emoji">🍽️</span>
+      <div class="ntr-food-card-text">
+        <h3 class="ntr-food-card-title">Brown rice</h3>
+        <div class="ntr-food-card-quantity">📏 100g</div>
+      </div>
+    </div>
+    <div class="ntr-food-card-actions">
+      <button class="nutrition-edit-btn ntr-edit-btn" data-ntr-food="Brown rice" data-ntr-quantity="100g" data-ntr-calories="130" data-ntr-protein="3" data-ntr-carbs="28" data-ntr-fat="1" data-ntr-edit-context="foodlog">✏️ Edit</button>
+      <button class="nutrition-delete-btn ntr-delete-btn" data-ntr-food="Brown rice" data-ntr-quantity="100g" data-ntr-calories="130" data-ntr-protein="3" data-ntr-carbs="28" data-ntr-fat="1" data-ntr-edit-context="foodlog" data-ntr-entry-id="ntr-test-1">🗑️ Delete</button>
+    </div>
+  </div>
+  <div class="ntr-stats-grid">
+    <div class="ntr-stat-card ntr-stat-card-calories">
+      <div class="ntr-stat-emoji ntr-stat-emoji-calories"></div>
+      <div class="ntr-stat-value">130</div>
+      <div class="ntr-stat-label">kcal</div>
+    </div>
+    <div class="ntr-stat-card ntr-stat-card-protein">
+      <div class="ntr-stat-emoji ntr-stat-emoji-protein"></div>
+      <div class="ntr-stat-value">3g</div>
+      <div class="ntr-stat-label">protein</div>
+    </div>
+    <div class="ntr-stat-card ntr-stat-card-carbs">
+      <div class="ntr-stat-emoji ntr-stat-emoji-carbs"></div>
+      <div class="ntr-stat-value">28g</div>
+      <div class="ntr-stat-label">carbs</div>
+    </div>
+    <div class="ntr-stat-card ntr-stat-card-fat">
+      <div class="ntr-stat-emoji ntr-stat-emoji-fat"></div>
+      <div class="ntr-stat-value">1g</div>
+      <div class="ntr-stat-label">fat</div>
+    </div>
+  </div>
+</div>
+
+<div class="nutrition-add-cta-container"><button id="nutrition-add-cta-test-2" class="nutrition-add-cta-btn" data-context="foodlog">➕ Add More Items to Food Log</button></div>"
+`;
+
+exports[`generateCardLayout snapshots (deterministic idGenerator injected) meal context includes the meal add-to-meal CTA and meal id 1`] = `
+"
+<div id="ntr-test-0" class="ntr-food-card" data-ntr-food="Grilled chicken" data-ntr-quantity="150g" data-ntr-calories="250" data-ntr-protein="40" data-ntr-carbs="0" data-ntr-fat="8">
+  <div class="ntr-food-card-header">
+    <div class="ntr-food-card-info">
+      <span class="ntr-food-card-emoji">🍽️</span>
+      <div class="ntr-food-card-text">
+        <h3 class="ntr-food-card-title">Grilled chicken</h3>
+        <div class="ntr-food-card-quantity">📏 150g</div>
+      </div>
+    </div>
+    <div class="ntr-food-card-actions">
+      <button class="nutrition-edit-btn ntr-edit-btn" data-ntr-food="Grilled chicken" data-ntr-quantity="150g" data-ntr-calories="250" data-ntr-protein="40" data-ntr-carbs="0" data-ntr-fat="8" data-ntr-edit-context="meal">✏️ Edit</button>
+      <button class="nutrition-delete-btn ntr-delete-btn" data-ntr-food="Grilled chicken" data-ntr-quantity="150g" data-ntr-calories="250" data-ntr-protein="40" data-ntr-carbs="0" data-ntr-fat="8" data-ntr-edit-context="meal" data-ntr-entry-id="ntr-test-0">🗑️ Delete</button>
+    </div>
+  </div>
+  <div class="ntr-stats-grid">
+    <div class="ntr-stat-card ntr-stat-card-calories">
+      <div class="ntr-stat-emoji ntr-stat-emoji-calories"></div>
+      <div class="ntr-stat-value">250</div>
+      <div class="ntr-stat-label">kcal</div>
+    </div>
+    <div class="ntr-stat-card ntr-stat-card-protein">
+      <div class="ntr-stat-emoji ntr-stat-emoji-protein"></div>
+      <div class="ntr-stat-value">40g</div>
+      <div class="ntr-stat-label">protein</div>
+    </div>
+    <div class="ntr-stat-card ntr-stat-card-carbs">
+      <div class="ntr-stat-emoji ntr-stat-emoji-carbs"></div>
+      <div class="ntr-stat-value">0g</div>
+      <div class="ntr-stat-label">carbs</div>
+    </div>
+    <div class="ntr-stat-card ntr-stat-card-fat">
+      <div class="ntr-stat-emoji ntr-stat-emoji-fat"></div>
+      <div class="ntr-stat-value">8g</div>
+      <div class="ntr-stat-label">fat</div>
+    </div>
+  </div>
+</div>
+
+
+<div id="ntr-test-1" class="ntr-food-card" data-ntr-food="Brown rice" data-ntr-quantity="100g" data-ntr-calories="130" data-ntr-protein="3" data-ntr-carbs="28" data-ntr-fat="1">
+  <div class="ntr-food-card-header">
+    <div class="ntr-food-card-info">
+      <span class="ntr-food-card-emoji">🍽️</span>
+      <div class="ntr-food-card-text">
+        <h3 class="ntr-food-card-title">Brown rice</h3>
+        <div class="ntr-food-card-quantity">📏 100g</div>
+      </div>
+    </div>
+    <div class="ntr-food-card-actions">
+      <button class="nutrition-edit-btn ntr-edit-btn" data-ntr-food="Brown rice" data-ntr-quantity="100g" data-ntr-calories="130" data-ntr-protein="3" data-ntr-carbs="28" data-ntr-fat="1" data-ntr-edit-context="meal">✏️ Edit</button>
+      <button class="nutrition-delete-btn ntr-delete-btn" data-ntr-food="Brown rice" data-ntr-quantity="100g" data-ntr-calories="130" data-ntr-protein="3" data-ntr-carbs="28" data-ntr-fat="1" data-ntr-edit-context="meal" data-ntr-entry-id="ntr-test-1">🗑️ Delete</button>
+    </div>
+  </div>
+  <div class="ntr-stats-grid">
+    <div class="ntr-stat-card ntr-stat-card-calories">
+      <div class="ntr-stat-emoji ntr-stat-emoji-calories"></div>
+      <div class="ntr-stat-value">130</div>
+      <div class="ntr-stat-label">kcal</div>
+    </div>
+    <div class="ntr-stat-card ntr-stat-card-protein">
+      <div class="ntr-stat-emoji ntr-stat-emoji-protein"></div>
+      <div class="ntr-stat-value">3g</div>
+      <div class="ntr-stat-label">protein</div>
+    </div>
+    <div class="ntr-stat-card ntr-stat-card-carbs">
+      <div class="ntr-stat-emoji ntr-stat-emoji-carbs"></div>
+      <div class="ntr-stat-value">28g</div>
+      <div class="ntr-stat-label">carbs</div>
+    </div>
+    <div class="ntr-stat-card ntr-stat-card-fat">
+      <div class="ntr-stat-emoji ntr-stat-emoji-fat"></div>
+      <div class="ntr-stat-value">1g</div>
+      <div class="ntr-stat-label">fat</div>
+    </div>
+  </div>
+</div>
+
+<div class="nutrition-add-cta-container"><button id="nutrition-add-cta-test-2" class="nutrition-add-cta-btn" data-context="meal" data-meal-id="meal-123">➕ Add More Items to Meal</button></div>"
+`;
+
+exports[`generateCardLayout snapshots (deterministic idGenerator injected) no context renders cards without CTA buttons 1`] = `
+"
+<div id="ntr-test-0" class="ntr-food-card" data-ntr-food="Grilled chicken" data-ntr-quantity="150g" data-ntr-calories="250" data-ntr-protein="40" data-ntr-carbs="0" data-ntr-fat="8">
+  <div class="ntr-food-card-header">
+    <div class="ntr-food-card-info">
+      <span class="ntr-food-card-emoji">🍽️</span>
+      <div class="ntr-food-card-text">
+        <h3 class="ntr-food-card-title">Grilled chicken</h3>
+        <div class="ntr-food-card-quantity">📏 150g</div>
+      </div>
+    </div>
+    <div class="ntr-food-card-actions">
+      <button class="nutrition-edit-btn ntr-edit-btn" data-ntr-food="Grilled chicken" data-ntr-quantity="150g" data-ntr-calories="250" data-ntr-protein="40" data-ntr-carbs="0" data-ntr-fat="8" data-ntr-edit-context="foodlog">✏️ Edit</button>
+      <button class="nutrition-delete-btn ntr-delete-btn" data-ntr-food="Grilled chicken" data-ntr-quantity="150g" data-ntr-calories="250" data-ntr-protein="40" data-ntr-carbs="0" data-ntr-fat="8" data-ntr-edit-context="foodlog" data-ntr-entry-id="ntr-test-0">🗑️ Delete</button>
+    </div>
+  </div>
+  <div class="ntr-stats-grid">
+    <div class="ntr-stat-card ntr-stat-card-calories">
+      <div class="ntr-stat-emoji ntr-stat-emoji-calories"></div>
+      <div class="ntr-stat-value">250</div>
+      <div class="ntr-stat-label">kcal</div>
+    </div>
+    <div class="ntr-stat-card ntr-stat-card-protein">
+      <div class="ntr-stat-emoji ntr-stat-emoji-protein"></div>
+      <div class="ntr-stat-value">40g</div>
+      <div class="ntr-stat-label">protein</div>
+    </div>
+    <div class="ntr-stat-card ntr-stat-card-carbs">
+      <div class="ntr-stat-emoji ntr-stat-emoji-carbs"></div>
+      <div class="ntr-stat-value">0g</div>
+      <div class="ntr-stat-label">carbs</div>
+    </div>
+    <div class="ntr-stat-card ntr-stat-card-fat">
+      <div class="ntr-stat-emoji ntr-stat-emoji-fat"></div>
+      <div class="ntr-stat-value">8g</div>
+      <div class="ntr-stat-label">fat</div>
+    </div>
+  </div>
+</div>
+
+
+<div id="ntr-test-1" class="ntr-food-card" data-ntr-food="Brown rice" data-ntr-quantity="100g" data-ntr-calories="130" data-ntr-protein="3" data-ntr-carbs="28" data-ntr-fat="1">
+  <div class="ntr-food-card-header">
+    <div class="ntr-food-card-info">
+      <span class="ntr-food-card-emoji">🍽️</span>
+      <div class="ntr-food-card-text">
+        <h3 class="ntr-food-card-title">Brown rice</h3>
+        <div class="ntr-food-card-quantity">📏 100g</div>
+      </div>
+    </div>
+    <div class="ntr-food-card-actions">
+      <button class="nutrition-edit-btn ntr-edit-btn" data-ntr-food="Brown rice" data-ntr-quantity="100g" data-ntr-calories="130" data-ntr-protein="3" data-ntr-carbs="28" data-ntr-fat="1" data-ntr-edit-context="foodlog">✏️ Edit</button>
+      <button class="nutrition-delete-btn ntr-delete-btn" data-ntr-food="Brown rice" data-ntr-quantity="100g" data-ntr-calories="130" data-ntr-protein="3" data-ntr-carbs="28" data-ntr-fat="1" data-ntr-edit-context="foodlog" data-ntr-entry-id="ntr-test-1">🗑️ Delete</button>
+    </div>
+  </div>
+  <div class="ntr-stats-grid">
+    <div class="ntr-stat-card ntr-stat-card-calories">
+      <div class="ntr-stat-emoji ntr-stat-emoji-calories"></div>
+      <div class="ntr-stat-value">130</div>
+      <div class="ntr-stat-label">kcal</div>
+    </div>
+    <div class="ntr-stat-card ntr-stat-card-protein">
+      <div class="ntr-stat-emoji ntr-stat-emoji-protein"></div>
+      <div class="ntr-stat-value">3g</div>
+      <div class="ntr-stat-label">protein</div>
+    </div>
+    <div class="ntr-stat-card ntr-stat-card-carbs">
+      <div class="ntr-stat-emoji ntr-stat-emoji-carbs"></div>
+      <div class="ntr-stat-value">28g</div>
+      <div class="ntr-stat-label">carbs</div>
+    </div>
+    <div class="ntr-stat-card ntr-stat-card-fat">
+      <div class="ntr-stat-emoji ntr-stat-emoji-fat"></div>
+      <div class="ntr-stat-value">1g</div>
+      <div class="ntr-stat-label">fat</div>
+    </div>
+  </div>
+</div>
+
+"
+`;
+
+exports[`generateDailySummary / generateMealProgressSummaryWithId snapshots daily summary vs goals 1`] = `
+"<div class="ntr-summary-card">
+<h3 class="ntr-summary-title">🎯 Totals vs Goals</h3>
+<div class="ntr-summary-divider"></div>
+  <div class="ntr-progress-row" data-nutrient="calories"><span class="ntr-progress-label"><span class="ntr-progress-emoji-calories"></span> Calories:</span> <span class="ntr-progress-values">1500 / 2000 kcal</span> <span class="ntr-progress-percentage zone-light-green">(75%)</span><div class="ntr-progress-track"><div class="ntr-progress-fill zone-light-green" style="--progress-width: 75;"><div class="ntr-progress-shine"></div><div class="ntr-progress-glow"></div></div></div></div>
+  <div class="ntr-progress-row" data-nutrient="protein"><span class="ntr-progress-label"><span class="ntr-progress-emoji-protein"></span> Protein:</span> <span class="ntr-progress-values">100 / 150 g</span> <span class="ntr-progress-percentage zone-yellow">(67%)</span><div class="ntr-progress-track"><div class="ntr-progress-fill zone-yellow" style="--progress-width: 67;"><div class="ntr-progress-shine"></div><div class="ntr-progress-glow"></div></div></div></div>
+  <div class="ntr-progress-row" data-nutrient="carbs"><span class="ntr-progress-label"><span class="ntr-progress-emoji-carbs"></span> Carbs:</span> <span class="ntr-progress-values">90 / 100 g</span> <span class="ntr-progress-percentage zone-green">(90%)</span><div class="ntr-progress-track"><div class="ntr-progress-fill zone-green" style="--progress-width: 90;"><div class="ntr-progress-shine"></div><div class="ntr-progress-glow"></div></div></div></div>
+  <div class="ntr-progress-row" data-nutrient="fat"><span class="ntr-progress-label"><span class="ntr-progress-emoji-fat"></span> Fat:</span> <span class="ntr-progress-values">50 / 80 g</span> <span class="ntr-progress-percentage zone-yellow">(63%)</span><div class="ntr-progress-track"><div class="ntr-progress-fill zone-yellow" style="--progress-width: 63;"><div class="ntr-progress-shine"></div><div class="ntr-progress-glow"></div></div></div></div>
+<div class="ntr-overall-progress">
+<div class="ntr-overall-progress-border">
+<div class="ntr-overall-progress-inner">
+<h3 class="ntr-overall-progress-title">💪 Overall Progress: 74%</h3>
+</div></div></div></div>
+"
+`;
+
+exports[`generateDailySummary / generateMealProgressSummaryWithId snapshots goal of zero does not divide by zero in the progress bars 1`] = `
+"  <div class="ntr-progress-row" data-nutrient="calories"><span class="ntr-progress-label"><span class="ntr-progress-emoji-calories"></span> Calories:</span> <span class="ntr-progress-values">1500 / 0 kcal</span> <span class="ntr-progress-percentage zone-red">(0%)</span><div class="ntr-progress-track"><div class="ntr-progress-fill zone-red" style="--progress-width: 0;"></div></div></div>
+  <div class="ntr-progress-row" data-nutrient="protein"><span class="ntr-progress-label"><span class="ntr-progress-emoji-protein"></span> Protein:</span> <span class="ntr-progress-values">100 / 0 g</span> <span class="ntr-progress-percentage zone-red">(0%)</span><div class="ntr-progress-track"><div class="ntr-progress-fill zone-red" style="--progress-width: 0;"></div></div></div>
+  <div class="ntr-progress-row" data-nutrient="carbs"><span class="ntr-progress-label"><span class="ntr-progress-emoji-carbs"></span> Carbs:</span> <span class="ntr-progress-values">90 / 0 g</span> <span class="ntr-progress-percentage zone-red">(0%)</span><div class="ntr-progress-track"><div class="ntr-progress-fill zone-red" style="--progress-width: 0;"></div></div></div>
+  <div class="ntr-progress-row" data-nutrient="fat"><span class="ntr-progress-label"><span class="ntr-progress-emoji-fat"></span> Fat:</span> <span class="ntr-progress-values">50 / 0 g</span> <span class="ntr-progress-percentage zone-red">(0%)</span><div class="ntr-progress-track"><div class="ntr-progress-fill zone-red" style="--progress-width: 0;"></div></div></div>
+"
+`;
+
+exports[`generateDailySummary / generateMealProgressSummaryWithId snapshots meal summary vs goals includes the meal id 1`] = `
+"<div class="ntr-summary-card" data-meal-id="meal-123">
+<h3 class="ntr-summary-title">🎯 Meal vs Goals</h3>
+<div class="ntr-summary-divider"></div>
+  <div class="ntr-progress-row" data-nutrient="calories"><span class="ntr-progress-label"><span class="ntr-progress-emoji-calories"></span> Calories:</span> <span class="ntr-progress-values">1500 / 2000 kcal</span> <span class="ntr-progress-percentage zone-light-green">(75%)</span><div class="ntr-progress-track"><div class="ntr-progress-fill zone-light-green" style="--progress-width: 75;"><div class="ntr-progress-shine"></div><div class="ntr-progress-glow"></div></div></div></div>
+  <div class="ntr-progress-row" data-nutrient="protein"><span class="ntr-progress-label"><span class="ntr-progress-emoji-protein"></span> Protein:</span> <span class="ntr-progress-values">100 / 150 g</span> <span class="ntr-progress-percentage zone-yellow">(67%)</span><div class="ntr-progress-track"><div class="ntr-progress-fill zone-yellow" style="--progress-width: 67;"><div class="ntr-progress-shine"></div><div class="ntr-progress-glow"></div></div></div></div>
+  <div class="ntr-progress-row" data-nutrient="carbs"><span class="ntr-progress-label"><span class="ntr-progress-emoji-carbs"></span> Carbs:</span> <span class="ntr-progress-values">90 / 100 g</span> <span class="ntr-progress-percentage zone-green">(90%)</span><div class="ntr-progress-track"><div class="ntr-progress-fill zone-green" style="--progress-width: 90;"><div class="ntr-progress-shine"></div><div class="ntr-progress-glow"></div></div></div></div>
+  <div class="ntr-progress-row" data-nutrient="fat"><span class="ntr-progress-label"><span class="ntr-progress-emoji-fat"></span> Fat:</span> <span class="ntr-progress-values">50 / 80 g</span> <span class="ntr-progress-percentage zone-yellow">(63%)</span><div class="ntr-progress-track"><div class="ntr-progress-fill zone-yellow" style="--progress-width: 63;"><div class="ntr-progress-shine"></div><div class="ntr-progress-glow"></div></div></div></div>
+<div class="ntr-overall-progress">
+<div class="ntr-overall-progress-border">
+<div class="ntr-overall-progress-inner">
+<h3 class="ntr-overall-progress-title">💪 Overall Progress: 74%</h3>
+</div></div></div></div>
+"
+`;
