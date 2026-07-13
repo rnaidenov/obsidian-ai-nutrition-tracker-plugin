@@ -43,6 +43,36 @@ describe('generateCardLayout snapshots (deterministic idGenerator injected)', ()
   });
 });
 
+describe('stable ids from data', () => {
+  test('an item carrying its own id uses that id instead of generating one', () => {
+    const idGenerator = makeDeterministicIdGenerator();
+    const itemsWithIds: FoodItem[] = [
+      { id: 'stable-id-1', food: 'Grilled chicken', quantity: '150g', calories: 250, protein: 40, carbs: 0, fat: 8 },
+    ];
+    const content = generateCardLayout(itemsWithIds, goals, 'foodlog', undefined, idGenerator);
+
+    expect(content).toContain('data-ntr-id="stable-id-1"');
+    expect(content).not.toContain('ntr-test-0');
+  });
+
+  test('re-rendering the same item with the same id twice produces byte-identical card markup', () => {
+    const itemsWithIds: FoodItem[] = [
+      { id: 'stable-id-1', food: 'Grilled chicken', quantity: '150g', calories: 250, protein: 40, carbs: 0, fat: 8 },
+    ];
+
+    const firstRender = generateCardLayout(itemsWithIds, goals, 'foodlog', undefined, makeDeterministicIdGenerator());
+    const secondRender = generateCardLayout(itemsWithIds, goals, 'foodlog', undefined, makeDeterministicIdGenerator());
+
+    expect(firstRender).toBe(secondRender);
+  });
+
+  test('items without an id still fall back to the injected idGenerator (unmigrated callers keep working)', () => {
+    const content = generateCardLayout(items, goals, 'foodlog', undefined, makeDeterministicIdGenerator());
+    expect(content).toContain('data-ntr-id="ntr-test-0"');
+    expect(content).toContain('data-ntr-id="ntr-test-1"');
+  });
+});
+
 describe('generateCTAButtons snapshots', () => {
   test('foodlog CTA', () => {
     expect(generateCTAButtons('foodlog', undefined, makeDeterministicIdGenerator())).toMatchSnapshot();

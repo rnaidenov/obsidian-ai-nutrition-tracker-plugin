@@ -8,7 +8,7 @@ exports[`generateCardLayout snapshots (deterministic idGenerator injected) empty
 
 exports[`generateCardLayout snapshots (deterministic idGenerator injected) foodlog context 1`] = `
 "
-<div id="ntr-test-0" class="ntr-food-card" data-ntr-food="Grilled chicken" data-ntr-quantity="150g" data-ntr-calories="250" data-ntr-protein="40" data-ntr-carbs="0" data-ntr-fat="8">
+<div id="ntr-test-0" class="ntr-food-card" data-ntr-id="ntr-test-0" data-ntr-food="Grilled chicken" data-ntr-quantity="150g" data-ntr-calories="250" data-ntr-protein="40" data-ntr-carbs="0" data-ntr-fat="8">
   <div class="ntr-food-card-header">
     <div class="ntr-food-card-info">
       <span class="ntr-food-card-emoji">🍽️</span>
@@ -18,8 +18,8 @@ exports[`generateCardLayout snapshots (deterministic idGenerator injected) foodl
       </div>
     </div>
     <div class="ntr-food-card-actions">
-      <button class="nutrition-edit-btn ntr-edit-btn" data-ntr-food="Grilled chicken" data-ntr-quantity="150g" data-ntr-calories="250" data-ntr-protein="40" data-ntr-carbs="0" data-ntr-fat="8" data-ntr-edit-context="foodlog">✏️ Edit</button>
-      <button class="nutrition-delete-btn ntr-delete-btn" data-ntr-food="Grilled chicken" data-ntr-quantity="150g" data-ntr-calories="250" data-ntr-protein="40" data-ntr-carbs="0" data-ntr-fat="8" data-ntr-edit-context="foodlog" data-ntr-entry-id="ntr-test-0">🗑️ Delete</button>
+      <button class="nutrition-edit-btn ntr-edit-btn" data-ntr-id="ntr-test-0" data-ntr-food="Grilled chicken" data-ntr-quantity="150g" data-ntr-calories="250" data-ntr-protein="40" data-ntr-carbs="0" data-ntr-fat="8" data-ntr-edit-context="foodlog">✏️ Edit</button>
+      <button class="nutrition-delete-btn ntr-delete-btn" data-ntr-id="ntr-test-0" data-ntr-food="Grilled chicken" data-ntr-quantity="150g" data-ntr-calories="250" data-ntr-protein="40" data-ntr-carbs="0" data-ntr-fat="8" data-ntr-edit-context="foodlog" data-ntr-entry-id="ntr-test-0">🗑️ Delete</button>
     </div>
   </div>
   <div class="ntr-stats-grid">
@@ -47,7 +47,7 @@ exports[`generateCardLayout snapshots (deterministic idGenerator injected) foodl
 </div>
 
 
-<div id="ntr-test-1" class="ntr-food-card" data-ntr-food="Brown rice" data-ntr-quantity="100g" data-ntr-calories="130" data-ntr-protein="3" data-ntr-carbs="28" data-ntr-fat="1">
+<div id="ntr-test-1" class="ntr-food-card" data-ntr-id="ntr-test-1" data-ntr-food="Brown rice" data-ntr-quantity="100g" data-ntr-calories="130" data-ntr-protein="3" data-ntr-carbs="28" data-ntr-fat="1">
   <div class="ntr-food-card-header">
     <div class="ntr-food-card-info">
       <span class="ntr-food-card-emoji">🍽️</span>
@@ -57,8 +57,8 @@ exports[`generateCardLayout snapshots (deterministic idGenerator injected) foodl
       </div>
     </div>
     <div class="ntr-food-card-actions">
-      <button class="nutrition-edit-btn ntr-edit-btn" data-ntr-food="Brown rice" data-ntr-quantity="100g" data-ntr-calories="130" data-ntr-protein="3" data-ntr-carbs="28" data-ntr-fat="1" data-ntr-edit-context="foodlog">✏️ Edit</button>
-      <button class="nutrition-delete-btn ntr-delete-btn" data-ntr-food="Brown rice" data-ntr-quantity="100g" data-ntr-calories="130" data-ntr-protein="3" data-ntr-carbs="28" data-ntr-fat="1" data-ntr-edit-context="foodlog" data-ntr-entry-id="ntr-test-1">🗑️ Delete</button>
+      <button class="nutrition-edit-btn ntr-edit-btn" data-ntr-id="ntr-test-1" data-ntr-food="Brown rice" data-ntr-quantity="100g" data-ntr-calories="130" data-ntr-protein="3" data-ntr-carbs="28" data-ntr-fat="1" data-ntr-edit-context="foodlog">✏️ Edit</button>
+      <button class="nutrition-delete-btn ntr-delete-btn" data-ntr-id="ntr-test-1" data-ntr-food="Brown rice" data-ntr-quantity="100g" data-ntr-calories="130" data-ntr-protein="3" data-ntr-carbs="28" data-ntr-fat="1" data-ntr-edit-context="foodlog" data-ntr-entry-id="ntr-test-1">🗑️ Delete</button>
     </div>
   </div>
   <div class="ntr-stats-grid">
@@ -90,7 +90,7 @@ exports[`generateCardLayout snapshots (deterministic idGenerator injected) foodl
 
 exports[`generateCardLayout snapshots (deterministic idGenerator injected) meal context includes the meal add-to-meal CTA and meal id 1`] = `
 "
-<div id="ntr-test-0" class="ntr-food-card" data-ntr-food="Grilled chicken" data-ntr-quantity="150g" data-ntr-calories="250" data-ntr-protein="40" data-ntr-carbs="0" data-ntr-fat="8">
+<div id="ntr-test-0" class="ntr-food-card" data-ntr-id="ntr-test-0" data-ntr-food="Grilled chicken" data-ntr-quantity="150g" data-ntr-calories="250" data-ntr-protein="40" data-ntr-carbs="0" data-ntr-fat="8">
   <div class="ntr-food-card-header">
     <div class="ntr-food-card-info">
       <span class="ntr-food-card-emoji">🍽️</span>
@@ -100,8 +100,8 @@ exports[`generateCardLayout snapshots (deterministic idGenerator injected) meal 
       </div>
     </div>
     <div class="ntr-food-card-actions">
-      <button class="nutrition-edit-btn ntr-edit-btn" data-ntr-food="Grilled chicken" data-ntr-quantity="150g" data-ntr-calories="250" data-ntr-protein="40" data-ntr-carbs="0" data-ntr-fat="8" data-ntr-edit-context="meal">✏️ Edit</button>
-      <button class="nutrition-delete-btn ntr-delete-btn" data-ntr-food="Grilled chicken" data-ntr-quantity="150g" data-ntr-calories="250" data-ntr-protein="40" data-ntr-carbs="0" data-ntr-fat="8" data-ntr-edit-context="meal" data-ntr-entry-id="ntr-test-0">🗑️ Delete</button>
+      <button class="nutrition-edit-btn ntr-edit-btn" data-ntr-id="ntr-test-0" data-ntr-food="Grilled chicken" data-ntr-quantity="150g" data-ntr-calories="250" data-ntr-protein="40" data-ntr-carbs="0" data-ntr-fat="8" data-ntr-edit-context="meal">✏️ Edit</button>
+      <button class="nutrition-delete-btn ntr-delete-btn" data-ntr-id="ntr-test-0" data-ntr-food="Grilled chicken" data-ntr-quantity="150g" data-ntr-calories="250" data-ntr-protein="40" data-ntr-carbs="0" data-ntr-fat="8" data-ntr-edit-context="meal" data-ntr-entry-id="ntr-test-0">🗑️ Delete</button>
     </div>
   </div>
   <div class="ntr-stats-grid">
@@ -129,7 +129,7 @@ exports[`generateCardLayout snapshots (deterministic idGenerator injected) meal 
 </div>
 
 
-<div id="ntr-test-1" class="ntr-food-card" data-ntr-food="Brown rice" data-ntr-quantity="100g" data-ntr-calories="130" data-ntr-protein="3" data-ntr-carbs="28" data-ntr-fat="1">
+<div id="ntr-test-1" class="ntr-food-card" data-ntr-id="ntr-test-1" data-ntr-food="Brown rice" data-ntr-quantity="100g" data-ntr-calories="130" data-ntr-protein="3" data-ntr-carbs="28" data-ntr-fat="1">
   <div class="ntr-food-card-header">
     <div class="ntr-food-card-info">
       <span class="ntr-food-card-emoji">🍽️</span>
@@ -139,8 +139,8 @@ exports[`generateCardLayout snapshots (deterministic idGenerator injected) meal 
       </div>
     </div>
     <div class="ntr-food-card-actions">
-      <button class="nutrition-edit-btn ntr-edit-btn" data-ntr-food="Brown rice" data-ntr-quantity="100g" data-ntr-calories="130" data-ntr-protein="3" data-ntr-carbs="28" data-ntr-fat="1" data-ntr-edit-context="meal">✏️ Edit</button>
-      <button class="nutrition-delete-btn ntr-delete-btn" data-ntr-food="Brown rice" data-ntr-quantity="100g" data-ntr-calories="130" data-ntr-protein="3" data-ntr-carbs="28" data-ntr-fat="1" data-ntr-edit-context="meal" data-ntr-entry-id="ntr-test-1">🗑️ Delete</button>
+      <button class="nutrition-edit-btn ntr-edit-btn" data-ntr-id="ntr-test-1" data-ntr-food="Brown rice" data-ntr-quantity="100g" data-ntr-calories="130" data-ntr-protein="3" data-ntr-carbs="28" data-ntr-fat="1" data-ntr-edit-context="meal">✏️ Edit</button>
+      <button class="nutrition-delete-btn ntr-delete-btn" data-ntr-id="ntr-test-1" data-ntr-food="Brown rice" data-ntr-quantity="100g" data-ntr-calories="130" data-ntr-protein="3" data-ntr-carbs="28" data-ntr-fat="1" data-ntr-edit-context="meal" data-ntr-entry-id="ntr-test-1">🗑️ Delete</button>
     </div>
   </div>
   <div class="ntr-stats-grid">
@@ -172,7 +172,7 @@ exports[`generateCardLayout snapshots (deterministic idGenerator injected) meal 
 
 exports[`generateCardLayout snapshots (deterministic idGenerator injected) no context renders cards without CTA buttons 1`] = `
 "
-<div id="ntr-test-0" class="ntr-food-card" data-ntr-food="Grilled chicken" data-ntr-quantity="150g" data-ntr-calories="250" data-ntr-protein="40" data-ntr-carbs="0" data-ntr-fat="8">
+<div id="ntr-test-0" class="ntr-food-card" data-ntr-id="ntr-test-0" data-ntr-food="Grilled chicken" data-ntr-quantity="150g" data-ntr-calories="250" data-ntr-protein="40" data-ntr-carbs="0" data-ntr-fat="8">
   <div class="ntr-food-card-header">
     <div class="ntr-food-card-info">
       <span class="ntr-food-card-emoji">🍽️</span>
@@ -182,8 +182,8 @@ exports[`generateCardLayout snapshots (deterministic idGenerator injected) no co
       </div>
     </div>
     <div class="ntr-food-card-actions">
-      <button class="nutrition-edit-btn ntr-edit-btn" data-ntr-food="Grilled chicken" data-ntr-quantity="150g" data-ntr-calories="250" data-ntr-protein="40" data-ntr-carbs="0" data-ntr-fat="8" data-ntr-edit-context="foodlog">✏️ Edit</button>
-      <button class="nutrition-delete-btn ntr-delete-btn" data-ntr-food="Grilled chicken" data-ntr-quantity="150g" data-ntr-calories="250" data-ntr-protein="40" data-ntr-carbs="0" data-ntr-fat="8" data-ntr-edit-context="foodlog" data-ntr-entry-id="ntr-test-0">🗑️ Delete</button>
+      <button class="nutrition-edit-btn ntr-edit-btn" data-ntr-id="ntr-test-0" data-ntr-food="Grilled chicken" data-ntr-quantity="150g" data-ntr-calories="250" data-ntr-protein="40" data-ntr-carbs="0" data-ntr-fat="8" data-ntr-edit-context="foodlog">✏️ Edit</button>
+      <button class="nutrition-delete-btn ntr-delete-btn" data-ntr-id="ntr-test-0" data-ntr-food="Grilled chicken" data-ntr-quantity="150g" data-ntr-calories="250" data-ntr-protein="40" data-ntr-carbs="0" data-ntr-fat="8" data-ntr-edit-context="foodlog" data-ntr-entry-id="ntr-test-0">🗑️ Delete</button>
     </div>
   </div>
   <div class="ntr-stats-grid">
@@ -211,7 +211,7 @@ exports[`generateCardLayout snapshots (deterministic idGenerator injected) no co
 </div>
 
 
-<div id="ntr-test-1" class="ntr-food-card" data-ntr-food="Brown rice" data-ntr-quantity="100g" data-ntr-calories="130" data-ntr-protein="3" data-ntr-carbs="28" data-ntr-fat="1">
+<div id="ntr-test-1" class="ntr-food-card" data-ntr-id="ntr-test-1" data-ntr-food="Brown rice" data-ntr-quantity="100g" data-ntr-calories="130" data-ntr-protein="3" data-ntr-carbs="28" data-ntr-fat="1">
   <div class="ntr-food-card-header">
     <div class="ntr-food-card-info">
       <span class="ntr-food-card-emoji">🍽️</span>
@@ -221,8 +221,8 @@ exports[`generateCardLayout snapshots (deterministic idGenerator injected) no co
       </div>
     </div>
     <div class="ntr-food-card-actions">
-      <button class="nutrition-edit-btn ntr-edit-btn" data-ntr-food="Brown rice" data-ntr-quantity="100g" data-ntr-calories="130" data-ntr-protein="3" data-ntr-carbs="28" data-ntr-fat="1" data-ntr-edit-context="foodlog">✏️ Edit</button>
-      <button class="nutrition-delete-btn ntr-delete-btn" data-ntr-food="Brown rice" data-ntr-quantity="100g" data-ntr-calories="130" data-ntr-protein="3" data-ntr-carbs="28" data-ntr-fat="1" data-ntr-edit-context="foodlog" data-ntr-entry-id="ntr-test-1">🗑️ Delete</button>
+      <button class="nutrition-edit-btn ntr-edit-btn" data-ntr-id="ntr-test-1" data-ntr-food="Brown rice" data-ntr-quantity="100g" data-ntr-calories="130" data-ntr-protein="3" data-ntr-carbs="28" data-ntr-fat="1" data-ntr-edit-context="foodlog">✏️ Edit</button>
+      <button class="nutrition-delete-btn ntr-delete-btn" data-ntr-id="ntr-test-1" data-ntr-food="Brown rice" data-ntr-quantity="100g" data-ntr-calories="130" data-ntr-protein="3" data-ntr-carbs="28" data-ntr-fat="1" data-ntr-edit-context="foodlog" data-ntr-entry-id="ntr-test-1">🗑️ Delete</button>
     </div>
   </div>
   <div class="ntr-stats-grid">

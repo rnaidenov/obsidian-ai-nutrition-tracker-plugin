@@ -26,8 +26,8 @@ export function generateCardLayout(
 
     const editContext = context || 'foodlog';
 
-    const entryId = idGenerator('ntr');
-    content += `\n<div id="${entryId}" class="ntr-food-card" data-ntr-food="${item.food.replace(/"/g, '&quot;')}" data-ntr-quantity="${item.quantity.replace(/"/g, '&quot;')}" data-ntr-calories="${item.calories}" data-ntr-protein="${item.protein}" data-ntr-carbs="${item.carbs}" data-ntr-fat="${item.fat}">\n`;
+    const entryId = item.id ?? idGenerator('ntr');
+    content += `\n<div id="${entryId}" class="ntr-food-card" data-ntr-id="${entryId}" data-ntr-food="${item.food.replace(/"/g, '&quot;')}" data-ntr-quantity="${item.quantity.replace(/"/g, '&quot;')}" data-ntr-calories="${item.calories}" data-ntr-protein="${item.protein}" data-ntr-carbs="${item.carbs}" data-ntr-fat="${item.fat}">\n`;
     content += `  <div class="ntr-food-card-header">\n`;
     content += `    <div class="ntr-food-card-info">\n`;
     content += `      <span class="ntr-food-card-emoji">${emoji}</span>\n`;
@@ -40,8 +40,8 @@ export function generateCardLayout(
     content += `      </div>\n`;
     content += `    </div>\n`;
     content += `    <div class="ntr-food-card-actions">\n`;
-    content += `      <button class="nutrition-edit-btn ntr-edit-btn" data-ntr-food="${item.food.replace(/"/g, '&quot;')}" data-ntr-quantity="${item.quantity.replace(/"/g, '&quot;')}" data-ntr-calories="${item.calories}" data-ntr-protein="${item.protein}" data-ntr-carbs="${item.carbs}" data-ntr-fat="${item.fat}" data-ntr-edit-context="${editContext}">✏️ Edit</button>\n`;
-    content += `      <button class="nutrition-delete-btn ntr-delete-btn" data-ntr-food="${item.food.replace(/"/g, '&quot;')}" data-ntr-quantity="${item.quantity.replace(/"/g, '&quot;')}" data-ntr-calories="${item.calories}" data-ntr-protein="${item.protein}" data-ntr-carbs="${item.carbs}" data-ntr-fat="${item.fat}" data-ntr-edit-context="${editContext}" data-ntr-entry-id="${entryId}">🗑️ Delete</button>\n`;
+    content += `      <button class="nutrition-edit-btn ntr-edit-btn" data-ntr-id="${entryId}" data-ntr-food="${item.food.replace(/"/g, '&quot;')}" data-ntr-quantity="${item.quantity.replace(/"/g, '&quot;')}" data-ntr-calories="${item.calories}" data-ntr-protein="${item.protein}" data-ntr-carbs="${item.carbs}" data-ntr-fat="${item.fat}" data-ntr-edit-context="${editContext}">✏️ Edit</button>\n`;
+    content += `      <button class="nutrition-delete-btn ntr-delete-btn" data-ntr-id="${entryId}" data-ntr-food="${item.food.replace(/"/g, '&quot;')}" data-ntr-quantity="${item.quantity.replace(/"/g, '&quot;')}" data-ntr-calories="${item.calories}" data-ntr-protein="${item.protein}" data-ntr-carbs="${item.carbs}" data-ntr-fat="${item.fat}" data-ntr-edit-context="${editContext}" data-ntr-entry-id="${entryId}">🗑️ Delete</button>\n`;
     content += `    </div>\n`;
     content += `  </div>\n`;
 
