@@ -17,10 +17,13 @@
   "author": "Rado",
   "license": "MIT",
   "devDependencies": {
+    "@types/jest": "^30.0.0",
     "@types/node": "^16.11.6",
     "builtin-modules": "^5.0.0",
     "esbuild": "^0.28.1",
+    "jest": "^30.4.2",
     "obsidian": "^1.13.1",
+    "ts-jest": "^29.4.11",
     "tslib": "2.4.0",
     "typescript": "^5.9.3"
   }
