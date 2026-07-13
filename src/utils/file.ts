@@ -78,6 +78,10 @@ export function generateMealId(): string {
   return 'meal_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 11);
 }
 
+export function generateEntryId(): string {
+  return 'entry_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 11);
+}
+
 export function sanitizeMealName(name: string): string {
   return name.replace(/[^a-zA-Z0-9\s-]/g, '').replace(/\s+/g, '-').toLowerCase();
 }
