@@ -1,5 +1,9 @@
 import { Meal, FoodItem, NutritionData, ServingUnit } from '../../types/nutrition';
 
+function generateEntryId(): string {
+  return 'entry_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 11);
+}
+
 export function calculateTotalNutrition(items: FoodItem[]): NutritionData {
   return items.reduce(
     (totals, item) => ({
@@ -151,11 +155,12 @@ export function createMeal(
   images?: string[]
 ): Meal {
   const { normalizedItems, baselineNutrition } = normalizeMealToUnit(items, servingUnit);
+  const itemsWithIds = normalizedItems.map(item => ({ ...item, id: item.id ?? generateEntryId() }));
 
   return {
     id,
     name: name.trim(),
-    items: normalizedItems,
+    items: itemsWithIds,
     description: description?.trim(),
     images: images || [],
     servingUnit,
