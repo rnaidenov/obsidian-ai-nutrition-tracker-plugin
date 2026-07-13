@@ -15,8 +15,6 @@ export default class NutritionTrackerPlugin extends Plugin {
   private editButtonHandler: (event: Event) => void;
   private deleteButtonHandler: (event: Event) => void;
   private ctaButtonHandler: (event: Event) => void;
-  private mealSyncTimeouts: Map<string, number> = new Map();
-  private isDeleteInProgress: boolean = false;
   private currentModal: FoodInputModal | null = null;
 
   private get ctx(): PluginContext {
@@ -69,11 +67,10 @@ export default class NutritionTrackerPlugin extends Plugin {
 
     // Set up event delegation for edit buttons
     this.setupEditButtonEventHandling();
-    
-    // Set up file modification listener for meal notes
-    this.setupMealNoteSyncHandler();
 
-    // Set up file rename listener
+    // Set up file rename listener — meal notes are renamed through the plugin's
+    // modal, not by hand-editing content, but the file itself can still be renamed
+    // in Obsidian's file explorer, so the meal's name in JSON is kept in sync with it.
     this.registerEvent(
       this.app.vault.on('rename', async (file, oldPath) => {
         if (file instanceof TFile) {
@@ -84,11 +81,6 @@ export default class NutritionTrackerPlugin extends Plugin {
   }
 
   onunload() {
-    this.mealSyncTimeouts.forEach(timeout => window.clearTimeout(timeout));
-    this.mealSyncTimeouts.clear();
-    
-    this.isDeleteInProgress = false;
-    
     if (this.currentModal) {
       this.currentModal.close();
       this.currentModal = null;
@@ -100,24 +92,6 @@ export default class NutritionTrackerPlugin extends Plugin {
       this.currentModal.close();
       this.currentModal = null;
     }
-    
-    const existingModalContainers = document.querySelectorAll('.modal-container.mod-dim');
-    const existingModalContent = document.querySelectorAll('.nutrition-tracker-modal');
-    
-    existingModalContainers.forEach(modal => {
-      if (modal.querySelector('.nutrition-tracker-modal')) {
-        modal.remove();
-      }
-    });
-
-    existingModalContent.forEach(modal => {
-      const container = modal.closest('.modal-container');
-      if (container) {
-        container.remove();
-      } else {
-        modal.remove();
-      }
-    });
   }
 
   private createAndOpenModal(setupFn?: (modal: FoodInputModal) => void) {
@@ -227,20 +201,14 @@ export default class NutritionTrackerPlugin extends Plugin {
         event.preventDefault();
         event.stopPropagation();
         event.stopImmediatePropagation();
-        
-        if (this.isDeleteInProgress) {
-          return;
-        }
-        
+
         if (target.hasAttribute('data-processing') || (target as HTMLButtonElement).disabled) {
           return;
         }
-        
-        this.isDeleteInProgress = true;
+
         target.setAttribute('data-processing', 'true');
         target.classList.add('disabled');
-        
-        
+
         try {
           const id = target.getAttribute('data-ntr-id') || '';
           const food = target.getAttribute('data-ntr-food') || '';
@@ -269,10 +237,9 @@ export default class NutritionTrackerPlugin extends Plugin {
           console.error('💥 Error in delete handler:', error);
         } finally {
           setTimeout(() => {
-            this.isDeleteInProgress = false;
             target.removeAttribute('data-processing');
             target.classList.remove('disabled');
-          }, 100); 
+          }, 100);
         }
       }
     };
@@ -304,30 +271,6 @@ export default class NutritionTrackerPlugin extends Plugin {
     this.registerDomEvent(document, 'click', this.editButtonHandler);
     this.registerDomEvent(document, 'click', this.deleteButtonHandler);
     this.registerDomEvent(document, 'click', this.ctaButtonHandler);
-  }
-
-  private setupMealNoteSyncHandler() {
-    this.registerEvent(
-      this.app.vault.on('modify', (file) => {
-        const isMealNote = MealOps.isMealNote(this.ctx, file);
-
-        if (isMealNote && file instanceof TFile) {
-          const filePath = file.path;
-
-          if (this.mealSyncTimeouts.has(filePath)) {
-            window.clearTimeout(this.mealSyncTimeouts.get(filePath));
-          }
-
-          const timeout = window.setTimeout(() => {
-            void MealOps.syncMealNoteToJSON(this.ctx, file).then(() => {
-              this.mealSyncTimeouts.delete(filePath);
-            });
-          }, 1000);
-
-          this.mealSyncTimeouts.set(filePath, timeout);
-        }
-      })
-    );
   }
 
   async loadSettings() {
