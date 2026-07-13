@@ -188,3 +188,26 @@ export function deleteCardFromContent(content: string, itemToDelete: { food: str
 
   return extractCompleteCard(content, match.index);
 }
+
+// The generated region (cards + progress summary) is wrapped in these markers so a full
+// re-render can replace it in place without touching user-authored content above/below.
+export const NTR_MARKER_BEGIN = '%% ntr:begin %%';
+export const NTR_MARKER_END = '%% ntr:end %%';
+
+export function wrapInMarkers(generatedContent: string): string {
+  return `${NTR_MARKER_BEGIN}\n${generatedContent}\n${NTR_MARKER_END}`;
+}
+
+export function replaceMarkedRegion(content: string, newRegionContent: string): string {
+  const beginIndex = content.indexOf(NTR_MARKER_BEGIN);
+  const endIndex = content.indexOf(NTR_MARKER_END);
+
+  if (beginIndex === -1 || endIndex === -1 || endIndex < beginIndex) {
+    const separator = content.trim().length > 0 ? '\n\n' : '';
+    return content + separator + wrapInMarkers(newRegionContent);
+  }
+
+  const before = content.slice(0, beginIndex);
+  const after = content.slice(endIndex + NTR_MARKER_END.length);
+  return before + wrapInMarkers(newRegionContent) + after;
+}
