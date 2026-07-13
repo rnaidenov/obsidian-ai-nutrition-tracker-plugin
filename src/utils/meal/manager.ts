@@ -223,35 +223,21 @@ export async function syncMealNoteToJSON(ctx: PluginContext, file: TFile): Promi
   }
 }
 
-export async function updateMealItem(ctx: PluginContext, originalItem: { food: string, quantity: string, calories: number, protein: number, carbs: number, fat: number }, newItem: FoodItem): Promise<void> {
+export async function updateMealItem(ctx: PluginContext, entryId: string, newItem: FoodItem): Promise<void> {
   try {
     const meals = await getMeals(ctx);
     let mealFound = false;
 
     for (const meal of meals) {
-      const itemIndex = meal.items.findIndex(item =>
-        item.food === originalItem.food &&
-        item.quantity === originalItem.quantity &&
-        item.calories === originalItem.calories
-      );
+      const itemIndex = meal.items.findIndex(item => item.id === entryId);
 
       if (itemIndex >= 0) {
         const { mealId: _mealId, timestamp: _timestamp, ...itemWithoutMealData } = newItem;
-        meal.items[itemIndex] = itemWithoutMealData;
+        meal.items[itemIndex] = { ...itemWithoutMealData, id: entryId };
         meal.updatedAt = new Date().toISOString();
 
         await writeMeals(ctx.vault, ctx.settings, meals);
-
         await createMealNote(ctx, meal);
-
-        const mealFileName = FileUtils.sanitizeMealName(meal.name) + '.md';
-        const mealFilePath = normalizePath(`${ctx.settings.mealStoragePath}/${mealFileName}`);
-        const mealFile = ctx.vault.getAbstractFileByPath(mealFilePath);
-        if (mealFile instanceof TFile) {
-          window.setTimeout(() => {
-            void syncMealNoteToJSON(ctx, mealFile);
-          }, 100);
-        }
 
         new Notice(`✅ Meal item updated: ${newItem.food} in "${meal.name}"`);
         mealFound = true;
@@ -269,36 +255,22 @@ export async function updateMealItem(ctx: PluginContext, originalItem: { food: s
   }
 }
 
-export async function deleteMealItem(ctx: PluginContext, itemToDelete: { food: string, quantity: string, calories: number, protein: number, carbs: number, fat: number }): Promise<void> {
+export async function deleteMealItem(ctx: PluginContext, entryId: string): Promise<void> {
   try {
     const meals = await getMeals(ctx);
     let mealFound = false;
 
     for (const meal of meals) {
-      const itemIndex = meal.items.findIndex(item =>
-        item.food === itemToDelete.food &&
-        item.quantity === itemToDelete.quantity &&
-        item.calories === itemToDelete.calories
-      );
+      const itemIndex = meal.items.findIndex(item => item.id === entryId);
 
       if (itemIndex >= 0) {
-        meal.items.splice(itemIndex, 1);
+        const [deletedItem] = meal.items.splice(itemIndex, 1);
         meal.updatedAt = new Date().toISOString();
 
         await writeMeals(ctx.vault, ctx.settings, meals);
-
         await createMealNote(ctx, meal);
 
-        const mealFileName = FileUtils.sanitizeMealName(meal.name) + '.md';
-        const mealFilePath = normalizePath(`${ctx.settings.mealStoragePath}/${mealFileName}`);
-        const mealFile = ctx.vault.getAbstractFileByPath(mealFilePath);
-        if (mealFile instanceof TFile) {
-          window.setTimeout(() => {
-            void syncMealNoteToJSON(ctx, mealFile);
-          }, 100);
-        }
-
-        new Notice(`✅ Meal item deleted: ${itemToDelete.food} from "${meal.name}"`);
+        new Notice(`✅ Meal item deleted: ${deletedItem.food} from "${meal.name}"`);
         mealFound = true;
         break;
       }
@@ -327,7 +299,7 @@ export async function addItemsToMeal(ctx: PluginContext, mealId: string, items: 
 
     const cleanItems = items.map(item => {
       const { mealId: _itemMealId, timestamp: _timestamp, ...cleanItem } = item;
-      return cleanItem;
+      return { ...cleanItem, id: cleanItem.id ?? FileUtils.generateEntryId() };
     });
 
     meal.items.push(...cleanItems);
@@ -336,15 +308,6 @@ export async function addItemsToMeal(ctx: PluginContext, mealId: string, items: 
     await writeMeals(ctx.vault, ctx.settings, meals);
 
     await createMealNote(ctx, meal);
-
-    const mealFileName = FileUtils.sanitizeMealName(meal.name) + '.md';
-    const mealFilePath = normalizePath(`${ctx.settings.mealStoragePath}/${mealFileName}`);
-    const mealFile = ctx.vault.getAbstractFileByPath(mealFilePath);
-    if (mealFile instanceof TFile) {
-      window.setTimeout(() => {
-        void syncMealNoteToJSON(ctx, mealFile);
-      }, 100);
-    }
 
     new Notice(`✅ ${items.length} item(s) added to meal "${meal.name}"`);
 

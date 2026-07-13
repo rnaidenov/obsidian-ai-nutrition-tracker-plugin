@@ -140,16 +140,20 @@ export async function processFood(
 
     // Handle editing vs creating
     if (initialData) {
+      if (!initialData.id) {
+        return { success: false, message: 'Could not identify the entry being edited. Please close and reopen the editor.' };
+      }
+
       if (editingContext === 'meal') {
         // Update meal item
         const newItem = allFoodItems[0]; // Use first item for editing
         if (newItem) {
-          await MealOps.updateMealItem(ctx, initialData, newItem);
+          await MealOps.updateMealItem(ctx, initialData.id, newItem);
           return { success: true, message: `✅ Meal item updated: ${newItem.food}` };
         }
       } else {
         // Update food log entry
-        await FoodLogOps.createOrUpdateFoodLog(ctx, allFoodItems, initialData);
+        await FoodLogOps.createOrUpdateFoodLog(ctx, allFoodItems, initialData.id);
         return { success: true, message: `✅ Food log updated` };
       }
     } else if (targetMealId) {

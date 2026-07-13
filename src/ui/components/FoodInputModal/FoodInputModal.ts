@@ -54,7 +54,7 @@ export class FoodInputModal extends Modal {
     this.onCloseCallback = onCloseCallback;
   }
 
-  setInitialData(data: { food: string, quantity: string, calories: number, protein: number, carbs: number, fat: number }) {
+  setInitialData(data: { id?: string, food: string, quantity: string, calories: number, protein: number, carbs: number, fat: number }) {
     this.initialData = data;
     this.description = `${data.quantity} ${data.food}`;
   }

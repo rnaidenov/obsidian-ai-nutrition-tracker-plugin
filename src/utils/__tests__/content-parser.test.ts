@@ -3,7 +3,6 @@ import {
   extractFoodItemsFromContent,
   calculateTotals,
   calculatePercentage,
-  deleteCardFromContent,
 } from '../content-parser';
 import { FoodItem, NutritionGoals } from '../../types/nutrition';
 
@@ -93,30 +92,5 @@ describe('calculatePercentage', () => {
 
   test('can exceed 100 when current exceeds goal', () => {
     expect(calculatePercentage(300, 200)).toBe(150);
-  });
-});
-
-describe('documented bug: duplicate identical entries are indistinguishable to deleteCardFromContent', () => {
-  test('deleting one of two identical entries always removes the first one in document order, not necessarily the one the user targeted', () => {
-    const duplicate = { food: 'Egg', quantity: '2 pcs', calories: 140, protein: 12, carbs: 1, fat: 10 };
-    const first: FoodItem = { ...duplicate, timestamp: '2026-07-13T08:00:00.000Z' };
-    const second: FoodItem = { ...duplicate, timestamp: '2026-07-13T18:00:00.000Z' };
-    const content = generateCardLayout([first, second], goals);
-
-    // The identity used for lookup is the (food, quantity, calories, protein, carbs, fat) tuple —
-    // it carries no timestamp/id, so both cards match equally and only positional order decides
-    // which one is removed. There is no way to ask "delete the second Egg entry" specifically.
-    const result = deleteCardFromContent(content, duplicate);
-
-    expect(result.success).toBe(true);
-    const remainingCards = extractFoodItemsFromContent(result.content);
-    expect(remainingCards).toHaveLength(1);
-
-    // Always the first-in-document-order card is removed, regardless of which one a user
-    // clicked delete on in the rendered note — this is the ambiguity the refactor's stable
-    // per-entry IDs are meant to fix. Only the second (later) entry's timestamp survives.
-    const survivingTimestamps = result.content.match(/ntr-food-card-timestamp">🕐 [^<]+</g) ?? [];
-    expect(survivingTimestamps).toHaveLength(1);
-    expect(result.content).not.toContain(new Date(first.timestamp!).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }));
   });
 });

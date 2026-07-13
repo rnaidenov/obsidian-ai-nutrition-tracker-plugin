@@ -52,4 +52,10 @@ export class Vault {
   async process(_file: TFile, fn: (data: string) => string): Promise<string> {
     return fn('');
   }
+
+  async rename(_file: TAbstractFile, _newPath: string): Promise<void> {}
+
+  async createBinary(path: string, _data: ArrayBuffer): Promise<TFile> {
+    return new TFile(path);
+  }
 }
