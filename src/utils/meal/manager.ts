@@ -1,9 +1,8 @@
-import { TFile, Notice, TAbstractFile, normalizePath } from 'obsidian';
+import { TFile, Notice, normalizePath } from 'obsidian';
 import { FoodItem, Meal } from '../../types/nutrition';
 import { PluginContext } from '../../types/plugin-context';
 import * as FileUtils from '../file';
 import * as LayoutGenerator from '../layout-generator';
-import * as ContentParser from '../content-parser';
 import { readMeals, writeMeals } from './meal-storage';
 import { migrateMealToV2, isLegacyMeal, calculateTotalNutrition } from './meal-operations';
 
@@ -167,62 +166,6 @@ function generateMealNoteContent(ctx: PluginContext, meal: Meal): string {
   return content;
 }
 
-export function isMealNote(ctx: PluginContext, file: TAbstractFile): boolean {
-  return FileUtils.isMealNote(file, ctx.settings.mealStoragePath, ctx.settings.logStoragePath);
-}
-
-export async function syncMealNoteToJSON(ctx: PluginContext, file: TFile): Promise<void> {
-  try {
-    const content = await ctx.vault.read(file);
-
-    if (!content.includes('data-meal-id="')) {
-      return;
-    }
-
-    const parsedMeal = ContentParser.parseMealFromMarkdown(content);
-
-    if (!parsedMeal) {
-      return;
-    }
-
-    const filename = file.path.split('/').pop()?.replace('.md', '') || '';
-    const mealName = FileUtils.convertFilenameToReadableName(filename);
-
-    const meals = await getMeals(ctx);
-    const mealIndex = meals.findIndex(m => m.id === parsedMeal.id);
-
-    if (mealIndex >= 0) {
-      const oldMeal = meals[mealIndex];
-
-      const nameChanged = oldMeal.name !== mealName;
-
-      const updatedMeal = {
-        ...oldMeal,
-        name: mealName,
-        items: parsedMeal.items || oldMeal.items,
-        description: parsedMeal.description !== undefined ? parsedMeal.description : oldMeal.description,
-        updatedAt: new Date().toISOString()
-      };
-
-      meals[mealIndex] = updatedMeal;
-      await writeMeals(ctx.vault, ctx.settings, meals);
-
-      if (!nameChanged) {
-        return;
-      }
-
-      await handleMealNameChange(ctx, oldMeal, updatedMeal, file);
-      new Notice(`✅ Meal updated: "${oldMeal.name}" → "${updatedMeal.name}"`);
-    } else {
-      new Notice("⚠️ meal not found in storage - this might be an orphaned meal note");
-    }
-
-  } catch (error) {
-    new Notice(`❌ Failed to sync meal changes: ${error.message}`);
-    throw error;
-  }
-}
-
 export async function updateMealItem(ctx: PluginContext, entryId: string, newItem: FoodItem): Promise<void> {
   try {
     const meals = await getMeals(ctx);
@@ -353,29 +296,18 @@ async function handleMealNameChange(ctx: PluginContext, oldMeal: Meal, newMeal: 
 
 export async function handleFileRename(ctx: PluginContext, oldPath: string, newPath: string): Promise<void> {
   try {
-    const newFilename = newPath.split('/').pop()?.replace('.md', '') || '';
-
     if (!newPath.startsWith(ctx.settings.mealStoragePath) || !oldPath.startsWith(ctx.settings.mealStoragePath)) {
       return;
     }
 
-    const file = ctx.vault.getAbstractFileByPath(newPath);
-    if (!(file instanceof TFile)) {
-      return;
-    }
-
-    const content = await ctx.vault.read(file);
-    if (!content.includes('data-meal-id="')) {
-      return;
-    }
-
-    const parsedMeal = ContentParser.parseMealFromMarkdown(content);
-    if (!parsedMeal || !parsedMeal.id) {
-      return;
-    }
+    // The rename event carries only paths, and a meal note's body never renders its own
+    // name — so the meal is identified by matching the old filename against the sanitized
+    // name already in JSON, with no need to read or parse the note's content.
+    const oldFilename = oldPath.split('/').pop()?.replace('.md', '') || '';
+    const newFilename = newPath.split('/').pop()?.replace('.md', '') || '';
 
     const meals = await getMeals(ctx);
-    const mealIndex = meals.findIndex(m => m.id === parsedMeal.id);
+    const mealIndex = meals.findIndex(m => FileUtils.sanitizeMealName(m.name) === oldFilename);
 
     if (mealIndex >= 0) {
       const oldMeal = meals[mealIndex];
@@ -386,16 +318,13 @@ export async function handleFileRename(ctx: PluginContext, oldPath: string, newP
         return;
       }
 
-      const updatedMeal = {
+      meals[mealIndex] = {
         ...oldMeal,
         name: newMealName,
         updatedAt: new Date().toISOString()
       };
 
-      meals[mealIndex] = updatedMeal;
       await writeMeals(ctx.vault, ctx.settings, meals);
-
-      await createMealNote(ctx, updatedMeal);
     }
 
   } catch (error) {
