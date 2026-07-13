@@ -1,5 +1,7 @@
 # 🍽️ AI Nutrition Tracker for Obsidian
 
+[![CI](https://github.com/rnaidenov/obsidian-ai-nutrition-tracker-plugin/actions/workflows/ci.yml/badge.svg)](https://github.com/rnaidenov/obsidian-ai-nutrition-tracker-plugin/actions/workflows/ci.yml)
+
 Transform your nutrition tracking with AI-powered food analysis. No more tedious forms or manual calculations - just describe what you ate or snap a photo, and let AI handle the rest.
 
 ## ✨ What It Does
@@ -85,6 +87,16 @@ Choose from powerful models like Gemini, Claude 4.5 Sonnet, GPT-5 to analyze you
 - Edit saved meals to adjust portions
 - Quickly log repeated meals without re-describing them
 - Perfect for meal prep and routine eating
+
+## 🗄️ How Data Is Stored
+
+Your data lives in your vault, in plain JSON — the rendered notes are a view, not the source of truth:
+
+- **Saved meals**: `{meal folder}/meals.json`
+- **Daily food logs**: `{log folder}/.data/{YYYY-MM-DD}.json`
+- **Rendered notes**: `{log folder}/{YYYY-MM-DD}.md` and one note per saved meal. Both are regenerated from the JSON above whenever you add, edit, or delete something. The generated cards and progress summary live between `%% ntr:begin %%` / `%% ntr:end %%` markers — any text you write above or below that region is preserved across edits.
+
+**⚠️ Since 3.0.0**: editing the food cards or description in a meal note by hand no longer syncs back — meal notes are a one-way render of `meals.json`. Renaming a meal note in the file explorer still updates the meal's name. See [CHANGELOG.md](CHANGELOG.md) for the full list of breaking changes and how upgrading from 2.x works (it's automatic — the plugin migrates your existing food log notes into the JSON store the first time it loads, and backs up each note's original content to `{log folder}/.data/backup-{date}.md` before rewriting it).
 
 ## 🎯 Features
 
