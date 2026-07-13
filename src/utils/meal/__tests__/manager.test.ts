@@ -1,5 +1,5 @@
 import { Vault } from 'obsidian';
-import { updateMealItem, deleteMealItem, addItemsToMeal } from '../manager';
+import { updateMealItem, deleteMealItem, addItemsToMeal, handleFileRename } from '../manager';
 import { Meal } from '../../../types/nutrition';
 import { PluginContext } from '../../../types/plugin-context';
 import { PluginSettings, DEFAULT_SETTINGS } from '../../../types/settings';
@@ -101,5 +101,84 @@ describe('addItemsToMeal — assigns ids to newly added items', () => {
       expect(typeof id).toBe('string');
       expect(id!.length).toBeGreaterThan(0);
     }
+  });
+});
+
+describe('handleFileRename — path/JSON based, no content parsing', () => {
+  function meal(overrides: Partial<Meal> = {}): Meal {
+    return {
+      id: 'meal-1',
+      name: 'Breakfast Bowl',
+      items: [],
+      createdAt: '2026-07-13T00:00:00.000Z',
+      updatedAt: '2026-07-13T00:00:00.000Z',
+      version: 2,
+      ...overrides,
+    };
+  }
+
+  test('a hand-rename in the file explorer updates the meal name in JSON', async () => {
+    const { vault, files } = createFakeVault(mealsFile([meal()]));
+
+    await handleFileRename(
+      makeCtx(vault),
+      'tracker/health/food/meals/breakfast-bowl.md',
+      'tracker/health/food/meals/morning-bowl.md'
+    );
+
+    const savedMeals: Meal[] = JSON.parse(files.get('tracker/health/food/meals/meals.json')!);
+    expect(savedMeals[0].name).toBe('Morning Bowl');
+  });
+
+  test('is a no-op when the name already matches (self-triggered by a UI-driven rename)', async () => {
+    // Simulates updateMeal's flow: JSON is written with the new name BEFORE the file is
+    // renamed, so by the time the vault "rename" event fires, sanitizeMealName(name) no
+    // longer matches the old filename — handleFileRename must not touch the JSON again.
+    const { vault, files } = createFakeVault(mealsFile([meal({ name: 'Morning Bowl' })]));
+    const before = files.get('tracker/health/food/meals/meals.json');
+
+    await handleFileRename(
+      makeCtx(vault),
+      'tracker/health/food/meals/breakfast-bowl.md',
+      'tracker/health/food/meals/morning-bowl.md'
+    );
+
+    expect(files.get('tracker/health/food/meals/meals.json')).toBe(before);
+  });
+
+  test('ignores renames outside the meal storage path', async () => {
+    const { vault, files } = createFakeVault(mealsFile([meal()]));
+    const before = files.get('tracker/health/food/meals/meals.json');
+
+    await handleFileRename(makeCtx(vault), 'tracker/health/food/log/2026-07-13.md', 'tracker/health/food/log/renamed.md');
+
+    expect(files.get('tracker/health/food/meals/meals.json')).toBe(before);
+  });
+
+  test('ignores a rename that does not match any tracked meal', async () => {
+    const { vault, files } = createFakeVault(mealsFile([meal()]));
+    const before = files.get('tracker/health/food/meals/meals.json');
+
+    await handleFileRename(
+      makeCtx(vault),
+      'tracker/health/food/meals/some-orphaned-note.md',
+      'tracker/health/food/meals/renamed-orphan.md'
+    );
+
+    expect(files.get('tracker/health/food/meals/meals.json')).toBe(before);
+  });
+
+  test('does not create or modify a note file — only meals.json is touched', async () => {
+    const { vault, files } = createFakeVault(mealsFile([meal()]));
+
+    await handleFileRename(
+      makeCtx(vault),
+      'tracker/health/food/meals/breakfast-bowl.md',
+      'tracker/health/food/meals/morning-bowl.md'
+    );
+
+    expect(vault.create).not.toHaveBeenCalled();
+    expect(files.size).toBe(1); // only meals.json exists — no .md note was ever created
+    expect([...files.keys()]).toEqual(['tracker/health/food/meals/meals.json']);
   });
 });
