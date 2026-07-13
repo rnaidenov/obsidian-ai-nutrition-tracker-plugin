@@ -4,5 +4,6 @@
     "paths": {
       "obsidian": ["./__mocks__/obsidian.ts"]
     }
-  }
+  },
+  "exclude": ["node_modules"]
 }
