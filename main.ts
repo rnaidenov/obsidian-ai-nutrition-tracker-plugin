@@ -149,9 +149,10 @@ export default class NutritionTrackerPlugin extends Plugin {
     });
   }
 
-  private editFoodEntry(food: string, quantity: string, calories: number, protein: number, carbs: number, fat: number, context?: 'meal' | 'foodlog') {
+  private editFoodEntry(id: string, food: string, quantity: string, calories: number, protein: number, carbs: number, fat: number, context?: 'meal' | 'foodlog') {
     this.createAndOpenModal(modal => {
       modal.setInitialData({
+        id,
         food,
         quantity,
         calories,
@@ -159,32 +160,23 @@ export default class NutritionTrackerPlugin extends Plugin {
         carbs,
         fat
       });
-      
+
       modal.setEditingContext(context || 'foodlog');
     });
   }
 
-  private async deleteFoodEntry(food: string, quantity: string, calories: number, protein: number, carbs: number, fat: number, context: 'meal' | 'foodlog', entryId: string) {
-    const entryToDelete = {
-      food,
-      quantity,
-      calories,
-      protein,
-      carbs,
-      fat
-    };
-    
+  private async deleteFoodEntry(id: string, food: string, quantity: string, context: 'meal' | 'foodlog') {
     try {
       if (context === 'meal') {
-        await MealOps.deleteMealItem(this.ctx, entryToDelete);
+        await MealOps.deleteMealItem(this.ctx, id);
         new Notice(`🍽️ Deleted from meal: ${food} (${quantity})`);
       } else {
-        await FoodLogOps.deleteFoodLogItem(this.ctx, entryToDelete);
+        await FoodLogOps.deleteFoodLogItem(this.ctx, id);
         new Notice(`📝 Deleted from food log: ${food} (${quantity})`);
       }
-      
+
       // Remove the card from the UI immediately
-      const cardElement = document.getElementById(entryId);
+      const cardElement = document.getElementById(id);
       if (cardElement) {
         cardElement.remove();
       }
@@ -202,8 +194,9 @@ export default class NutritionTrackerPlugin extends Plugin {
       if (target && target.classList.contains('nutrition-edit-btn')) {
         event.preventDefault();
         event.stopPropagation();
-        
+
         // Extract data from button attributes
+        const id = target.getAttribute('data-ntr-id') || '';
         const food = target.getAttribute('data-ntr-food') || '';
         const quantity = target.getAttribute('data-ntr-quantity') || '';
         const calories = parseFloat(target.getAttribute('data-ntr-calories') || '0');
@@ -211,14 +204,19 @@ export default class NutritionTrackerPlugin extends Plugin {
         const carbs = parseFloat(target.getAttribute('data-ntr-carbs') || '0');
         const fat = parseFloat(target.getAttribute('data-ntr-fat') || '0');
         const context = target.getAttribute('data-ntr-edit-context') as 'meal' | 'foodlog' || 'foodlog';
-        
+
+        if (!id) {
+          new Notice('❌ error: could not identify this entry. Please try again or report this issue.');
+          return;
+        }
+
         if (context === 'meal') {
           new Notice(`🍽️ Opening meal item editor: ${food} (${quantity})`);
         } else {
           new Notice(`📝 Opening food log editor: ${food} (${quantity})`);
         }
-        
-        this.editFoodEntry(food, quantity, calories, protein, carbs, fat, context);
+
+        this.editFoodEntry(id, food, quantity, calories, protein, carbs, fat, context);
       }
     };
     
@@ -244,20 +242,21 @@ export default class NutritionTrackerPlugin extends Plugin {
         
         
         try {
+          const id = target.getAttribute('data-ntr-id') || '';
           const food = target.getAttribute('data-ntr-food') || '';
           const quantity = target.getAttribute('data-ntr-quantity') || '';
-          const calories = parseFloat(target.getAttribute('data-ntr-calories') || '0');
-          const protein = parseFloat(target.getAttribute('data-ntr-protein') || '0');
-          const carbs = parseFloat(target.getAttribute('data-ntr-carbs') || '0');
-          const fat = parseFloat(target.getAttribute('data-ntr-fat') || '0');
           const context = target.getAttribute('data-ntr-edit-context') as 'meal' | 'foodlog' || 'foodlog';
-          const entryId = target.getAttribute('data-ntr-entry-id') || '';
-          
+
+          if (!id) {
+            new Notice('❌ error: could not identify this entry. Please try again or report this issue.');
+            return;
+          }
+
           new ConfirmModal(
             this.app,
             `Are you sure you want to delete "${food} (${quantity})"?`,
             () => {
-              void this.deleteFoodEntry(food, quantity, calories, protein, carbs, fat, context, entryId);
+              void this.deleteFoodEntry(id, food, quantity, context);
             },
             {
               confirmText: 'Delete',
@@ -265,7 +264,7 @@ export default class NutritionTrackerPlugin extends Plugin {
               isDestructive: true
             }
           ).open();
-          
+
         } catch (error) {
           console.error('💥 Error in delete handler:', error);
         } finally {
