@@ -58,4 +58,8 @@ export class Vault {
   async createBinary(path: string, _data: ArrayBuffer): Promise<TFile> {
     return new TFile(path);
   }
+
+  getFiles(): TFile[] {
+    return [];
+  }
 }
